@@ -1,0 +1,41 @@
+# The whole stack with nothing but Docker installed (Compose 2.24 or newer):
+#   cp .example.env .env                 # optional: without a key the recorded examples still work
+#   docker compose up --build --wait     # returns when both containers are healthy
+#   open http://localhost:3000           # the demo; the API and Swagger are at http://localhost:8000/docs
+#   docker compose down
+# A port already in use:  FRONTEND_PORT=3001 BACKEND_PORT=8001 docker compose up --build --wait
+name: ctviz
+
+services:
+  backend:
+    build:
+      context: .                         # the repository root: the image copies docs/examples
+      dockerfile: backend/Dockerfile
+    env_file:
+      - path: .env                       # the only service that receives the key
+        required: false                  # no .env (a fresh unzip): the service starts without a planner
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"    # loopback only: the API has no authentication
+    restart: on-failure:3                # a crash is retried, a configuration error cannot loop for ever
+    stop_grace_period: 50s               # above the 45 s request deadline: an answer in flight finishes
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    # One container on purpose: the registry rate limiter and the cache live in this process's memory.
+
+  frontend:
+    build: ./frontend                    # its own context: nothing outside frontend/ is sent
+    environment:
+      BACKEND_URL: http://backend:8000   # the only setting; read per request by the proxy route
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy       # the backend image's own HEALTHCHECK (GET /healthz)
+    restart: on-failure:3
+    stop_grace_period: 55s               # above the proxy's 50 s timeout; Compose stops this service first
+    read_only: true
+    tmpfs: ["/app/.next/cache:uid=1000,gid=1000"]    # the one path Next writes; uid 1000 is the node user
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]

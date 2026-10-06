@@ -1,0 +1,25 @@
+# The build context is frontend/. This keeps it to what "next build" reads (about 0.4 MB).
+
+# Installed and built on the host: the wrong platform for the image, and close to 1 GB.
+node_modules
+.next
+out
+coverage
+*.tsbuildinfo
+next-env.d.ts
+
+# Never in an image: "next build" copies .env and .env.production into the standalone output.
+.env*
+*.pem
+
+# Tests and their generated, git-ignored fixtures: "next build" type-checks every .ts file it is sent.
+src/__tests__
+**/*.test.ts
+**/*.test.tsx
+vitest.config.*
+
+# Not inputs of the build. Leaving these out also keeps the build layer cached when only they change.
+Dockerfile
+.dockerignore
+.gitignore
+*.md

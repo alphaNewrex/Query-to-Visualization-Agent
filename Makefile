@@ -1,7 +1,7 @@
 # Written for GNU Make 3.81, the version macOS ships.
 # Every target is a plain command line, so nothing here depends on make itself.
 
-.PHONY: setup api test check
+.PHONY: setup api test check up down smoke
 
 setup:
 	cd backend && uv sync --locked
@@ -14,3 +14,13 @@ test:
 
 check:
 	cd backend && uv run ruff check . && uv run ruff format --check . && uv run mypy src && uv run pytest --block-network --record-mode=none
+
+# Containers: the whole stack with nothing but Docker installed (see docker-compose.yml).
+up:
+	docker compose up --build --wait
+
+down:
+	docker compose down
+
+smoke:
+	bash docker-smoke.sh
