@@ -1,0 +1,4 @@
+# Kept in git, left out of the submission archive built with `git archive`.
+# The plan describes the system before it was built; the README describes what was built.
+docs/PLAN.md export-ignore
+.gitattributes export-ignore

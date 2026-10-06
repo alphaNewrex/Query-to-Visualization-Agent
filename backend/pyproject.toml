@@ -1,0 +1,52 @@
+[project]
+name = "ctviz"
+version = "0.1.0"
+description = "ClinicalTrials.gov query-to-visualization service"
+authors = [
+    { name = "Harsh Gujarathi", email = "gujarathiharsh02@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "anyio==4.15.1",
+    "cachetools==7.2.1",
+    "fastapi==0.142.2",
+    "httpx2==2.13.1",
+    "openai==3.25.0",
+    "pydantic==2.13.5",
+    "pydantic-settings==2.15.0",
+    "stamina==26.1.0",
+    "structlog==26.1.0",
+    "uvicorn[standard]==0.54.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "mypy==2.4.0",
+    "pycountry==26.2.16",
+    "pytest==9.1.1",
+    "pytest-recording==0.14.0",
+    "ruff==0.16.10",
+    "syrupy==6.1.1",
+    "vcrpy==8.3.0",
+]
+
+[tool.pytest.ini_options]
+# --block-network and --record-mode=none are passed by `make test`, not here,
+# so the opt-in live tests and cassette recording are not blocked.
+addopts = "-q --strict-markers --strict-config -m 'not live'"
+markers = ["live: needs the network, and for some tests an API key"]
+filterwarnings = ["error"]
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF"]
+
+[tool.mypy]
+strict = true
+plugins = ["pydantic.mypy"]
