@@ -1,6 +1,6 @@
 # Code plan: ClinicalTrials.gov Query-to-Visualization Agent
 
-Draft for the owner's approval. Written 2026-10-06. Nothing described here has been built; the repository holds only `docs/` (the assignment and this plan), empty `backend/` and `frontend/` folders, an empty `readme.md`, `.gitignore`, `.example.env` and `.env`, and has no commits yet.
+Approved by the owner on 2026-10-06, the day it was written. Implementation is under way, with one local commit per milestone on `main`. At this revision the repository holds the foundations of milestone M0 (the `backend/` and `frontend/` projects with their tooling and tests) and the container files of section 10.4; everything else described here is still to be built.
 
 **How facts are labelled.** Every statement about the ClinicalTrials.gov API, the OpenAI API, a library or a tool is one of two kinds:
 
@@ -27,9 +27,12 @@ Terms used throughout: a **trial** is one ClinicalTrials.gov study record. A **s
 | Frontend | Next.js 16.3.8 with shadcn/ui; one renderer per visualization `type`; types generated from the backend schema | Owner's decision; proves the contract renders deterministically |
 | FHIR | One URL template in the response, one design precedent, one README paragraph | FHIR exists for one study per request only and cannot serve search or aggregation |
 | Documents and examples | Schema reference, README tables, frontend types and example runs are generated and checked for drift by the test command | The assignment grades schema documentation and asks for actual outputs |
-| Order of work | The assignment's own example request answered end to end by hour 5.25; every later milestone leaves a runnable zip, and from the end of M3 the zip holds everything the assignment's section 6 lists; 1.5 hours of buffer | The required deliverables are never the last thing built |
+| Order of work | The assignment's own example request answered end to end by hour 5.25; every later milestone leaves a runnable zip, and from the end of M3 the zip holds everything the assignment's section 6 lists; 0.75 hours of buffer | The required deliverables are never the last thing built |
 | Backend stack | Python 3.13, FastAPI 0.142.2, Pydantic 2.13.5, httpx2 2.13.1, `openai` 3.25.0, no agent framework | Installed and run together on 2026-10-06; one model set drives validation, schema, documentation and the model's output format |
 | Planner model | `gpt-5.4-mini` at reasoning effort `low`; fallback `gpt-4.1-mini` | Measured accuracy and latency; neither is on the deprecation list |
+| Containers | One image per service (multi-stage, pinned bases, non-root, read-only filesystem) and a Compose file; one backend process per container | Owner's decision. Built and smoke-tested against the real code on 2026-10-06; the registry rate limiter and the caches live in that process's memory |
+| Caching | Three layers in process memory: registry calls, the model's plan, the finished response | Registry calls are rate-limited and model output is not repeatable; a repeated question is answered identically with no external call |
+| Icons | `lucide-react` only | Owner's decision; it is the icon library the shadcn scaffold is configured with |
 
 ---
 
@@ -54,7 +57,7 @@ make dev      # API on http://127.0.0.1:8000 (Swagger at /docs), demo on http://
 
 With no key, the demo opens on a gallery of recorded runs (chart, data rows, citations, trace, raw JSON), and "Run live" re-executes an example against the live registry using its recorded plan. With `OPENAI_API_KEY` in the root `.env`, any question works. The README prints the plain `uv`, `pnpm` and `pip` commands beside every `make` target for reviewers without GNU Make.
 
-**First version and stretch.** The first version covers all nine appendix query classes and sixteen further cases (section 8, rows 10 to 25: eleven chart classes and five edge cases) with seven visualization types, 20 dimensions, deep citations on every datum, three non-chart outcomes, the demo frontend and ten recorded example runs. Stretch items, in order: numeric aggregates such as median enrollment by phase; a model-callable tool mode; Docker; a Chat Completions fallback for gateways without the Responses API; a FHIR pass-through; map, heatmap and pie types. Section 11 gives the hour budget, the cut order and the things that are never cut.
+**First version and stretch.** The first version covers all nine appendix query classes and sixteen further cases (section 8, rows 10 to 25: eleven chart classes and five edge cases) with seven visualization types, 20 dimensions, deep citations on every datum, three non-chart outcomes, the demo frontend and ten recorded example runs. Containers are part of the first version (section 10.4). Stretch items, in order: a progress stream for the demo; numeric aggregates such as median enrollment by phase; a model-callable tool mode; a Chat Completions fallback for gateways without the Responses API; a FHIR pass-through; map, heatmap and pie types. Section 11 gives the hour budget, the cut order and the things that are never cut.
 
 ---
 
@@ -143,12 +146,14 @@ Two code folders, `backend/` and `frontend/`, as the owner decided. The existing
 ```text
 .
 ├── readme.md                       The root README (existing, empty). Tables between <!-- gen:NAME:start/end --> markers are generated
-├── Makefile                        setup, api, web, dev, test, check, docs, examples, replay, verify-examples, eval, zip (GNU Make 3.81 compatible)
+├── Makefile                        setup, api, web, dev, test, check, docs, examples, replay, verify-examples, eval, zip, up, down, smoke (GNU Make 3.81 compatible)
 ├── .example.env                    Owner's file, byte-identical (three variables)
 ├── .env                            Real key, git-ignored (existing)
 ├── .gitignore                      Existing `.env` line, plus .venv/, node_modules/, .next/, dist/, caches
 ├── .gitattributes                  `docs/PLAN.md export-ignore` and `.gitattributes export-ignore`: both stay in git and out of the zip (open decision 17)
-├── docker-compose.yml              Stretch S3
+├── docker-compose.yml              The stack for a reviewer with only Docker: backend and frontend services (section 10.4)
+├── docker-smoke.sh                 Builds both images, starts the stack on its own ports, makes three HTTP checks, removes everything
+├── .dockerignore                   Allow-list for the backend image's build context (the repository root); never an env file
 ├── docs/
 │   ├── PROMPT.md                   The assignment (existing)
 │   ├── PLAN.md                     This plan (existing). Tracked in git, left out of the zip (open decision 17)
@@ -166,7 +171,7 @@ Two code folders, `backend/` and `frontend/`, as the owner decided. The existing
 ├── backend/
 │   ├── pyproject.toml, uv.lock, .python-version (3.13)
 │   ├── requirements.txt            Exported from uv.lock for a plain `python -m venv` + `pip` run
-│   ├── Dockerfile                  Stretch S3
+│   ├── Dockerfile                  Multi-stage image, built from the repository root because it copies docs/examples (section 10.4)
 │   ├── src/ctviz/
 │   │   ├── settings.py             Settings (pydantic-settings), env-file discovery, per-variable source log, model and effort checks
 │   │   ├── errors.py               AppError hierarchy, error codes, HTTP mapping table
@@ -234,8 +239,9 @@ Two code folders, `backend/` and `frontend/`, as the owner decided. The existing
 │       ├── fixtures/               Trimmed real study records, eval questions
 │       └── __snapshots__/          syrupy: wire schema sent to the model, prompt
 └── frontend/
-    ├── package.json, pnpm-lock.yaml, pnpm-workspace.yaml, next.config.ts, components.json, eslint.config.mjs, vitest.config.ts
-    ├── AGENTS.md, CLAUDE.md        Written by the scaffolder; they point coding agents at the documentation bundled with this Next.js version
+    ├── package.json, pnpm-lock.yaml, pnpm-workspace.yaml, next.config.ts, components.json, eslint.config.mjs, vitest.config.mts
+    ├── Dockerfile, .dockerignore   Multi-stage image from the standalone output; the build context is frontend/ alone (section 10.4)
+    ├── AGENTS.md, CLAUDE.md        Written by the scaffolder; they point coding agents at the documentation bundled with this Next.js version. The project's own conventions (icons) follow the scaffolder's block
     ├── scripts/gen-types.mjs       JSON Schema to TypeScript (json-schema-to-typescript 16.0.0); --check mode; typed example fixture
     └── src/
         ├── app/layout.tsx, page.tsx, globals.css
@@ -416,6 +422,7 @@ Small supporting types, all frozen dataclasses unless they are contract models: 
 | `options.citations_per_datum` | integer 0 to 20 | 5 | 0 disables citations |
 | `options.drug_match` | `broad`, `name_only` | `broad` | `broad`: the registry's intervention search (names, other names, titles, descriptions, synonyms). `name_only`: intervention names and their synonyms only. For pembrolizumab the two give 2,971 and 2,567 trials, so the definition used is always stated in the response |
 | `options.include_trace` | boolean | true | Include the step list in `meta.debug.trace` |
+| `options.use_cache` | boolean | true | `false` bypasses the plan cache and the response cache of section 4.9 for this request; the registry-call cache stays. The planner evaluation sends `false`, because it measures how plans vary between runs |
 
 Rules across fields:
 
@@ -1090,6 +1097,8 @@ Reasons for the order:
 - **Retries.** Three attempts with exponential backoff and jitter through `stamina` on timeouts, connection errors, 429, 403 and 5xx; a `Retry-After` header is honoured within the request deadline.
 - **Error bodies.** A non-200 body is read as text and never parsed as JSON: 400 and 404 are `text/plain`; the edge returns HTML for 403 and for 414 (a URL above roughly 7 to 8 KB). A 400 for a URL this service built is a bug: it is logged with the upstream message and surfaces as 500. Unknown parameters, fields and enum values are hard 400s, so no model-written text ever becomes a parameter name. URLs are kept under 6 KB.
 - **Cache.** `cachetools.TTLCache` keyed on `(data_timestamp, canonical URL)`: 1,024 count or sample results and 8 parsed walks, 15-minute TTL, single-flight for identical in-flight requests. `GET /version` is cached for five minutes; every registry response carries an ETag that encodes the same data timestamp, so a new timestamp simply stops old entries from matching. Entity probes made during resolution are cache hits during execution.
+- **Plan cache** (`planning/service.py`). Keyed on the question after the whitespace normalisation of 4.3, the structured request fields in canonical form, `PROMPT_VERSION`, the planner model and effort, and the current UTC date (the model is told today's date). The value is the checked plan with its planner metadata. 512 entries, 24-hour TTL. It saves the model call and, because model output is not repeatable, makes a repeated question produce the same plan. Clarification and unsupported plans are cached; a failed or unrepaired planning attempt is not.
+- **Response cache** (`pipeline.py`). Keyed on the canonical plan, the effective options and the registry's data timestamp; the value is the finished response. Everything after the plan is deterministic for one data version, so a hit is exact, and a registry refresh changes the key. 256 entries. A hit gets a fresh `request_id`, `generated_at` and `timing`, and `meta.cache` says it was a hit; its request log and trace are those of the run that built it. Never cached: errors, a response carrying the warning `upstream_throttled`, and a response whose walk straddled a data refresh. Identical requests in flight share one run. Both caches are skipped with `options.use_cache: false`. Both live in process memory, so they are lost on restart and not shared between containers; section 10.4 gives the scale-out path.
 
 ### 4.10 Normalisation rules
 
@@ -1293,6 +1302,7 @@ class Settings(BaseSettings):
     one_page_max: int = 1000;  walk_cap: int = 5000;  max_fanout_requests: int = 60
     low_match_threshold: int = 10
     request_deadline_s: float = 45.0;  cache_ttl_s: int = 900
+    plan_cache_size: int = 512;  response_cache_size: int = 256
     examples_dir: Path | None = None
     log_format: Literal["console", "json"] = "console"
 
@@ -1622,6 +1632,8 @@ interface Meta {
                          shown: number; total: number; rule: string }[] }
   citations: { is_enabled: boolean; max_per_datum: number; selection: string; trials_cited: number }
   suggested_followups: { label: string; request: QueryRequest }[]     // built by rules, never by the model
+  cache: { is_plan_cached: boolean; is_response_cached: boolean
+           cached_at: string | null }           // when a cached response was first built; null on a fresh one
   timing: { total_ms: number; plan_ms: number; resolve_ms: number; fetch_ms: number; build_ms: number }
   debug: { trace: TraceStep[] } | null          // null when options.include_trace is false
 }
@@ -1828,6 +1840,7 @@ One page, `/`.
 | `citation-sheet` | A shadcn sheet opened by selecting any datum (6.5) |
 | `error-boundary` | Wraps the registry renderer. An unexpected specification degrades to the fallback (message, rows as a table, raw JSON) instead of a blank page |
 | Footer | "Source: ClinicalTrials.gov, data as of {data_timestamp}. Counts are aggregated by this service." This is what the registry's terms of use ask for: attribution, the data date and a statement of modification |
+| Icons | Every icon comes from `lucide-react`, the library the shadcn scaffold is configured with (`components.json`). No other icon set, no hand-drawn SVG icons, no emoji used as icons. Lucide 1.x ships no brand logos. The rule is also in `frontend/AGENTS.md`, which coding agents read |
 
 ### 6.3 The type-to-renderer registry (`components/viz/registry.tsx`)
 
@@ -2041,6 +2054,7 @@ Written for GNU Make 3.81 (what macOS ships). Every target is declared `.PHONY`;
 | `docs` | `cd backend && uv run python scripts/gen_docs.py`; `cd frontend && pnpm gen:types` |
 | `examples`, `replay`, `verify-examples`, `eval` | The scripts of section 9; all need the network, the first and last need the key |
 | `zip` | `check`; refuse a dirty tree; `git archive --format=zip --prefix=query-to-visualization-agent/ -o dist/submission.zip HEAD`; `cd backend && uv run python scripts/check_submission.py ../dist/submission.zip` |
+| `up`, `down`, `smoke` | `docker compose up --build --wait`; `docker compose down`; `bash docker-smoke.sh` (section 10.4) |
 
 **Running the backend with stock Python** (no `uv`, no `make`; needs Python 3.12 or newer). `backend/requirements.txt` is exported from the lockfile (`uv export --format requirements.txt --no-dev --no-hashes --no-emit-project`, flags checked on uv 0.12.23):
 
@@ -2073,13 +2087,33 @@ This path is not yet verified; it is run once by hand in milestone M8, and the R
 
 `check_submission.py` fails if a required heading is missing, since hand-written parts cannot be generated, and while the marker `<!-- owner:confirm -->` is in the README, since the one section only the owner can write must not ship as a draft.
 
-### 10.4 Docker (stretch S3)
+### 10.4 Containers and infrastructure
 
-`backend/Dockerfile` on the official uv multi-stage pattern (`ghcr.io/astral-sh/uv:python3.13-trixie-slim` builder with `uv sync --locked`, `python:3.13-slim-trixie` runtime, non-root user); `frontend/Dockerfile` with `output: "standalone"`; `docker-compose.yml` with `env_file: .env` for the backend, `BACKEND_URL=http://backend:8000` for the frontend and `docs/examples` mounted into the backend with `CTVIZ_EXAMPLES_DIR`. Neither image has been built (no Docker daemon was running when the stack was tried), so this is attempted only after everything else, and the README lists it as optional.
+Built and smoke-tested on 2026-10-06 against the real backend and frontend code (Docker Engine 29.8, Compose 5.5, Apple silicon; both base images also publish linux/amd64).
+
+| File | What it does |
+| --- | --- |
+| `backend/Dockerfile` | Two stages on `python:3.13.16-slim-trixie`. The builder installs exactly what `uv.lock` says (`uv` 0.12.23, `uv sync --locked --no-dev`) and installs the project as a wheel. The runtime stage holds only the virtual environment and `docs/examples`, and runs `uvicorn` as uid 10001 on `0.0.0.0:8000`. Built from the repository root, because the recorded examples live in `docs/` |
+| `frontend/Dockerfile` | Two stages on `node:24.21.0-trixie-slim`, the current LTS line. `pnpm` at the version `package.json` pins is installed with `npm`, because newer Node images ship no corepack. `next build` with `output: "standalone"`; the runtime stage holds `server.js`, its traced modules and the static assets, and runs as the `node` user. The build context is `frontend/` alone |
+| `.dockerignore`, `frontend/.dockerignore` | The root file is an allow-list: only `backend/pyproject.toml`, `backend/uv.lock`, `backend/src` and `docs/examples` reach the builder. Both files exclude every `.env*` file, and the backend image's build fails if one is found inside it |
+| `docker-compose.yml` | Services `backend` and `frontend`. Only the backend receives the root `.env`, and that file is optional: without it the service starts with no planner. The frontend receives `BACKEND_URL=http://backend:8000` and nothing secret, and starts once the backend is healthy. Ports are bound to localhost and can be moved with `BACKEND_PORT` and `FRONTEND_PORT`. Both containers run on a read-only filesystem with all capabilities dropped and `no-new-privileges` |
+| `docker-smoke.sh` | Builds both images, starts the stack under its own project name and ports, checks the backend's `/healthz`, the page and the proxy path, and removes everything. `make smoke` runs it |
+
+Measured: the backend image is about 60 MB compressed, builds cold in 7 to 12 s and is healthy 1.2 s after start. The frontend image is about 95 MB compressed, builds cold in 17 to 21 s and is healthy 1.2 s after start. Both stop within a second of `docker stop`. The smoke test passes against the foundations commit.
+
+**For a reviewer with only Docker:** `cp .example.env .env` (optional), `docker compose up --build --wait`, then `http://localhost:3000` for the demo and `http://localhost:8000/docs` for the API.
+
+**Health checks.** Each image carries its own `HEALTHCHECK` and needs no curl. The backend's calls `/healthz`, which is liveness only and makes no upstream call; the frontend's fetches its own page.
+
+**Process model.** One backend container running one async process. Requests are served concurrently, because nearly all of a request's time is spent waiting on OpenAI and the registry. The registry rate limiter and the three caches of section 4.9 live in that process's memory, so the image must not be started with several workers or replicas: each copy would have its own limiter, so the registry would see a multiple of the intended rate, and its own caches.
+
+**Scale-out path, not built.** To run more than one backend process, the limiter and the caches move behind a small interface with a Redis implementation, and Redis joins the Compose file. Nothing in this design needs a task queue: every request finishes in seconds inside its own HTTP response. A queue with separate workers becomes the right tool only if the 5,000-trial walk cap is lifted or scheduled jobs are added.
+
+**Still to change.** The smoke test's third check accepts the backend's own 404 for `/v1/examples` as proof that the proxy reached it, because that endpoint does not exist yet. When the examples endpoints land, it becomes a 200 holding the first example.
 
 ### 10.5 Submission zip
 
-The repository has no commits yet. Milestone M0 makes the first commit, and every milestone ends with one, because the archive is built with `git archive`: it includes only tracked files, so `.env`, `node_modules`, `.venv` and `.next` cannot leak. `check_submission.py` then asserts: no path named `.env`; the root README contains every required heading and no `<!-- owner:confirm -->` marker; at least five example folders each hold `request.json` and `response.json` that validate against the committed schema; both lockfiles are present; and, with `--cleanroom`, that `make setup && make test` passes in a fresh directory. The example assertion is added in M3, when five examples exist; the others run from M1.
+Every milestone ends with a local commit on `main` (owner decision 15), because the archive is built with `git archive`: it includes only tracked files, so `.env`, `node_modules`, `.venv` and `.next` cannot leak. `check_submission.py` then asserts: no path named `.env`; the root README contains every required heading and no `<!-- owner:confirm -->` marker; at least five example folders each hold `request.json` and `response.json` that validate against the committed schema; both lockfiles are present; and, with `--cleanroom`, that `make setup && make test` passes in a fresh directory. The example assertion is added in M3, when five examples exist; the others run from M1.
 
 ### 10.6 The reviewer's path, minute by minute
 
@@ -2099,7 +2133,7 @@ Budgets assume AI-assisted implementation with every diff reviewed, which the as
 
 | # | Milestone | Hours (ends at) | Deliverables | Acceptance check | Risk retired |
 | --- | --- | --- | --- | --- | --- |
-| M0 | Foundations and live checks | 1.25 (1.25) | First commit of the existing files. A root `.gitattributes` that keeps `docs/PLAN.md` and itself out of the archive (open decision 17). uv project with pins, ruff, mypy, pytest, Makefile. `Settings` with tests (file found from three directories, allow-list, quoted list, hidden input, effort check, placeholder key read as no key). Error envelope and handlers, `/healthz`. `contract/plan.py` with its lint test. Live checks written to `docs/spikes.md`: (a) `QueryPlan` accepted in strict mode by both planner models, and eight smoke questions run twice on the default model with latency and tokens (about 25 calls); (b) the ramped burst test of 4.9; (c) the relevance-ordered sample of one bucket requested twice | `make check` green; the spike table filled; the limiter defaults and the schema decision recorded. Gate: if the schema is rejected, the lint names the construct to remove. If fewer than 7 of 8 smoke questions are right in both runs, remove `filters.evidence` first (rule 20 then keeps a filter with a warning) and re-run before anything is built on it | Schema rejection; upstream throttling |
+| M0 | Foundations and live checks | 1.25 (1.25) | First commit of the existing files. A root `.gitattributes` that keeps `docs/PLAN.md` and itself out of the archive (open decision 17). uv project with pins, ruff, mypy, pytest, Makefile. `Settings` with tests (file found from three directories, allow-list, quoted list, hidden input, effort check, placeholder key read as no key). Error envelope and handlers, `/healthz`. The container files of section 10.4 with their smoke test. `contract/plan.py` with its lint test. Live checks written to `docs/spikes.md`: (a) `QueryPlan` accepted in strict mode by both planner models, and eight smoke questions run twice on the default model with latency and tokens (about 25 calls); (b) the ramped burst test of 4.9; (c) the relevance-ordered sample of one bucket requested twice | `make check` green; the spike table filled; the limiter defaults and the schema decision recorded. Gate: if the schema is rejected, the lint names the construct to remove. If fewer than 7 of 8 smoke questions are right in both runs, remove `filters.evidence` first (rule 20 then keeps a filter with a warning) and re-run before anything is built on it | Schema rejection; upstream throttling |
 | M1 | Thin end-to-end slice | 4.0 (5.25) | Contract models for the envelope, `time_series`, channels, `Datum` and meta, with the invariants they need. `essie`, `params`, `CtGovClient.version`, `count` and `sample` with limiter, retry, cache and request log. The `start_date` catalogue entry and the fan-out executor with citations. `OpenAIPlanner`, `FakePlanner`, a minimal `check_plan` (hygiene, merge, token grounding). `POST /v1/query` and `POST /v1/analyses`. `run_examples.py` with example 01. Schema export and its drift test. The golden test. Frontend scaffold, type generation, proxy, time-series renderer, JSON tab. `make zip` with the no-`.env`, heading and lockfile checks. README with every heading of 10.3: the quick start and the link to example 01 are filled, and the design-decision and limitation sections each start with a few true bullets | The assignment's example request returns a `time_series`; the recorded pembrolizumab buckets for 2015 to 2026 equal the twelve known counts; the chart is visible at :3000; `make test` passes offline; the archive holds no `.env` | Toolchains; the schema and examples pipeline; "nothing to submit" |
 | M2 | Planner hardening | 3.0 (8.25) | Prompt v1 with glossary and eight examples. All 29 rules; rule 25 is tested against a small `CountryTable` built in the test, because the committed table arrives in M4 (until then the service's table is empty, so a country entity gets the `unknown_country` clarification). The repair turn, the fallback model, the failure policy. `EntityResolver` with its warnings and no-data explanations. Structured mode. Adapter tests for all twelve aliases. The evaluation set and scorecard, including one hour of prompt iteration | The target of 9.2 is met, or the measured numbers are recorded and the work moves on; no trap leaves an invented filter or an ungrounded entity; "pembrolizumb" returns a chart with `low_match_count`; the clarification example exists | Plan accuracy; silent wrong entities |
 | M3 | Closed-vocabulary aggregates | 2.75 (11.0) | Catalogue entries for the eleven closed dimensions, the other three date fields with quarter and month, and the enrollment bins. Compared groups, a series dimension, per-series counts, the intersection count. `bar_chart`, `histogram` and `metric` builders. `choose_chart`. Checksums and exclusions. `/v1/capabilities`, `/v1/schema/{name}`, `/readyz`. `schema_to_markdown()` and `splice_readme()` (5.11): `docs/SCHEMA.md` and the README's `request-schema` and `response-summary` blocks, covered by the docs drift test. Examples 02, 06 and 09 recorded. Until M4 adds the walk, row 4 of the strategy table is skipped and small scopes fan out as well | Appendix queries 1 to 6 and extras 11 and 14 produce valid specifications on cassettes; Duchenne phases sum to 499 and pembrolizumab phases to 2,971; the Sex bucket is sent as `AREA[Sex]"ALL"`; five example runs are committed (01, 02, 06, 09 and 10) and the README documents the request and response schemas, so the zip holds everything the assignment's section 6 lists and `check_submission.py` passes with its example assertion added | Wrong numbers from list-valued fields; an incomplete submission |
@@ -2107,8 +2141,8 @@ Budgets assume AI-assisted implementation with every diff reviewed, which the as
 | M5 | Networks | 2.75 (16.75) | The drug normaliser with table tests and alias learning. Node kinds, arm-level pairing, presence push-down, pruning, the anchor rule. The network builder. The too-little-co-occurrence outcome. The unscoped subset with its date range | On cassettes: the Duchenne sponsor and drug frame has 114 sponsors, 187 drugs and 224 links before alias merging, with PTC Therapeutics and ataluren heaviest (13, or 14 with the alias merged); the pembrolizumab same-arm frame has 6,036 links before merging and leaves out the anchor; at most 30 nodes; every link cites a trial with two excerpts | Normalisation as a time sink (time-boxed) |
 | M6 | Frontend breadth | 3.0 (19.75) | Bar, histogram, scatter, network, table and metric renderers. Citation sheet with scope evidence. Data and Trace tabs. The `/v1/examples` endpoints and the example gallery with "Run live". Outcome cards, error boundary, palette. Vitest over all examples | Every committed example renders in the test and by eye; selecting a bar, point, node, link and table row opens citations with working links; `pnpm typecheck && pnpm lint && pnpm build` are clean | The contract not being renderable |
 | M7 | Evidence and documents | 1.75 (21.5) | `verify_examples.py` and its report; `replay_examples.py` for `make replay`. All ten examples regenerated. A final pass over the README's hand-written sections, which have grown milestone by milestone since M1, and its remaining generated blocks (`capabilities`, `errors`, `config`, `examples`). The final scorecard. The FHIR paragraph. The draft of "How this was built" under the owner marker (10.3). Three screenshots (ten minutes). The generated changelog | The replay report shows every excerpt and every `source_url` matching; the docs check is clean; `check_submission.py` finds every required heading and fails on nothing but the owner marker | Unverified claims in the README |
-| M8 | Hardening and packaging | 1.0 (22.5) | `check_submission.py --cleanroom`. Error-path review (timeouts, 429, deadline, URL length). Log review for secrets. `requirements.txt` and one manual start with stock Python. Final `make zip` from a fresh clone | The owner has rewritten "How this was built" and deleted the marker; the clean-room run passes from the zip; the archive holds no `.env` | A reviewer who cannot run it |
-| | Buffer | 1.5 (24.0) | Unknowns; otherwise stretch items in order | | |
+| M8 | Hardening and packaging | 1.75 (23.25) | The plan cache and the response cache of 4.9 with their tests (a hit, a miss on a new data timestamp, the bypass option, failures not cached, one run for identical requests in flight). `check_submission.py --cleanroom`. Error-path review (timeouts, 429, deadline, URL length). Log review for secrets. `requirements.txt` and one manual start with stock Python. Final `make zip` from a fresh clone | The owner has rewritten "How this was built" and deleted the marker; the clean-room run passes from the zip; the archive holds no `.env`; a repeated question is answered from the cache with no upstream request; `make smoke` passes on the final images | A reviewer who cannot run it |
+| | Buffer | 0.75 (24.0) | Unknowns; otherwise stretch items in order | | |
 
 **Checkpoints.** At the end of M1 (hour 5.25) a runnable zip exists: the assignment's own request answered end to end, one recorded example run, and a README that has every heading of 10.3 with the quick start filled. It is not yet a complete submission, because the assignment's section 6 asks for three to five example runs and for schema documentation in the README. Both are in place at the end of M3 (hour 11.0): examples 01, 02, 06, 09 and 10, `docs/SCHEMA.md` and the README's generated request and response blocks. From M1 on, each milestone's commit also brings the README sections it touches up to date, so M7 gives the hand-written sections their final pass and never their first draft. At hour 12.5 the differential test must pass for `phase` on the walk path, which is the first half of M4; if it does not, cut items 1 to 3 below are dropped at once so that networks and the frontend keep their hours (items 4 and 5 are already built by then, so dropping them would save nothing; the next cuts in order are items 6 and 7). At the end of M6 the remaining time is spent on M7 and M8 before any stretch item.
 
@@ -2125,20 +2159,21 @@ Budgets assume AI-assisted implementation with every diff reviewed, which the as
 9. The Trace tab (the JSON tab already shows `meta`).
 10. A series from a second dimension (compared groups stay).
 11. Histogram.
+12. The plan cache and the response cache (the registry-call cache stays, so a repeated question still makes no registry call).
 
-The budget is tight for this scope, and M2 is its densest milestone, so the cut order is part of the plan and not a contingency. Estimated savings: items 1 to 5 together about 2.5 hours (0.5, 0.5, 0.5, 0.25 and 0.75), items 6 to 11 about 3.5 more (1.0, 0.75, 0.25, 0.5, 0.5 and 0.5). A cut saves its hours only when it is decided before the milestone that builds the item: item 8 and the fallback model of item 4 are built in M2; the chart preference, items 5 and 10 and the histogram builder in M3; items 1, 2, 6 and 7 in M4; item 3 in M5; item 9 and the scatter and histogram renderers in M6. Decided before M2 starts, the cuts and the 1.5-hour buffer are about 7.5 hours of slack before anything on the "never cut" list is at risk. At the hour-12.5 checkpoint items 4, 5, 8 and 10 and the histogram builder are already built, and about 5.5 hours remain (items 1 to 3, 6, 7 and 9, the histogram renderer and the buffer).
+The budget is tight for this scope, and M2 is its densest milestone, so the cut order is part of the plan and not a contingency. Estimated savings: items 1 to 5 together about 2.5 hours (0.5, 0.5, 0.5, 0.25 and 0.75), items 6 to 11 about 3.5 more (1.0, 0.75, 0.25, 0.5, 0.5 and 0.5), and item 12 another 0.75. A cut saves its hours only when it is decided before the milestone that builds the item: item 8 and the fallback model of item 4 are built in M2; the chart preference, items 5 and 10 and the histogram builder in M3; items 1, 2, 6 and 7 in M4; item 3 in M5; item 9 and the scatter and histogram renderers in M6; item 12 in M8. Decided before M2 starts, the cuts and the 0.75-hour buffer are about 7.5 hours of slack before anything on the "never cut" list is at risk. At the hour-12.5 checkpoint items 4, 5, 8 and 10 and the histogram builder are already built, and about 5.5 hours remain (items 1 to 3, 6, 7, 9 and 12, the histogram renderer and the buffer).
 
 **Never cut:** the assignment's example request, the nine appendix classes, bar, time-series and network types, the metric type, citations with references, the validator, the invariants, the differential test, the generated schema reference, the README, the example runs, the offline tests and the zip check.
 
 **Stretch, only after everything above, in this order:**
 
+- **S0. A progress stream for the demo.** `POST /v1/query/stream` answers with Server-Sent Events: one `stage` event as each step of the trace completes (planning, plan ready, each entity resolved, fetched n of N, building), then one `result` event whose data is the body `POST /v1/query` returns, or one `error` event with the error envelope. The response carries `Cache-Control: no-cache, no-transform`; without it the Next.js proxy buffers the whole stream. The proxy's allow-list gains the path, and the page reads the stream with a streamed `fetch` and shows the stages above the loading skeleton. No WebSocket is needed, because the browser sends one request and then only listens. `POST /v1/query` stays the plain JSON endpoint and the contract does not change. Until this is built the page shows a loading skeleton only. (S3, Docker, moved into the first version: section 10.4.)
 - **S1. Numeric aggregates.** Median, mean or sum of enrollment by a dimension ("median enrollment by phase"): one `measure` field on `aggregate`, a `numbers` list on `Cell`, walk only. Row field `enrollment_median`, unit participants.
 - **S2. A model-callable tool mode.** `options.planner = "agent"`: `resolve_entity` exposed as a strict function tool in a loop of at most three turns, the final turn forced with `tool_choice="none"`, with the stateless replay of reasoning items that `store=False` requires. A looked-up spelling may replace the user's words only when it is within a small edit distance of them and matches many times more trials, and the response states the substitution with both counts. The loop's live behaviour is not yet verified. It becomes the default only if, on the evaluation set extended with five questions that need a registry fact (two misspellings, an operator-word abbreviation, an ambiguous sponsor, a country alias), (a) plan accuracy is at least that of the single call, (b) median planning time on the clean questions is within 0.3 s of it, and (c) at least three of the five are answered better. Either way the README reports the numbers.
-- **S3. Docker** (section 10.4).
 - **S4. A Chat Completions fallback** (`chat.completions.parse`) for an OpenAI-compatible gateway that lacks the Responses API; strict schemas were accepted there on the seven models tried.
 - **S5. The FHIR pass-through** (section 7), if the owner wants it.
 - **S6. `choropleth_map`, `heatmap`, `pie_chart`** (pie for exclusive categories only).
-- **S7. Parallel walks over the nine exclusive phase partitions** to lift the walk cap; a progress stream.
+- **S7. Parallel walks over the nine exclusive phase partitions** to lift the walk cap.
 
 **Feature to rubric line** (also a README table):
 
@@ -2146,6 +2181,7 @@ The budget is tight for this scope, and M2 is its densest milestone, so the cut 
 | --- | --- |
 | Plan, check, resolve, strategy, engine, build with typed seams; one-way dependencies | System design |
 | Field catalogue and one group-by; two exact data primitives chosen by rule; caps, truncation metadata, limiter, cache | System design |
+| Three cache layers keyed on the registry's data version; containers with health checks, least privilege and a smoke test | System design |
 | Nine phase buckets, partial dates, withheld records, the `ALL` operator, country table, drug normalisation, arm-level links | System design (real-world data) |
 | Strict schema of closed choices; no data fields; grounding of entities, years and filters; 29 rules; one bounded repair; scorecard run three times per question | AI and agent design |
 | Typed registry tools run by code and traced; entity resolution with counts; replayable plan | AI and agent design |
@@ -2165,7 +2201,7 @@ The budget is tight for this scope, and M2 is its densest milestone, so the cut 
 | --- | --- | --- | --- |
 | 1 | The plan schema behaves differently from the shape that was measured (it adds `filters.evidence`, two variants and a few fields) | First gate of M0 with numbers; lint and snapshot at build time; a validator that does not depend on model quality; a stated simplification if the gate fails; a scorecard with repetitions | M0, M2 |
 | 2 | ClinicalTrials.gov throttles bursts of count calls. No limit is documented, and nothing faster than about one request per second has been tried, apart from three simultaneous requests | Ramped burst test in hour one; limiter in settings; one-page walks for small scopes; on a 429 or 403 halve concurrency and prefer walks for ten minutes; cache keyed on the data timestamp | M0 |
-| 3 | 24 hours is tight for the engine, the contract and the frontend together | A runnable zip from hour 5.25 and everything the assignment's section 6 lists from the end of M3; the README written milestone by milestone; acceptance checks per milestone; the cut order fixed in advance; the hour-12.5 rule; 1.5 hours of buffer | M1, M3, hour 12.5 |
+| 3 | 24 hours is tight for the engine, the contract and the frontend together | A runnable zip from hour 5.25 and everything the assignment's section 6 lists from the end of M3; the README written milestone by milestone; acceptance checks per milestone; the cut order fixed in advance; the hour-12.5 rule; 0.75 hours of buffer | M1, M3, hour 12.5 |
 | 4 | Model aliases change or disappear before grading: the plan assumes snapshots cannot be pinned with this key (12.2), five allowed models are deprecated, one ends on 2026-10-23 | Defaults are two non-deprecated models from different families; the resolved snapshot is recorded in every response; examples replay without a model; the gallery needs no key | M1 |
 | 5 | A reviewer runs with a different key, an exported key, or none | Gallery, `/v1/analyses` and structured mode need no key; the start-up log names the source of each variable; the start-up error names the variable to change; `/readyz` checks subset, not equality | M1 |
 | 6 | Plans are not repeatable run to run (no seed; structured fields varied at temperature 0) | Deterministic validation after every plan; every response returns its plan; examples are recorded outputs replayed from plan plus cassette; the evaluation repeats each question | M1, M2 |
@@ -2183,7 +2219,7 @@ The budget is tight for this scope, and M2 is its densest milestone, so the cut 
 | 18 | Very new dependencies: `openai` 3.25.0 and Next 16.4.0 were published on 2026-10-06; httpx2 is five months old | Exact pins and lockfiles; the SDK is imported by one module | M0 |
 | 19 | Responses grow large (rows that cite themselves; long citation lists) | Caps on citations, points and rows; gzip; a size test on every example; a logged warning above 500 kB | M4 |
 | 20 | The owner expects more from FHIR than a link | Section 7 gives the measurements; the pass-through is specified and costed; open decision 3 | Plan |
-| 21 | A reviewer lacks uv, pnpm or GNU Make | Raw commands beside every target; `requirements.txt` and a stock-Python path; screenshots in the README; recorded examples readable without installing anything | M7, M8 |
+| 21 | A reviewer lacks uv, pnpm or GNU Make | The Compose stack, which needs only Docker (10.4); raw commands beside every target; `requirements.txt` and a stock-Python path; screenshots in the README; recorded examples readable without installing anything | M0, M7, M8 |
 | 22 | Scope creep | Seven types fixed; the stretch list is ordered; the cut list is agreed in advance | Plan |
 
 ### 12.2 What is not yet verified
@@ -2200,7 +2236,7 @@ The budget is tight for this scope, and M2 is its densest milestone, so the cut 
 | A real model refusal (handled from SDK source and canned bodies) | Offline adapter tests only |
 | Whether an allowed alias also admits its dated snapshot id | Not checked: it would need a call outside `ALLOWED_MODELS`. The plan assumes versions cannot be pinned |
 | That a response sent without `store=False` is kept for at least 30 days (taken from the SDK docstring and OpenAI's documentation) | Not checked: it would store data on the owner's account. Every call sends `store=False`, and the adapter test asserts it |
-| Docker images; the tool loop of S2 | Stretch |
+| The tool loop of S2; the progress stream of S0 | Stretch |
 
 ### 12.3 Decisions for the owner
 
@@ -2221,8 +2257,8 @@ Each has a recommended default, so work is not blocked.
 | 11 | **Citation cap.** Default 5 trials per datum, maximum 20 | As listed |
 | 12 | **Example runs.** Ten recorded, five featured in the README | As listed |
 | 13 | **Home of generated documents and examples.** The existing documentation folder, keeping the code to `backend/` and `frontend/`. It was spelled with a capital D when planning began and is lower-case `docs/` on disk now | Use `docs/`, the name on disk, everywhere |
-| 14 | **Docker.** Expected by the reviewers, or optional? | Optional (stretch S3); the images have never been built |
-| 15 | **First commit.** The repository has no commits; the plan commits the existing files in M0 | The implementer makes the first commit unless the owner prefers to |
+| 14 | **Docker.** Decided by the owner on 2026-10-06: required | Both images, the Compose file and the smoke test are built and tested (section 10.4) |
+| 15 | **Commits.** Decided by the owner on 2026-10-06 | One local commit per milestone on `main`, made by the implementer and never pushed |
 | 16 | **Integrity note** (assignment section 8): which AI tools to name, and how to word "designed deliberately versus generated and adapted" | The owner writes this section in their own words. The implementer drafts the facts in M7 under the marker `<!-- owner:confirm -->`, and `make zip` fails until the owner has rewritten the section and deleted the marker (10.3) |
 | 17 | **This plan in the zip.** `docs/PLAN.md` is a tracked file, and `git archive` ships every tracked file unless told otherwise. Ship it as design evidence, or keep it out of the zip? | Keep it in git and leave it out of the zip, with `docs/PLAN.md export-ignore` in a root `.gitattributes`: it describes the system before it was built, and any feature cut later would contradict the README. If the owner wants it shipped as design evidence, delete that line and bring the plan's status line and its cut features up to date in M7 |
 
@@ -2256,6 +2292,10 @@ Each has a recommended default, so work is not blocked.
 | **The website's internal facet endpoint** (`/api/int/studies`, per-facet counts in one call) | Not used | Faster than fan-out and its counts match, but it is undocumented, absent from the OpenAPI document and has no stability promise; the assignment names the Data API. A test oracle at most |
 | **Bulk download into a local database** | Rejected | Real group-by and no caps, but it means downloading the whole registry, goes stale against a weekday refresh, and is not "backed by the ClinicalTrials.gov API" in the sense the assignment means |
 | **A model-written narrative summary** | Not built | It is the one step where a model would write numbers. The headline is templated from the computed data. If added later: off by default, and dropped unless every number in it occurs in the data |
-| **Streaming progress events** | Not built | Answers arrive in seconds; Next buffers proxied event streams unless headers are set exactly; no rubric line rewards it |
+| **Streaming progress events** | First stretch item (S0) | Answers arrive in seconds, so the first version shows a loading skeleton. The owner wants the demo to feel live, so a Server-Sent Events variant of the query endpoint is the first thing built after the required work. Next buffers a proxied event stream unless the response carries `no-transform` |
+| **A WebSocket for progress** | Rejected | The browser sends one request and then only listens. Server-Sent Events do that over plain HTTP and pass through the Next.js proxy |
+| **A task queue with workers** (Celery) | Rejected | Every request finishes in seconds inside its own HTTP response, and that time is spent waiting on the network, which one async process serves concurrently. A queue would add a broker and worker containers, and the workers would still share the one registry rate limit |
+| **Redis now, for the caches and the rate limiter** | Not built; it is the scale-out path (10.4) | One backend process needs neither. Redis becomes necessary with several processes, or to keep the caches across restarts |
+| **Several workers or replicas of the backend** | Rejected for now | The limiter and the caches are in process memory: each copy would have its own, and the registry would see a multiple of the intended rate |
 | **Zod, a data-fetching library, d3-format in the frontend** | Not added | The backend refuses to send an invalid specification; generated types and example-rendering tests cover the boundary; three number formats are ten lines |
 | **`rewrites()` instead of a Route Handler proxy** | Rejected | The destination is fixed at build time, which breaks Docker and any non-default port |
