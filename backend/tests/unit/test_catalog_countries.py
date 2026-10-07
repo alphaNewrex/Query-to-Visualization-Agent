@@ -88,3 +88,11 @@ def test_kosovo_is_not_matched_to_serbia() -> None:
 def test_suggestions_are_close_registry_names() -> None:
     assert TABLE.suggest("Germny") == ["Germany"]
     assert TABLE.suggest("qqqqqq") == []
+
+
+def test_a_leading_article_is_not_part_of_the_country_name() -> None:
+    table = load_country_table()
+    assert table.resolve("the UK") == table.resolve("UK") == "United Kingdom"
+    assert table.resolve("the United States") == "United States"
+    assert table.resolve("The Netherlands") == "Netherlands"
+    assert table.resolve("the moon") is None

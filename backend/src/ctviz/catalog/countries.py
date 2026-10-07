@@ -109,6 +109,11 @@ class CountryTable:
         India, Italy and Norway.
         """
         word = " ".join(text.split())
+        if word.casefold().startswith("the ") and self._lookup(word[4:]) is not None:
+            word = word[4:]  # "the UK", "the United States": the article is not part of the name
+        return self._lookup(word)
+
+    def _lookup(self, word: str) -> CountryMatch | None:
         folded = word.casefold()
         name = self._by_folded_name.get(folded) or self._aliases.get(folded)
         if name is None and word.isupper():
