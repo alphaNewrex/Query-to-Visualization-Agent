@@ -25,7 +25,7 @@ from ctviz.contract.response import QueryResponse
 
 # A heading counts when its text starts with one of these, in any case.
 REQUIRED_HEADINGS: Final = (
-    "Quick start",
+    "How to run",
     "Request schema",
     "Response schema",
     "Example runs",

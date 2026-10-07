@@ -1074,3 +1074,93 @@ shows, and the planner reads the new message as a follow-up to them.
 | --- | --- | --- | --- | --- | --- |
 | `query` | string \| null | yes |  | at most 1,000 characters | The previous question as sent (`meta.query`); null when the previous turn had none. |
 | `plan` | [`QueryPlan`](#queryplan) | yes |  |  | `meta.plan` of the previous answer. |
+
+## Service reference
+
+Generated from the routes, the error classes, the catalogue and settings.
+
+**Endpoints**
+
+| Method and path | What it does |
+| --- | --- |
+| `GET /healthz` | Liveness: the process is up |
+| `GET /readyz` | Readiness: the registry answers, and the configured models are listed by the key |
+| `POST /v1/query` | Answer a question with a visualization specification |
+| `POST /v1/query/stream` | Answer a question, reporting progress as server-sent events |
+| `POST /v1/analyses` | Run a typed plan, with no model call |
+| `GET /v1/capabilities` | Dimensions, limits and planner state |
+| `GET /v1/schema/{name}` | A JSON Schema of the contract |
+| `GET /v1/examples` | The recorded example runs |
+| `GET /v1/examples/{slug}` | One recorded run: request, plan and response |
+
+**Error codes**
+
+| `error.code` | HTTP status | Retryable | Meaning |
+| --- | --- | --- | --- |
+| `invalid_request` | 422 | no | The body broke a validation rule; `details.errors` lists each path, code and message. |
+| `not_found` | 404 | no | No such path, schema or recorded example. |
+| `method_not_allowed` | 405 | no | The path exists but not for this method. |
+| `planner_unavailable` | 503 | no | No model could write a plan; `details.reason` is `not_configured`, `configuration` or `transient`. Only `transient` is retryable. Structured mode and `/v1/analyses` need no model. |
+| `upstream_unavailable` | 502 | yes | ClinicalTrials.gov answered 5xx, refused the connection or sent an unreadable body, after retries. |
+| `upstream_rate_limited` | 503 | yes | ClinicalTrials.gov kept throttling after backoff; `Retry-After` is set. |
+| `upstream_timeout` | 504 | yes | ClinicalTrials.gov did not answer in time, after retries. |
+| `deadline_exceeded` | 504 | yes | The request ran past its own deadline (45 s by default). |
+| `internal_error` | 500 | no | A bug, or an answer that failed an internal consistency check and was withheld instead of sent. Quote `request_id`. |
+| `backend_unreachable` | 502 | yes | Sent only by the frontend's proxy: the backend did not answer. |
+
+**Dimensions and limits**
+
+| `group_by` key | Kind | A trial counts under | Values |
+| --- | --- | --- | --- |
+| `phase` | closed list | one value | 9 values |
+| `overall_status` | closed list | one value | 14 values |
+| `study_type` | closed list | one value | Interventional, Observational, Expanded Access, Not provided |
+| `sponsor_class` | closed list | one value | 10 values |
+| `intervention_type` | closed list | one or more values | 11 values |
+| `sex` | closed list | one value | Female, Male, All, Not provided |
+| `age_group` | closed list | one or more values | Child, Adult, Older Adult |
+| `allocation` | closed list | one value | Randomized, Non-Randomized, N/A, Not provided |
+| `masking` | closed list | one value | 6 values |
+| `primary_purpose` | closed list | one value | 11 values |
+| `has_results` | closed list | one value | With results, Without results |
+| `intervention_model` | closed list | one value | 6 values |
+| `country` | open list | one or more values | from the data |
+| `state` | open list | one or more values | from the data |
+| `sponsor` | open list | one value | from the data |
+| `drug` | open list | one or more values | from the data |
+| `condition` | open list | one or more values | from the data |
+| `start_date` | date | one value | years, quarters or months |
+| `primary_completion_date` | date | one value | years, quarters or months |
+| `completion_date` | date | one value | years, quarters or months |
+| `first_posted_date` | date | one value | years, quarters or months |
+| `enrollment` | number, binned | one value | 11 values |
+
+Numeric fields (scatter plots and statistics): `enrollment`, `duration_months`, `site_count`. Network node kinds: `sponsor`, `drug`, `condition`, `country`. Visualization types: `bar_chart`, `time_series`, `histogram`, `scatter_plot`, `network_graph`, `table`, `metric`.
+
+Limits: a request to ClinicalTrials.gov returns at most 1,000 trials; a paged walk reads every matching trial, in date ranges read at once, and is refused as too broad when it is estimated not to fit the deadline at 5 requests a second; a count fan-out makes at most 60 requests; 15 categories by default and at most 50; at most 10 series; at most 60 links in a network; a request is cut off after 45 s.
+
+**Settings**
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | none | The planner's key. Blank, or the placeholder of `.example.env`, counts as no key. |
+| `OPENAI_API_BASE` | `https://api.openai.com/v1` | Base URL of the OpenAI API; it must offer the Responses API. |
+| `ALLOWED_MODELS` | none | Comma-separated models the key may use. Once a key is set, the planner models must be in it. |
+| `CTVIZ_PLANNER_MODEL` | `gpt-5.4-mini` | The model that writes plans. |
+| `CTVIZ_PLANNER_EFFORT` | `low` | Reasoning effort sent with the planner model; the families without one get temperature 0. |
+| `CTVIZ_PLANNER_FALLBACK_MODEL` | `gpt-4.1-mini` | Asked once when the planner model fails. |
+| `CTVIZ_PLANNER_TIMEOUT_S` | `20` | Seconds to wait for one model call. |
+| `CTVIZ_CTGOV_BASE_URL` | `https://clinicaltrials.gov/api/v2` | The ClinicalTrials.gov Data API. |
+| `CTVIZ_CTGOV_CONCURRENCY` | `6` | Registry requests in flight at once. |
+| `CTVIZ_CTGOV_BURST` | `10` | Registry requests let through at once. |
+| `CTVIZ_CTGOV_RATE_PER_S` | `8` | Registry requests per second after the burst. |
+| `CTVIZ_ONE_PAGE_MAX` | `1000` | The most trials one registry request returns (its page-size limit). |
+| `CTVIZ_WALK_PAGES_PER_S` | `5` | Registry requests per second that a paged walk is assumed to make, used to estimate whether a walk fits the request deadline. A walk has no limit on trials. |
+| `CTVIZ_MAX_FANOUT_REQUESTS` | `60` | The most count requests one question may make. |
+| `CTVIZ_LOW_MATCH_THRESHOLD` | `10` | A name that matches fewer trials gets the `low_match_count` warning. |
+| `CTVIZ_REQUEST_DEADLINE_S` | `45` | Seconds before a request is answered 504 `deadline_exceeded`. |
+| `CTVIZ_CACHE_TTL_S` | `900` | Seconds a registry answer is kept in memory. |
+| `CTVIZ_PLAN_CACHE_SIZE` | `512` | Plans kept in memory. |
+| `CTVIZ_RESPONSE_CACHE_SIZE` | `256` | Finished responses kept in memory. |
+| `CTVIZ_EXAMPLES_DIR` | none | The folder `GET /v1/examples` reads (default `docs/examples`). |
+| `CTVIZ_LOG_FORMAT` | `console` | `console` or `json`. |

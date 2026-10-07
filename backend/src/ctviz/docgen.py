@@ -344,15 +344,6 @@ def render_definition(
 README_STYLE: Final = Style(page=SCHEMA_PAGE, preview=8)
 
 
-def request_tables(schema: Schema, style: Style = README_STYLE, level: int = 4) -> str:
-    """The tables of the README's request section: the body of `POST /v1/query` and the two types it holds."""
-    definitions = schema["$defs"]
-    return "\n".join(
-        render_definition(name, definitions, can_be_sent=True, style=style, level=level, with_example=False)
-        for name in ("QueryRequest", "RequestOptions", "CompareSpec")
-    )
-
-
 def _names(names: str) -> tuple[str, ...]:
     return tuple(names.split())
 
@@ -530,7 +521,22 @@ def schema_reference(schema: Schema | None = None) -> str:
         parts.extend(
             render_definition(name, definitions, can_be_sent=name in sendable) for name in section.definitions
         )
+    parts.append(service_reference())
     return "\n".join(parts)
+
+
+def service_reference() -> str:
+    """The tables that describe the running service and not a model: endpoints, errors, limits, settings."""
+    tables = (
+        ("Endpoints", endpoints_table()),
+        ("Error codes", errors_table()),
+        ("Dimensions and limits", capabilities_tables()),
+        ("Settings", settings_table()),
+    )
+    intro = (
+        "## Service reference\n\nGenerated from the routes, the error classes, the catalogue and settings.\n"
+    )
+    return "\n".join([intro, *(f"**{title}**\n\n{table}\n" for title, table in tables)])
 
 
 def _slug(title: str) -> str:
@@ -800,13 +806,6 @@ def read_examples(directory: Path) -> list[ExampleRun]:
     return runs
 
 
-FEATURED: Final = (
-    "01-assignment-request",
-    "02-compare-phases",
-    "03-recruiting-by-country",
-    "04-sponsor-drug-network",
-    "05-drug-cooccurrence",
-)
 _REPLAY: Final = """\
 jq -c '{plan: .meta.plan, options: .meta.options}' docs/examples/01-assignment-request/response.json \\
   | curl -s -X POST http://127.0.0.1:8000/v1/analyses -H 'Content-Type: application/json' -d @-
@@ -817,25 +816,6 @@ def _shown(run: ExampleRun) -> str:
     if run.visualization == "none":
         return f"`{run.kind}` (nothing to draw)"
     return f"`{run.visualization}`" + (f" ({run.variant})" if run.variant else "")
-
-
-def _runs_table(runs: Sequence[ExampleRun], base: str) -> str:
-    lines = ["| Run | Question | Visualization | Headline |", "| --- | --- | --- | --- |"]
-    for run in runs:
-        link = f"[{run.slug}]({base}{run.slug}/response.json)"
-        lines.append(f"| {link} | {_cell(run.question)} | {_shown(run)} | {_cell(run.headline)} |")
-    return "\n".join(lines)
-
-
-def examples_tables(directory: Path, base: str) -> str:
-    """The README's two tables: the featured runs, then the others. `base` is the path to `directory`."""
-    runs = read_examples(directory)
-    featured = [run for run in runs if run.slug in FEATURED]
-    others = [run for run in runs if run.slug not in FEATURED]
-    parts = ["**Featured**", "", _runs_table(featured, base)]
-    if others:
-        parts += ["", "**Also recorded**", "", _runs_table(others, base)]
-    return "\n".join(parts)
 
 
 def _joined(values: Sequence[str]) -> str:
@@ -877,93 +857,6 @@ def examples_index(directory: Path) -> str:
     return "\n".join(lines) + "\n"
 
 
-# The parts of a response that the README's abridged copy folds away.
-_FOLDED: Final = (
-    ("meta", "interpretation"),
-    ("meta", "plan"),
-    ("meta", "options"),
-    ("meta", "planner"),
-    ("meta", "cache"),
-    ("meta", "timing"),
-    ("meta", "debug"),
-    ("meta", "suggested_followups"),
-)
-_LINE_WIDTH: Final = 130
-_LONGEST_TEXT: Final = 100
-
-
-def _cut(items: list[Any], keep: int, noun: str) -> list[Any]:
-    return items if len(items) <= keep else [*items[:keep], f"... {len(items) - keep} more {noun}"]
-
-
-def _shortened(node: Any) -> Any:
-    """`node` with every string over 100 characters cut to its first 97 and three dots."""
-    if isinstance(node, str):
-        return node if len(node) <= _LONGEST_TEXT else node[: _LONGEST_TEXT - 3] + "..."
-    if isinstance(node, list):
-        return [_shortened(item) for item in node]
-    if isinstance(node, dict):
-        return {key: _shortened(value) for key, value in node.items()}
-    return node
-
-
-def _dump(value: Any, level: int = 0) -> str:
-    """JSON with a container on one line when it fits, so that a channel or a citation stays readable."""
-    flat = json.dumps(value, ensure_ascii=False)
-    pad = "  " * level
-    if not isinstance(value, dict | list) or not value or len(pad) + len(flat) <= _LINE_WIDTH:
-        return flat
-    if isinstance(value, dict):
-        items = [f"{pad}  {json.dumps(key)}: {_dump(item, level + 1)}" for key, item in value.items()]
-        return "{\n" + ",\n".join(items) + f"\n{pad}}}"
-    return "[\n" + ",\n".join(f"{pad}  {_dump(item, level + 1)}" for item in value) + f"\n{pad}]"
-
-
-def abridged_response(response: Mapping[str, Any]) -> str:
-    """A real response cut to its shape: two rows with one citation each, one reference, the rest folded."""
-    cut: dict[str, Any] = json.loads(json.dumps(response))
-    if cut["visualization"] is not None:
-        data = cut["visualization"]["data"]
-        for rows in [data["nodes"], data["edges"]] if isinstance(data, dict) else [data]:
-            for row in rows[:2]:
-                row["citations"] = _cut(row["citations"], 1, "citations")
-            rows[:] = _cut(rows, 2, "rows")
-    references = cut["references"]
-    shown = list(references)[:1]
-    cut["references"] = {nct_id: references[nct_id] for nct_id in shown}
-    if len(references) > len(shown):
-        cut["references"]["..."] = f"{len(references) - len(shown)} more trials"
-    for *parents, key in _FOLDED:
-        node = cut
-        for parent in parents:
-            node = node[parent]
-        node[key] = "..."
-    if cut["meta"]["source"] is not None:
-        cut["meta"]["source"]["requests"] = _cut(cut["meta"]["source"]["requests"], 0, "requests")
-    return _dump(_shortened(cut))
-
-
-def _run_summary(response: Mapping[str, Any]) -> str:
-    """What the run did, from its own `meta`: the trials, the requests and the time it took."""
-    meta = response["meta"]
-    matched = sum(series["trials_matched"] for series in meta["counts"]["series"])
-    timing = meta["timing"]
-    visualization = response["visualization"]
-    first = visualization["data"][0][visualization["encoding"]["x"]["field"]]
-    return (
-        f"The service matched {matched:,} trials with {len(meta['source']['requests'])} requests to "
-        f"ClinicalTrials.gov and answered in {timing['total_ms'] / 1000:.1f} s, of which the model call took "
-        f"{timing['plan_ms'] / 1000:.1f} s. The series starts in {first}, the first period with a trial; "
-        "empty periods before it are left out."
-    )
-
-
-def response_example(directory: Path, slug: str = "01-assignment-request") -> str:
-    """The README's account of one recorded run, as a sentence and a fenced abridged copy of its response."""
-    response = json.loads((directory / slug / "response.json").read_text(encoding="utf-8"))
-    return f"{_run_summary(response)}\n\n```json\n{abridged_response(response)}\n```"
-
-
 # --- The README's generated blocks -----------------------------------------------------------------------
 
 _MARKER: Final = re.compile(r"<!-- gen:(?P<name>[a-z-]+):start -->\n.*?<!-- gen:(?P=name):end -->", re.DOTALL)
@@ -995,19 +888,10 @@ def find_readme(root: Path) -> Path | None:
     return next((path for path in sorted(root.iterdir()) if path.name.lower() == "readme.md"), None)
 
 
-def readme_blocks(examples_directory: Path, schema: Schema | None = None) -> dict[str, str]:
-    """The text of every generated block of the README."""
+def readme_blocks(schema: Schema | None = None) -> dict[str, str]:
+    """The text of every generated block of the README: the table of visualization types."""
     schema = schema if schema is not None else json_schema(Contract)
-    return {
-        "endpoints": endpoints_table(),
-        "config": settings_table(),
-        "request-schema": request_tables(schema),
-        "response-types": response_types_table(schema),
-        "response-example": response_example(examples_directory),
-        "errors": errors_table(),
-        "capabilities": capabilities_tables(),
-        "examples": examples_tables(examples_directory, "docs/examples/"),
-    }
+    return {"response-types": response_types_table(schema)}
 
 
 # --- Every generated document ------------------------------------------------------------------------------
@@ -1022,7 +906,7 @@ def generated_documents(root: Path = REPOSITORY_ROOT) -> dict[Path, str]:
     readme = find_readme(root)
     if readme is None:
         raise DocumentError(f"There is no README in {root}.")
-    blocks = readme_blocks(docs / "examples", schema)
+    blocks = readme_blocks(schema)
     documents[readme] = splice(readme.read_text(encoding="utf-8"), blocks)
     return documents
 

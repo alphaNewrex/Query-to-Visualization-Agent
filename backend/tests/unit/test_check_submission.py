@@ -14,7 +14,7 @@ from tests.unit.contract_samples import time_series_response
 TOP = "query-to-visualization-agent/"
 DROPPED = ("docs/examples/04", "docs/examples/05")
 HEADINGS = "\n".join(f"## {heading}" for heading in (
-    "Quick start", "Request schema", "Response schema", "Example runs",
+    "How to run", "Request schema", "Response schema", "Example runs",
     "Key design decisions and tradeoffs", "How correctness was validated",
     "Limitations and what I would improve", "How this was built",
 ))  # fmt: skip
@@ -93,8 +93,8 @@ def test_a_missing_heading_fails_and_names_it(script: ModuleType, tmp_path: Path
 
 
 def test_a_heading_matches_by_its_first_words_in_any_case(script: ModuleType) -> None:
-    assert script.missing_headings("### QUICK START and more\n## request schema\n") == [
-        heading for heading in script.REQUIRED_HEADINGS if heading not in ("Quick start", "Request schema")
+    assert script.missing_headings("### HOW TO RUN and more\n## request schema\n") == [
+        heading for heading in script.REQUIRED_HEADINGS if heading not in ("How to run", "Request schema")
     ]
 
 

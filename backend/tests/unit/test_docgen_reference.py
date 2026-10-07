@@ -191,15 +191,6 @@ def test_a_long_enum_can_be_shown_in_part() -> None:
 # --- The tables of the README ---------------------------------------------------------------------------
 
 
-def test_the_request_tables_link_to_the_schema_page_and_keep_the_rules(schema: dict[str, Any]) -> None:
-    tables = docgen.request_tables(schema)
-
-    assert "#### QueryRequest" in tables and "#### RequestOptions" in tables and "#### CompareSpec" in tables
-    assert "[`CompareSpec`](docs/SCHEMA.md#comparespec)" in tables
-    assert "Rules across fields" in tables
-    assert "Example:" not in tables
-
-
 def test_the_types_table_has_one_row_per_visualization_type(schema: dict[str, Any]) -> None:
     rows = docgen.response_types_table(schema).splitlines()[2:]
 
@@ -284,44 +275,6 @@ def test_a_run_is_labelled_by_how_it_is_drawn(visualization: dict[str, Any], exp
     assert docgen._variant(visualization) == expected
 
 
-def test_the_readme_tables_split_the_featured_runs_from_the_others(recorded: Path) -> None:
-    tables = docgen.examples_tables(recorded, "docs/examples/")
-    featured, others = tables.split("**Also recorded**")
-
-    assert all(slug in featured for slug in docgen.FEATURED)
-    assert not any(slug in others for slug in docgen.FEATURED)
-    assert "(docs/examples/01-assignment-request/response.json)" in featured
-
-
-def test_the_abridged_response_is_json_with_every_key_and_a_few_rows(recorded: Path) -> None:
-    block = docgen.response_example(recorded)
-    document = json.loads(block.split("```json\n")[1].removesuffix("\n```"))
-    full = json.loads((recorded / "01-assignment-request" / "response.json").read_text(encoding="utf-8"))
-
-    assert list(document) == list(full)
-    assert list(document["meta"]) == list(full["meta"])
-    assert len(document["visualization"]["data"]) == 3
-    assert document["visualization"]["data"][-1].endswith("more rows")
-    assert len(document["references"]) == 2
-    assert document["meta"]["plan"] == "..."
-    assert all(len(text) <= 100 for text in strings(document))
-
-
-def test_a_network_is_cut_in_its_nodes_and_its_links(recorded: Path) -> None:
-    full = json.loads((recorded / "04-sponsor-drug-network" / "response.json").read_text(encoding="utf-8"))
-    document = json.loads(docgen.abridged_response(full))
-
-    assert len(document["visualization"]["data"]["nodes"]) == 3
-    assert len(document["visualization"]["data"]["edges"]) == 3
-
-
-def test_an_answer_with_nothing_to_draw_is_abridged_too(recorded: Path) -> None:
-    full = json.loads((recorded / "10-no-drug-named" / "response.json").read_text(encoding="utf-8"))
-    document = json.loads(docgen.abridged_response(full))
-
-    assert document["visualization"] is None and document["meta"]["source"] is None
-
-
 def strings(node: Any) -> list[str]:
     if isinstance(node, str):
         return [node]
@@ -381,7 +334,7 @@ def test_written_documents_are_fresh_and_a_changed_one_is_stale(
     root = tmp_path / "repository"
     shutil.copytree(real_repository_root / "docs" / "examples", root / "docs" / "examples")
     (root / "README.md").write_text(
-        "".join(f"{block(name, 'x')}\n" for name in docgen.readme_blocks(root / "docs" / "examples")),
+        "".join(f"{block(name, 'x')}\n" for name in docgen.readme_blocks()),
         encoding="utf-8",
     )
 
@@ -396,18 +349,6 @@ def test_written_documents_are_fresh_and_a_changed_one_is_stale(
     assert docgen.stale_documents(root) == []
     (root / "docs" / "SCHEMA.md").write_text("by hand", encoding="utf-8")
     (root / "README.md").write_text(
-        (root / "README.md").read_text(encoding="utf-8").replace("### ", "## "), encoding="utf-8"
+        (root / "README.md").read_text(encoding="utf-8").replace("`bar_chart`", "`bar`"), encoding="utf-8"
     )
     assert [path.name for path in docgen.stale_documents(root)] == ["SCHEMA.md", "README.md"]
-
-
-def test_the_abridged_response_is_introduced_by_the_numbers_of_its_own_run(recorded: Path) -> None:
-    block = docgen.response_example(recorded)
-    full = json.loads((recorded / "01-assignment-request" / "response.json").read_text(encoding="utf-8"))
-    timing = full["meta"]["timing"]
-
-    sentence = block.split("\n\n")[0]
-    assert f"{full['meta']['counts']['series'][0]['trials_matched']:,} trials" in sentence
-    assert f"{len(full['meta']['source']['requests'])} requests" in sentence
-    assert f"{timing['total_ms'] / 1000:.1f} s" in sentence
-    assert f"starts in {full['visualization']['data'][0]['start_year']}," in sentence

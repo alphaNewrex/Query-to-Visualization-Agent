@@ -31,22 +31,16 @@ def anchors(markdown: str) -> set[str]:
     }
 
 
-def test_every_make_target_the_readme_names_exists_and_every_target_is_described(
-    real_repository_root: Path, readme: str
-) -> None:
+def test_every_make_target_the_readme_names_exists(real_repository_root: Path, readme: str) -> None:
     makefile = (real_repository_root / "Makefile").read_text(encoding="utf-8")
     phony = re.search(r"^\.PHONY:(.*)$", makefile, re.MULTILINE)
     assert phony is not None
     declared = set(phony[1].split())
     defined = set(re.findall(r"^([a-z-]+):", makefile, re.MULTILINE))
     named = set(re.findall(r"(?:`|^ *)make ([a-z-]+)", readme, re.MULTILINE))
-    rows = readme.split("| `make` target |")[1].splitlines()[2:]
-    table = [row for row in rows[: next(i for i, row in enumerate(rows) if not row.startswith("|"))]]
-    described = {name for row in table for name in re.findall(r"`([a-z-]+)`", row.split("|")[1])}
 
     assert declared == defined
-    assert named <= declared
-    assert declared == described
+    assert named and named <= declared
 
 
 def test_every_relative_link_and_every_path_in_code_spans_exists(
