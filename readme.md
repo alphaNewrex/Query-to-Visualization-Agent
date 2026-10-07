@@ -2,7 +2,7 @@
 
 Ask a question about clinical trials in plain English and get back a chart specification as JSON, built from live [ClinicalTrials.gov](https://clinicaltrials.gov) data. Every value in the chart comes with the trial records behind it.
 
-A language model reads the question and writes a small typed plan. Code does the rest. It calls the registry, counts the trials, picks one of seven visualization types and attaches the citations. The backend is FastAPI, and there is a Next.js chat UI for trying it out.
+A language model reads the question and writes a small typed plan. Ordinary code does the rest: it calls the registry, counts the trials, picks one of seven visualization types and attaches the citations. The backend is FastAPI, and a Next.js chat UI is included as a demo.
 
 **Demo video:** [a short walkthrough of the service and its UI](https://drive.google.com/file/d/1SDQznpA6DpLR_ksyTSkuI1vzYERXm6uG/view?usp=share_link) (Google Drive).
 
@@ -44,22 +44,22 @@ cp .example.env .env
 make dev      # API on http://127.0.0.1:8000, UI on http://localhost:3000
 ```
 
-The `.env` file holds `OPENAI_API_KEY`, `OPENAI_API_BASE` and `ALLOWED_MODELS`. The planner uses `gpt-5.4-mini` and falls back to `gpt-4.1-mini`. Every other setting has a default, and they are all in [`backend/src/ctviz/settings.py`](backend/src/ctviz/settings.py).
+**Configuration.** `.env` holds `OPENAI_API_KEY`, `OPENAI_API_BASE` and `ALLOWED_MODELS`. The planner uses `gpt-5.4-mini` and falls back to `gpt-4.1-mini`. Every other setting has a default and is defined in [`backend/src/ctviz/settings.py`](backend/src/ctviz/settings.py).
 
-You can try it without a key. The ten recorded examples and the schemas are still served, and `POST /v1/analyses` runs a typed plan against the live registry. Only free-text questions need the model, and without a key they return `503 planner_unavailable`.
+**Without a key** the service still does everything that does not need the model. It serves the ten recorded examples and the schemas, and `POST /v1/analyses` runs a typed plan against the live registry. A free-text question returns `503 planner_unavailable`.
 
-To run the tests, use `make test`. It runs about 1,150 backend and 200 frontend tests offline and needs no key. `make check` adds linting, type checks and a check that the generated docs are up to date, and `make zip` builds the submission archive.
+**Tests.** `make test` runs about 1,150 backend and 200 frontend tests offline, with no key. `make check` adds linting, type checks and a check that the generated docs are current. `make zip` builds the submission archive.
 
 ## How it works
 
-The easiest way to explain the pipeline is to follow the assignment's own example through it. The full recorded run is in [`docs/examples/01-assignment-request/`](docs/examples/01-assignment-request/).
+Here is the assignment's own example, end to end. The full recorded run is in [`docs/examples/01-assignment-request/`](docs/examples/01-assignment-request/).
 
 ```bash
 curl -s -X POST http://127.0.0.1:8000/v1/query -H 'Content-Type: application/json' \
   -d '{"query": "How has the number of trials for this drug changed over time?", "drug_name": "Pembrolizumab"}'
 ```
 
-1. **Plan.** One OpenAI call with a strict output schema turns the question into a `QueryPlan`. The model sees the question, today's date and the request fields. It never sees trial data and has no tools.
+1. **Plan.** One OpenAI call with a strict output schema turns the question into a `QueryPlan`. The model sees the question, today's date and the request fields. It never sees trial data and it has no tools.
 
    ```json
    {"entities": [{"kind": "drug", "value": "Pembrolizumab", "role": "filter"}],
@@ -70,7 +70,7 @@ curl -s -X POST http://127.0.0.1:8000/v1/query -H 'Content-Type: application/jso
 3. **Resolve.** Each name is looked up in the registry. "Pembrolizumab" matches 2,971 trials as an intervention.
 4. **Fetch.** The registry has no group-by, so the service gets exact numbers in one of two ways. For plain counts it asks the registry for one count per bucket, here one per start year. When the answer needs the records themselves, as a median, a network or a scatter plot does, it pages through every matching trial.
 5. **Build.** Rules pick the chart type from the shape of the plan, and a single date dimension becomes a line. Titles, labels and notes come from templates. The sample trials returned with each count become the citations.
-6. **Verify.** 17 invariants are checked before the response goes out. For example, every cited NCT ID must have been returned by the registry in this request, and every excerpt must equal the value in the record. If a check fails the service returns a 500 instead of a chart it cannot back up.
+6. **Verify.** 17 invariants are checked before the response goes out. Two of them: every cited NCT ID was returned by the registry in this request, and every excerpt equals the value in the record. A failure is a 500, not a wrong answer.
 
 This run made 36 registry requests and took about 7 seconds, half of it the model call. The response, heavily shortened:
 
@@ -98,9 +98,9 @@ This run made 36 registry requests and took about 7 seconds, half of it the mode
 }
 ```
 
-The model's part is deliberately small. It decides which words name a drug, a condition, a sponsor or a country, which filters the question states, and what kind of analysis is wanted. Code produces everything else: the API parameters, the numbers, the rows, the titles and sentences, the NCT IDs and the citations.
+The model only makes choices. It decides which words name a drug, a condition, a sponsor or a country, which filters the question states, and what kind of analysis is wanted. Code produces everything else: the API parameters, the numbers, the rows, the titles and sentences, the NCT IDs and the citations.
 
-Follow-ups work without a session. The client sends the previous question and plan back, and the model writes a complete new plan. A greeting or small talk gets a templated reply, with no registry call.
+Follow-ups work without a session. The client sends the previous question and plan back, and the model writes a complete new plan. A greeting or small talk gets a templated reply and no registry call.
 
 ### Data flow
 
@@ -200,36 +200,20 @@ A visualization has `type`, `title`, `subtitle`, `encoding` and `data`. `encodin
 
 A category channel carries `is_exclusive: false` when one trial can fall under several values, as with countries or drugs. Those values should not be drawn as parts of a whole.
 
-### Citations
+**Citations.** Every datum (a bar, a point, a node, a link) carries `citations`, `citation_count` and `source_url`. A citation is `{nct_id, field, excerpt}`: the trial, the path of the field in its registry record, and the exact value found there. `citation_count` is the number of trials behind the datum. Five of them are cited by default, and `source_url` is a registry query that returns all of them, where such a query exists. Titles and links of the cited trials are in `references`.
 
-Every datum (a bar, a point, a node, a link) carries `citations`, `citation_count` and `source_url`. A citation is `{nct_id, field, excerpt}`: the trial, the path of the field in its registry record, and the exact value found there. `citation_count` is the number of trials behind the datum. Five of them are cited by default, and `source_url` is a registry query that returns all of them, where such a query exists. Titles and links of the cited trials are in `references`.
-
-### Metadata
-
-`meta` is not needed to draw the chart. It records how the answer was produced: the filters applied, the plan, assumptions, warnings, trial counts, every upstream request and the timings. It is described field by field in [`docs/SCHEMA.md`](docs/SCHEMA.md#metadata).
+**Metadata.** `meta` is not needed to draw the chart. It records how the answer was produced: the filters applied, the plan, assumptions, warnings, trial counts, every upstream request and the timings. It is described field by field in [`docs/SCHEMA.md`](docs/SCHEMA.md#metadata).
 
 ## Key design decisions and tradeoffs
 
-The model writes a plan and never touches data. It can't invent a number, a trial or an NCT ID because it never produces one. The price is that a question outside the plan's vocabulary gets a clarification or an "unsupported" reply where a looser agent would have improvised something.
-
-There are two ways to read the registry, and both are exact. One count request per bucket works at any size. A paged read of every matching trial handles what counts can't: networks, scatter plots, medians and open-ended groupings such as sponsor. Tests require the two to agree on the same records. I chose not to sample, so a question too broad to read within the 45 second deadline is answered with a request to narrow it.
-
-Every chart comes from one aggregation engine over a catalogue of 22 dimensions. A trend is a date dimension, a comparison is several scopes and a network is two dimensions. Adding a dimension means adding one catalogue entry.
-
-Every answer can be replayed. A response includes the plan it ran, and `POST /v1/analyses` runs a plan without the model, so the same plan on the same data version gives the same chart.
-
-Responses are checked before they are sent. The 17 invariants cover what JSON Schema can't express, including that citations point at real records with matching text.
-
-All text in a response comes from templates. No sentence written by the model reaches a title, a headline or a warning.
-
-The service keeps no session state. For a follow-up the client sends the previous plan back, which also means a follow-up can be tested like any other request.
-
-Approaches I considered and rejected:
-
-- A free tool-calling loop, because the model would read data and write numbers itself.
-- A generative-UI layer, because the model would retype the data rows.
-- A bulk download into a local database, because it goes stale against the registry's weekday refreshes.
-- FHIR as the data source, because it serves one study per request.
+- **The model writes a plan and never data.** It cannot invent a number, a trial or an NCT ID, because it never produces one. The cost is flexibility. A question outside the plan's vocabulary gets a clarification or an "unsupported" reply, not an improvised answer.
+- **Two exact ways to read the registry.** One count request per bucket is exact at any size. A paged read of every matching trial covers what counts cannot: networks, scatter plots, medians and open-ended groupings such as sponsor. Tests require both to give the same result on the same records. Nothing is sampled. A question too broad to read within the 45 second deadline is answered with a request to narrow it.
+- **One field catalogue and one engine.** Every chart comes from the same aggregation over 22 dimensions. A trend is a date dimension, a comparison is several scopes and a network is two dimensions. Adding a dimension is one catalogue entry.
+- **Every answer can be replayed.** A response returns the plan it ran, and `POST /v1/analyses` runs a plan without the model. The same plan on the same data version gives the same chart.
+- **Responses are verified before they are sent.** The 17 invariants cover what JSON Schema cannot, including that citations point at real records with matching text.
+- **Text comes from templates.** No sentence written by the model reaches a title, a headline or a warning.
+- **No session state.** The client sends the previous plan back for a follow-up, so a follow-up can be tested like any other request.
+- **What I rejected.** A free tool-calling loop, because the model would read data and write numbers. A generative-UI layer, because the model would retype data rows. A bulk download into a local database, because it goes stale against the registry's weekday refreshes. FHIR as the data source, because it serves one study per request.
 
 ## Example runs
 
@@ -258,11 +242,11 @@ jq -c '{plan: .meta.plan, options: .meta.options}' docs/examples/04-sponsor-drug
 
 ## How correctness was validated
 
-- About 1,150 backend and 200 frontend tests run with the network blocked. They cover query escaping, odd real records, every plan rule and most of the invariants, and they check that the two data paths agree on the same records.
-- A citation audit re-fetched every cited record for 68 responses. All 3,832 cited trials exist and all 7,045 excerpts match the registry. It also turned up real bugs, since fixed: some scatter points cited the wrong evidence, and some `source_url` totals did not match their datum.
-- An aggregation audit put 533 questions to the service and recomputed each answer independently from the raw registry records. It flagged 24 cases, mostly top-N and "Other" counts under a comparison. Those were fixed with tests, but the full batch has not been run again since.
-- Of 13 deliberately difficult questions, 12 produced a chart and 1 was refused because it asked for three measures at once. A few of the 12 were imperfect. One, for example, added a split that nobody asked for.
-- Running the ten recorded plans again against the live registry reproduced the recorded answers.
+- **Offline tests.** About 1,150 backend and 200 frontend tests run with the network blocked. They cover query escaping, odd real records, every plan rule and most of the invariants, and they check that the two data paths agree on the same records.
+- **Citation audit.** A script re-fetched every cited record for 68 responses. All 3,832 cited trials exist, and all 7,045 excerpts match the registry. The audit also found real defects, which are fixed: some scatter points cited the wrong evidence, and some `source_url` totals did not match their datum.
+- **Aggregation audit.** 533 questions were answered by the service and recomputed independently from the raw registry records. 24 cases were flagged, mostly top-N and "Other" counts under a comparison, and fixed with tests. The full batch was not run again after the fixes.
+- **Hard prompts.** Of 13 deliberately difficult questions, 12 produced a chart and 1 was refused because it asked for three measures at once. A few of the 12 were imperfect. One added a split that nobody asked for.
+- **Replays.** Running the ten recorded plans again against the live registry reproduced the recorded answers.
 
 ## Limitations and what I would improve
 
@@ -273,9 +257,9 @@ jq -c '{plan: .meta.plan, options: .meta.options}' docs/examples/04-sponsor-drug
 - Wording changes counts. "Heart attack" and "myocardial infarction" reach different trial sets in the registry's search.
 - The model's reading can vary between runs, for example by adding a split. Caching keeps a repeated question stable, but there is no repeated-run evaluation yet.
 - Citations are a sample, and nothing says why a cited trial matched. The registry matches synonyms, so a cited trial can look unrelated.
-- Very broad questions are refused. Sampling them and scaling the result up is not built.
+- Very broad questions are refused, not sampled.
 - Not supported: investigator or site networks, maps, results data, and reading the free text of trial descriptions.
-- The service runs as one process with no login, its caches are in memory, and the UI has no browser tests.
+- It runs as one process with no login and in-memory caches, and the UI has no browser tests.
 
 With more time I would add an evaluation harness with repeated runs, drug class and alias resolution from the registry's own terms, a reason for each cited trial, a shared cache in Redis and browser tests.
 
