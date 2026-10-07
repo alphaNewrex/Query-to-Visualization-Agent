@@ -10391,8 +10391,8 @@
     }
   },
   "meta": {
-    "request_id": "950b2184-0bce-4964-9bec-d5e8e0069b84",
-    "generated_at": "2026-10-07T05:46:54.736700Z",
+    "request_id": "d4597484-a778-4f33-be0c-3559ffeacbb0",
+    "generated_at": "2026-10-07T07:04:11.561183Z",
     "query": "Plot enrollment against duration for completed Duchenne muscular dystrophy trials.",
     "filters": {
       "drug_name": [],
@@ -10552,7 +10552,7 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T05:46:54.736700Z",
+      "retrieved_at": "2026-10-07T07:04:11.561183Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
@@ -10631,7 +10631,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&filter.overallStatus=COMPLETED&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 53,
+          "duration_ms": 58,
           "total_count": 240,
           "records_returned": 1,
           "is_cached": false,
@@ -10651,7 +10651,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&filter.overallStatus=COMPLETED&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,CompletionDate,CompletionDateType,Condition,EnrollmentCount,EnrollmentType,StartDate,StartDateType,StudyFirstPostDate",
           "status": 200,
-          "duration_ms": 183,
+          "duration_ms": 220,
           "total_count": 240,
           "records_returned": 240,
           "is_cached": false,
@@ -10700,10 +10700,10 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 1972,
-      "plan_ms": 1722,
-      "resolve_ms": 55,
-      "fetch_ms": 187,
+      "total_ms": 1928,
+      "plan_ms": 1634,
+      "resolve_ms": 60,
+      "fetch_ms": 224,
       "build_ms": 3
     },
     "debug": {
@@ -10712,7 +10712,7 @@
           "index": 0,
           "type": "plan",
           "summary": "Plot enrollment against study duration for completed Duchenne muscular dystrophy trials.",
-          "duration_ms": 1722,
+          "duration_ms": 1634,
           "request_indexes": [],
           "detail": {}
         },
@@ -10720,7 +10720,7 @@
           "index": 1,
           "type": "resolve_entity",
           "summary": "1 entities",
-          "duration_ms": 55,
+          "duration_ms": 60,
           "request_indexes": [
             0,
             1,
@@ -10737,7 +10737,7 @@
           "index": 2,
           "type": "execute",
           "summary": "2 requests",
-          "duration_ms": 187,
+          "duration_ms": 224,
           "request_indexes": [
             8,
             9

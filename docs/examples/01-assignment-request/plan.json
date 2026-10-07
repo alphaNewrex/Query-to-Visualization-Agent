@@ -1,5 +1,5 @@
 {
-  "interpretation": "Count trials for Pembrolizumab by start year.",
+  "interpretation": "Count pembrolizumab trials by start year.",
   "entities": [
     {
       "kind": "drug",

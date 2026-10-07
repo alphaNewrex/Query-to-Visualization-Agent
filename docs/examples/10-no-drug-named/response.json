@@ -12,8 +12,8 @@
   },
   "references": {},
   "meta": {
-    "request_id": "a4fd4d72-c5b7-4ea1-8856-680febecfb06",
-    "generated_at": "2026-10-07T05:46:59.794030Z",
+    "request_id": "21f71900-bced-4ec4-87ea-bc2dcb9f235e",
+    "generated_at": "2026-10-07T07:04:16.635080Z",
     "query": "How has the number of trials for this drug changed over time?",
     "filters": {
       "drug_name": [],
@@ -96,8 +96,8 @@
       "is_fallback": false,
       "usage": {
         "input_tokens": 9000,
-        "output_tokens": 146,
-        "reasoning_tokens": 12,
+        "output_tokens": 150,
+        "reasoning_tokens": 16,
         "cached_tokens": 8448
       }
     },
@@ -128,8 +128,8 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 1338,
-      "plan_ms": 1338,
+      "total_ms": 2039,
+      "plan_ms": 2039,
       "resolve_ms": 0,
       "fetch_ms": 0,
       "build_ms": 0
@@ -140,7 +140,7 @@
           "index": 0,
           "type": "plan",
           "summary": "Count trials for an unnamed drug by start year.",
-          "duration_ms": 1338,
+          "duration_ms": 2039,
           "request_indexes": [],
           "detail": {}
         }
