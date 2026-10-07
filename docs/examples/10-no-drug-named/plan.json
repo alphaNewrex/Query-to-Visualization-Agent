@@ -1,5 +1,5 @@
 {
-  "interpretation": "Count trials for an unnamed drug by time.",
+  "interpretation": "Count trials for an unnamed drug by start year.",
   "entities": [],
   "filters": {
     "phases": [],

@@ -1,11 +1,11 @@
 {
   "spec_version": "1.0",
   "kind": "visualization",
-  "message": "10 of 10 trials, ordered by largest enrollment.",
+  "message": "10 of 14,604 trials, ordered by largest enrollment.",
   "visualization": {
     "type": "table",
     "title": "Trials with the largest enrollment: lung cancer",
-    "subtitle": "10 trials · ClinicalTrials.gov, data as of 2026-10-06",
+    "subtitle": "10 of 14,604 trials · ClinicalTrials.gov, data as of 2026-10-06",
     "encoding": {
       "columns": [
         {
@@ -71,8 +71,43 @@
         "citations": [
           {
             "nct_id": "NCT03847753",
+            "field": "protocolSection.identificationModule.nctId",
+            "excerpt": "NCT03847753"
+          },
+          {
+            "nct_id": "NCT03847753",
+            "field": "protocolSection.identificationModule.briefTitle",
+            "excerpt": "Exploring the Comorbidity Between Mental Disorders and General Medical Conditions"
+          },
+          {
+            "nct_id": "NCT03847753",
             "field": "protocolSection.designModule.enrollmentInfo.count",
             "excerpt": "5940299"
+          },
+          {
+            "nct_id": "NCT03847753",
+            "field": "protocolSection.designModule.enrollmentInfo.type",
+            "excerpt": "ACTUAL"
+          },
+          {
+            "nct_id": "NCT03847753",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT03847753",
+            "field": "protocolSection.statusModule.overallStatus",
+            "excerpt": "COMPLETED"
+          },
+          {
+            "nct_id": "NCT03847753",
+            "field": "protocolSection.statusModule.startDateStruct.date",
+            "excerpt": "2000-01-01"
+          },
+          {
+            "nct_id": "NCT03847753",
+            "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+            "excerpt": "University of Aarhus"
           }
         ],
         "citation_count": 1,
@@ -90,8 +125,43 @@
         "citations": [
           {
             "nct_id": "NCT01236053",
+            "field": "protocolSection.identificationModule.nctId",
+            "excerpt": "NCT01236053"
+          },
+          {
+            "nct_id": "NCT01236053",
+            "field": "protocolSection.identificationModule.briefTitle",
+            "excerpt": "Cancer in Patients With Gabapentin (GPRD)"
+          },
+          {
+            "nct_id": "NCT01236053",
             "field": "protocolSection.designModule.enrollmentInfo.count",
             "excerpt": "2323608"
+          },
+          {
+            "nct_id": "NCT01236053",
+            "field": "protocolSection.designModule.enrollmentInfo.type",
+            "excerpt": "ACTUAL"
+          },
+          {
+            "nct_id": "NCT01236053",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT01236053",
+            "field": "protocolSection.statusModule.overallStatus",
+            "excerpt": "COMPLETED"
+          },
+          {
+            "nct_id": "NCT01236053",
+            "field": "protocolSection.statusModule.startDateStruct.date",
+            "excerpt": "2010-06"
+          },
+          {
+            "nct_id": "NCT01236053",
+            "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+            "excerpt": "GlaxoSmithKline"
           }
         ],
         "citation_count": 1,
@@ -109,8 +179,43 @@
         "citations": [
           {
             "nct_id": "NCT04506528",
+            "field": "protocolSection.identificationModule.nctId",
+            "excerpt": "NCT04506528"
+          },
+          {
+            "nct_id": "NCT04506528",
+            "field": "protocolSection.identificationModule.briefTitle",
+            "excerpt": "COVID EHR COHORT at the University of Wisconsin"
+          },
+          {
+            "nct_id": "NCT04506528",
             "field": "protocolSection.designModule.enrollmentInfo.count",
             "excerpt": "1634381"
+          },
+          {
+            "nct_id": "NCT04506528",
+            "field": "protocolSection.designModule.enrollmentInfo.type",
+            "excerpt": "ACTUAL"
+          },
+          {
+            "nct_id": "NCT04506528",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT04506528",
+            "field": "protocolSection.statusModule.overallStatus",
+            "excerpt": "COMPLETED"
+          },
+          {
+            "nct_id": "NCT04506528",
+            "field": "protocolSection.statusModule.startDateStruct.date",
+            "excerpt": "2020-06-11"
+          },
+          {
+            "nct_id": "NCT04506528",
+            "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+            "excerpt": "University of Wisconsin, Madison"
           }
         ],
         "citation_count": 1,
@@ -128,8 +233,43 @@
         "citations": [
           {
             "nct_id": "NCT02501668",
+            "field": "protocolSection.identificationModule.nctId",
+            "excerpt": "NCT02501668"
+          },
+          {
+            "nct_id": "NCT02501668",
+            "field": "protocolSection.identificationModule.briefTitle",
+            "excerpt": "The Prevalence of Lung Cancer in Patients With Interstitial Lung Disease"
+          },
+          {
+            "nct_id": "NCT02501668",
             "field": "protocolSection.designModule.enrollmentInfo.count",
             "excerpt": "1375842"
+          },
+          {
+            "nct_id": "NCT02501668",
+            "field": "protocolSection.designModule.enrollmentInfo.type",
+            "excerpt": "ACTUAL"
+          },
+          {
+            "nct_id": "NCT02501668",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT02501668",
+            "field": "protocolSection.statusModule.overallStatus",
+            "excerpt": "COMPLETED"
+          },
+          {
+            "nct_id": "NCT02501668",
+            "field": "protocolSection.statusModule.startDateStruct.date",
+            "excerpt": "2015-07"
+          },
+          {
+            "nct_id": "NCT02501668",
+            "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+            "excerpt": "Keimyung University Dongsan Medical Center"
           }
         ],
         "citation_count": 1,
@@ -147,8 +287,43 @@
         "citations": [
           {
             "nct_id": "NCT05506800",
+            "field": "protocolSection.identificationModule.nctId",
+            "excerpt": "NCT05506800"
+          },
+          {
+            "nct_id": "NCT05506800",
+            "field": "protocolSection.identificationModule.briefTitle",
+            "excerpt": "Guangzhou Women's Health Cohort Study (GWHCS)"
+          },
+          {
+            "nct_id": "NCT05506800",
             "field": "protocolSection.designModule.enrollmentInfo.count",
             "excerpt": "1000000"
+          },
+          {
+            "nct_id": "NCT05506800",
+            "field": "protocolSection.designModule.enrollmentInfo.type",
+            "excerpt": "ESTIMATED"
+          },
+          {
+            "nct_id": "NCT05506800",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT05506800",
+            "field": "protocolSection.statusModule.overallStatus",
+            "excerpt": "SUSPENDED"
+          },
+          {
+            "nct_id": "NCT05506800",
+            "field": "protocolSection.statusModule.startDateStruct.date",
+            "excerpt": "2016-03-03"
+          },
+          {
+            "nct_id": "NCT05506800",
+            "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+            "excerpt": "Guangzhou Women and Children's Medical Center"
           }
         ],
         "citation_count": 1,
@@ -166,8 +341,43 @@
         "citations": [
           {
             "nct_id": "NCT06632886",
+            "field": "protocolSection.identificationModule.nctId",
+            "excerpt": "NCT06632886"
+          },
+          {
+            "nct_id": "NCT06632886",
+            "field": "protocolSection.identificationModule.briefTitle",
+            "excerpt": "AI-Assisted Non-Contrast CT for Multi-Cancer Screening"
+          },
+          {
+            "nct_id": "NCT06632886",
             "field": "protocolSection.designModule.enrollmentInfo.count",
             "excerpt": "1000000"
+          },
+          {
+            "nct_id": "NCT06632886",
+            "field": "protocolSection.designModule.enrollmentInfo.type",
+            "excerpt": "ESTIMATED"
+          },
+          {
+            "nct_id": "NCT06632886",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "NA"
+          },
+          {
+            "nct_id": "NCT06632886",
+            "field": "protocolSection.statusModule.overallStatus",
+            "excerpt": "RECRUITING"
+          },
+          {
+            "nct_id": "NCT06632886",
+            "field": "protocolSection.statusModule.startDateStruct.date",
+            "excerpt": "2024-10-07"
+          },
+          {
+            "nct_id": "NCT06632886",
+            "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+            "excerpt": "Guo ShiWei"
           }
         ],
         "citation_count": 1,
@@ -185,8 +395,43 @@
         "citations": [
           {
             "nct_id": "NCT02012699",
+            "field": "protocolSection.identificationModule.nctId",
+            "excerpt": "NCT02012699"
+          },
+          {
+            "nct_id": "NCT02012699",
+            "field": "protocolSection.identificationModule.briefTitle",
+            "excerpt": "Integrated Cancer Repository for Cancer Research"
+          },
+          {
+            "nct_id": "NCT02012699",
             "field": "protocolSection.designModule.enrollmentInfo.count",
             "excerpt": "999999"
+          },
+          {
+            "nct_id": "NCT02012699",
+            "field": "protocolSection.designModule.enrollmentInfo.type",
+            "excerpt": "ESTIMATED"
+          },
+          {
+            "nct_id": "NCT02012699",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT02012699",
+            "field": "protocolSection.statusModule.overallStatus",
+            "excerpt": "RECRUITING"
+          },
+          {
+            "nct_id": "NCT02012699",
+            "field": "protocolSection.statusModule.startDateStruct.date",
+            "excerpt": "2013-11-01"
+          },
+          {
+            "nct_id": "NCT02012699",
+            "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+            "excerpt": "University of Nebraska"
           }
         ],
         "citation_count": 1,
@@ -204,8 +449,43 @@
         "citations": [
           {
             "nct_id": "NCT04334239",
+            "field": "protocolSection.identificationModule.nctId",
+            "excerpt": "NCT04334239"
+          },
+          {
+            "nct_id": "NCT04334239",
+            "field": "protocolSection.identificationModule.briefTitle",
+            "excerpt": "Effectiveness of Care in Certified Cancer Centres in Germany"
+          },
+          {
+            "nct_id": "NCT04334239",
             "field": "protocolSection.designModule.enrollmentInfo.count",
             "excerpt": "670000"
+          },
+          {
+            "nct_id": "NCT04334239",
+            "field": "protocolSection.designModule.enrollmentInfo.type",
+            "excerpt": "ACTUAL"
+          },
+          {
+            "nct_id": "NCT04334239",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT04334239",
+            "field": "protocolSection.statusModule.overallStatus",
+            "excerpt": "COMPLETED"
+          },
+          {
+            "nct_id": "NCT04334239",
+            "field": "protocolSection.statusModule.startDateStruct.date",
+            "excerpt": "2017-05-01"
+          },
+          {
+            "nct_id": "NCT04334239",
+            "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+            "excerpt": "Technische Universität Dresden"
           }
         ],
         "citation_count": 1,
@@ -223,8 +503,43 @@
         "citations": [
           {
             "nct_id": "NCT07008560",
+            "field": "protocolSection.identificationModule.nctId",
+            "excerpt": "NCT07008560"
+          },
+          {
+            "nct_id": "NCT07008560",
+            "field": "protocolSection.identificationModule.briefTitle",
+            "excerpt": "Spatiotemporal Associations Between the COVID-19 Pandemic and Cancer Diagnoses in Bavaria"
+          },
+          {
+            "nct_id": "NCT07008560",
             "field": "protocolSection.designModule.enrollmentInfo.count",
             "excerpt": "438000"
+          },
+          {
+            "nct_id": "NCT07008560",
+            "field": "protocolSection.designModule.enrollmentInfo.type",
+            "excerpt": "ESTIMATED"
+          },
+          {
+            "nct_id": "NCT07008560",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT07008560",
+            "field": "protocolSection.statusModule.overallStatus",
+            "excerpt": "ACTIVE_NOT_RECRUITING"
+          },
+          {
+            "nct_id": "NCT07008560",
+            "field": "protocolSection.statusModule.startDateStruct.date",
+            "excerpt": "2025-09-03"
+          },
+          {
+            "nct_id": "NCT07008560",
+            "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+            "excerpt": "Bavarian Cancer Registry"
           }
         ],
         "citation_count": 1,
@@ -242,8 +557,43 @@
         "citations": [
           {
             "nct_id": "NCT04125381",
+            "field": "protocolSection.identificationModule.nctId",
+            "excerpt": "NCT04125381"
+          },
+          {
+            "nct_id": "NCT04125381",
+            "field": "protocolSection.identificationModule.briefTitle",
+            "excerpt": "Arsenic Exposure and Lung Cancer Incidence"
+          },
+          {
+            "nct_id": "NCT04125381",
             "field": "protocolSection.designModule.enrollmentInfo.count",
             "excerpt": "314000"
+          },
+          {
+            "nct_id": "NCT04125381",
+            "field": "protocolSection.designModule.enrollmentInfo.type",
+            "excerpt": "ACTUAL"
+          },
+          {
+            "nct_id": "NCT04125381",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT04125381",
+            "field": "protocolSection.statusModule.overallStatus",
+            "excerpt": "COMPLETED"
+          },
+          {
+            "nct_id": "NCT04125381",
+            "field": "protocolSection.statusModule.startDateStruct.date",
+            "excerpt": "2019-01-14"
+          },
+          {
+            "nct_id": "NCT04125381",
+            "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+            "excerpt": "University of Rome Tor Vergata"
           }
         ],
         "citation_count": 1,
@@ -313,8 +663,8 @@
     }
   },
   "meta": {
-    "request_id": "c3b6be86-6a93-45e1-8ba0-0a97c8873e9c",
-    "generated_at": "2026-10-07T02:47:37.769873Z",
+    "request_id": "7eac0084-f8b7-4ec2-978b-a35564d89070",
+    "generated_at": "2026-10-07T05:46:56.789138Z",
     "query": "List the 10 largest lung cancer trials.",
     "filters": {
       "drug_name": [],
@@ -438,15 +788,15 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v3",
+      "prompt_version": "plan-v7",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 8247,
-        "output_tokens": 185,
-        "reasoning_tokens": 34,
-        "cached_tokens": 7936
+        "input_tokens": 8996,
+        "output_tokens": 184,
+        "reasoning_tokens": 33,
+        "cached_tokens": 8448
       }
     },
     "conversation": {
@@ -463,7 +813,7 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T02:47:37.769873Z",
+      "retrieved_at": "2026-10-07T05:46:56.789138Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
@@ -550,9 +900,9 @@
         },
         {
           "method": "GET",
-          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&countTotal=true&pageSize=10&fields=NCTId,BriefTitle,Condition,EnrollmentCount,LeadSponsorName,OverallStatus,Phase,StartDate,StudyFirstPostDate&sort=EnrollmentCount:desc",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&countTotal=true&pageSize=10&fields=NCTId,BriefTitle,Condition,EnrollmentCount,EnrollmentType,LeadSponsorName,OverallStatus,Phase,StartDate,StudyFirstPostDate&sort=EnrollmentCount:desc",
           "status": 200,
-          "duration_ms": 86,
+          "duration_ms": 94,
           "total_count": 14604,
           "records_returned": 10,
           "is_cached": false,
@@ -603,10 +953,10 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 1221,
-      "plan_ms": 1131,
+      "total_ms": 2031,
+      "plan_ms": 1933,
       "resolve_ms": 2,
-      "fetch_ms": 87,
+      "fetch_ms": 95,
       "build_ms": 0
     },
     "debug": {
@@ -615,7 +965,7 @@
           "index": 0,
           "type": "plan",
           "summary": "List lung cancer trials by enrollment, largest first.",
-          "duration_ms": 1131,
+          "duration_ms": 1933,
           "request_indexes": [],
           "detail": {}
         },
@@ -640,7 +990,7 @@
           "index": 2,
           "type": "execute",
           "summary": "1 requests",
-          "duration_ms": 87,
+          "duration_ms": 95,
           "request_indexes": [
             8
           ],

@@ -12,8 +12,8 @@
   },
   "references": {},
   "meta": {
-    "request_id": "19e0fbfd-4a70-480d-930c-89417f152135",
-    "generated_at": "2026-10-07T02:47:40.360101Z",
+    "request_id": "a4fd4d72-c5b7-4ea1-8856-680febecfb06",
+    "generated_at": "2026-10-07T05:46:59.794030Z",
     "query": "How has the number of trials for this drug changed over time?",
     "filters": {
       "drug_name": [],
@@ -48,7 +48,7 @@
     },
     "interpretation": null,
     "plan": {
-      "interpretation": "Count trials for an unnamed drug by time.",
+      "interpretation": "Count trials for an unnamed drug by start year.",
       "entities": [],
       "filters": {
         "phases": [],
@@ -90,15 +90,15 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v3",
+      "prompt_version": "plan-v7",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 8251,
-        "output_tokens": 143,
-        "reasoning_tokens": 10,
-        "cached_tokens": 7936
+        "input_tokens": 9000,
+        "output_tokens": 146,
+        "reasoning_tokens": 12,
+        "cached_tokens": 8448
       }
     },
     "conversation": {
@@ -128,8 +128,8 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 1196,
-      "plan_ms": 1196,
+      "total_ms": 1338,
+      "plan_ms": 1338,
       "resolve_ms": 0,
       "fetch_ms": 0,
       "build_ms": 0
@@ -139,8 +139,8 @@
         {
           "index": 0,
           "type": "plan",
-          "summary": "Count trials for an unnamed drug by time.",
-          "duration_ms": 1196,
+          "summary": "Count trials for an unnamed drug by start year.",
+          "duration_ms": 1338,
           "request_indexes": [],
           "detail": {}
         }

@@ -130,13 +130,13 @@ curl -s -X POST http://127.0.0.1:8000/v1/query -H 'Content-Type: application/jso
 The structured field `drug_name` is what "this drug" refers to, and the answer is a `time_series` of trials started per year. Below is the recorded run [`docs/examples/01-assignment-request/`](docs/examples/01-assignment-request/response.json), cut down: two rows, one citation each, one reference, the `meta` blocks that the schema reference describes folded to `"..."`, and strings cut at 100 characters.
 
 <!-- gen:response-example:start -->
-The service matched 2,971 trials with 36 requests to ClinicalTrials.gov and answered in 7.2 s, of which the model call took 1.7 s. The series starts in 2008, the first period with a trial; empty periods before it are left out.
+The service matched 2,971 trials with 36 requests to ClinicalTrials.gov and answered in 5.4 s, of which the model call took 1.9 s. The series starts in 2008, the first period with a trial; empty periods before it are left out.
 
 ```json
 {
   "spec_version": "1.0",
   "kind": "visualization",
-  "message": "259 trials started in 2025; the peak was 299 in 2022.",
+  "message": "259 trials started in 2025; the peak was 299 in 2022 (counted over the periods that have ended, 2...",
   "visualization": {
     "type": "time_series",
     "title": "Trials started per year: Pembrolizumab",
@@ -184,8 +184,8 @@ The service matched 2,971 trials with 36 requests to ClinicalTrials.gov and answ
     "...": "76 more trials"
   },
   "meta": {
-    "request_id": "3bc29ba6-7304-4e2f-8319-dab6b3d19cd3",
-    "generated_at": "2026-10-07T02:47:17.183228Z",
+    "request_id": "fe1507f9-b286-4f5f-a42c-a7c5a8262cca",
+    "generated_at": "2026-10-07T05:46:36.916342Z",
     "query": "How has the number of trials for this drug changed over time?",
     "filters": {
       "drug_name": ["Pembrolizumab"],
@@ -227,7 +227,7 @@ The service matched 2,971 trials with 36 requests to ClinicalTrials.gov and answ
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T02:47:17.183228Z",
+      "retrieved_at": "2026-10-07T05:46:36.916342Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
@@ -241,8 +241,8 @@ The service matched 2,971 trials with 36 requests to ClinicalTrials.gov and answ
           "trials_matched": 2971,
           "trials_analyzed": 2959,
           "trials_excluded": [
-            {"reason": "after_window", "count": 7, "message": "After the periods shown"},
-            {"reason": "no_start_date", "count": 5, "message": "No start date on record"}
+            {"reason": "no_start_date", "count": 5, "message": "No start date on record"},
+            {"reason": "after_window", "count": 7, "message": "After the periods shown"}
           ]
         }
       ],
@@ -549,7 +549,7 @@ Ten questions were run through the service and the answers recorded, unedited, u
 
 | Run | Question | Visualization | Headline |
 | --- | --- | --- | --- |
-| [01-assignment-request](docs/examples/01-assignment-request/response.json) | How has the number of trials for this drug changed over time? (drug_name: Pembrolizumab) | `time_series` (line) | 259 trials started in 2025; the peak was 299 in 2022. |
+| [01-assignment-request](docs/examples/01-assignment-request/response.json) | How has the number of trials for this drug changed over time? (drug_name: Pembrolizumab) | `time_series` (line) | 259 trials started in 2025; the peak was 299 in 2022 (counted over the periods that have ended, 2008 to 2025; 7 trials started after 2026 are not shown). |
 | [02-compare-phases](docs/examples/02-compare-phases/response.json) | Compare phases for trials involving pembrolizumab vs nivolumab. | `bar_chart` (grouped) | The largest group is Phase 2 for pembrolizumab, with 1,259 trials. |
 | [03-recruiting-by-country](docs/examples/03-recruiting-by-country/response.json) | Which countries have the most recruiting trials for lung cancer? | `bar_chart` (horizontal) | China is the largest group: 903 of 2,298 trials (39.3%). |
 | [04-sponsor-drug-network](docs/examples/04-sponsor-drug-network/response.json) | Show a network of sponsors and drugs for Duchenne muscular dystrophy trials. | `network_graph` (bipartite) | 24 nodes and 15 links; the strongest link joins PTC Therapeutics and Ataluren in 13 trials. |
@@ -561,7 +561,7 @@ Ten questions were run through the service and the answers recorded, unedited, u
 | --- | --- | --- | --- |
 | [06-enrollment-histogram](docs/examples/06-enrollment-histogram/response.json) | What is the distribution of enrollment sizes for pembrolizumab trials? | `histogram` | The most common size range is 25-49, with 649 trials. |
 | [07-enrollment-vs-duration](docs/examples/07-enrollment-vs-duration/response.json) | Plot enrollment against duration for completed Duchenne muscular dystrophy trials. | `scatter_plot` | 235 trials plotted, duration against enrollment. |
-| [08-largest-trials](docs/examples/08-largest-trials/response.json) | List the 10 largest lung cancer trials. | `table` | 10 of 10 trials, ordered by largest enrollment. |
+| [08-largest-trials](docs/examples/08-largest-trials/response.json) | List the 10 largest lung cancer trials. | `table` | 10 of 14,604 trials, ordered by largest enrollment. |
 | [09-recruiting-count](docs/examples/09-recruiting-count/response.json) | How many recruiting trials are there for Duchenne muscular dystrophy? | `metric` | 61 trials match: Duchenne muscular dystrophy; Status: Recruiting. |
 | [10-no-drug-named](docs/examples/10-no-drug-named/response.json) | How has the number of trials for this drug changed over time? | `clarification` (nothing to draw) | The question needs a drug name that it does not give. Add it to the question or its field. |
 <!-- gen:examples:end -->

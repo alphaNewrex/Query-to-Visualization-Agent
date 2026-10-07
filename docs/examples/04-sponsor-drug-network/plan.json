@@ -32,6 +32,6 @@
     "target": "drug",
     "link": "same_trial"
   },
-  "chart_preference": "network_graph",
+  "chart_preference": null,
   "unapplied": []
 }

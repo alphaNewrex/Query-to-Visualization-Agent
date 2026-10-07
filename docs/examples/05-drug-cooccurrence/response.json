@@ -962,11 +962,6 @@
               "excerpt": "Paclitaxel + Carboplatin"
             },
             {
-              "nct_id": "NCT07610525",
-              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
-              "excerpt": "Paclitaxel + Carboplatin"
-            },
-            {
               "nct_id": "NCT07420439",
               "field": "protocolSection.armsInterventionsModule.interventions[2].name",
               "excerpt": "Carboplatin"
@@ -995,11 +990,6 @@
               "nct_id": "NCT07793942",
               "field": "protocolSection.armsInterventionsModule.interventions[11].name",
               "excerpt": "Pemetrexed"
-            },
-            {
-              "nct_id": "NCT07777822",
-              "field": "protocolSection.armsInterventionsModule.interventions[3].name",
-              "excerpt": "pemetrexed + cisplatin /carboplatin"
             },
             {
               "nct_id": "NCT07777822",
@@ -1062,11 +1052,6 @@
               "excerpt": "pemetrexed + cisplatin /carboplatin"
             },
             {
-              "nct_id": "NCT07777822",
-              "field": "protocolSection.armsInterventionsModule.interventions[3].name",
-              "excerpt": "pemetrexed + cisplatin /carboplatin"
-            },
-            {
               "nct_id": "NCT07744126",
               "field": "protocolSection.armsInterventionsModule.interventions[2].name",
               "excerpt": "Carboplatin"
@@ -1122,11 +1107,6 @@
               "excerpt": "pemetrexed + cisplatin /carboplatin"
             },
             {
-              "nct_id": "NCT07777822",
-              "field": "protocolSection.armsInterventionsModule.interventions[3].name",
-              "excerpt": "pemetrexed + cisplatin /carboplatin"
-            },
-            {
               "nct_id": "NCT07486817",
               "field": "protocolSection.armsInterventionsModule.interventions[1].name",
               "excerpt": "Cisplatin"
@@ -1135,11 +1115,6 @@
               "nct_id": "NCT07486817",
               "field": "protocolSection.armsInterventionsModule.interventions[3].name",
               "excerpt": "Pemetrexed"
-            },
-            {
-              "nct_id": "NCT07365319",
-              "field": "protocolSection.armsInterventionsModule.interventions[5].name",
-              "excerpt": "Pemetrexed + Cisplatin /Carboplatin"
             },
             {
               "nct_id": "NCT07365319",
@@ -1482,11 +1457,6 @@
               "excerpt": "Ipilimumab plus nivolumab"
             },
             {
-              "nct_id": "NCT07740941",
-              "field": "protocolSection.armsInterventionsModule.interventions[1].name",
-              "excerpt": "Ipilimumab plus nivolumab"
-            },
-            {
               "nct_id": "NCT07436390",
               "field": "protocolSection.armsInterventionsModule.interventions[2].name",
               "excerpt": "Ipilimumab/Nivolumab"
@@ -1615,11 +1585,6 @@
               "nct_id": "NCT07365319",
               "field": "protocolSection.armsInterventionsModule.interventions[3].name",
               "excerpt": "Paclitaxel + Carboplatin"
-            },
-            {
-              "nct_id": "NCT07261683",
-              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
-              "excerpt": "Weekly Paclitaxel/Nab-Paclitaxel, Pembrolizumab, and Mirabegron"
             },
             {
               "nct_id": "NCT07261683",
@@ -3422,11 +3387,6 @@
               "excerpt": "5-Fluorouracil + leucovorin"
             },
             {
-              "nct_id": "NCT06109467",
-              "field": "protocolSection.armsInterventionsModule.interventions[3].name",
-              "excerpt": "5-Fluorouracil + leucovorin"
-            },
-            {
               "nct_id": "NCT05239741",
               "field": "protocolSection.armsInterventionsModule.interventions[3].name",
               "excerpt": "5-fluorouracil"
@@ -4510,11 +4470,6 @@
               "nct_id": "NCT05284539",
               "field": "protocolSection.armsInterventionsModule.interventions[0].name",
               "excerpt": "Pemetrexed, Cisplatin, Bevacizumab Plus Pembrolizumab"
-            },
-            {
-              "nct_id": "NCT05284539",
-              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
-              "excerpt": "Pemetrexed, Cisplatin, Bevacizumab Plus Pembrolizumab"
             }
           ],
           "citation_count": 8,
@@ -5311,8 +5266,8 @@
     }
   },
   "meta": {
-    "request_id": "1b091f08-597e-488f-bcde-057e71cfcf18",
-    "generated_at": "2026-10-07T02:47:33.235306Z",
+    "request_id": "dc792f0b-7788-4a5e-92c1-6a94975196de",
+    "generated_at": "2026-10-07T05:46:50.943066Z",
     "query": "Which drugs frequently co-occur in combination studies with pembrolizumab?",
     "filters": {
       "drug_name": [
@@ -5390,7 +5345,7 @@
           "series": null,
           "name": "walk",
           "reason": "All 2,971 trials were read and grouped here.",
-          "upstream_requests": 3
+          "upstream_requests": 13
         }
       ],
       "chart_rationale": "Rule 13: one kind of node on both sides, so a force-directed network."
@@ -5443,15 +5398,15 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v3",
+      "prompt_version": "plan-v7",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 8253,
-        "output_tokens": 200,
-        "reasoning_tokens": 42,
-        "cached_tokens": 7936
+        "input_tokens": 9002,
+        "output_tokens": 216,
+        "reasoning_tokens": 58,
+        "cached_tokens": 8448
       }
     },
     "conversation": {
@@ -5480,7 +5435,7 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T02:47:33.235306Z",
+      "retrieved_at": "2026-10-07T05:46:50.943066Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
@@ -5567,31 +5522,131 @@
         },
         {
           "method": "GET",
-          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 709,
+          "duration_ms": 62,
           "total_count": 2877,
-          "records_returned": 1000,
+          "records_returned": 1,
           "is_cached": false,
           "origin": "execution"
         },
         {
           "method": "GET",
-          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate&pageToken=ZVNj7o2Elu8o3lpwS9785unumpOQJJxuYfag2vwakA",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1&fields=NCTId,StudyFirstPostDate&sort=StudyFirstPostDate:asc",
           "status": 200,
-          "duration_ms": 705,
-          "total_count": null,
-          "records_returned": 1000,
+          "duration_ms": 57,
+          "total_count": 2877,
+          "records_returned": 1,
           "is_cached": false,
           "origin": "execution"
         },
         {
           "method": "GET",
-          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate&pageToken=ZVNj7o2Elu8o3lpwS9785unumpOQJJxtbPGj3P0TkA",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1&fields=NCTId,StudyFirstPostDate&sort=StudyFirstPostDate:desc",
           "status": 200,
-          "duration_ms": 749,
-          "total_count": null,
-          "records_returned": 877,
+          "duration_ms": 67,
+          "total_count": 2877,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=%28AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29%29%20AND%20%28AREA%5BStudyFirstPostDate%5DRANGE%5BMIN,2018-05-22%5D%29&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 59,
+          "total_count": 792,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=%28AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29%29%20AND%20%28AREA%5BStudyFirstPostDate%5DRANGE%5B2018-05-23,2022-07-30%5D%29&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 59,
+          "total_count": 1080,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=%28AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29%29%20AND%20%28AREA%5BStudyFirstPostDate%5DRANGE%5B2018-05-23,2020-06-25%5D%29&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 55,
+          "total_count": 508,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=%28AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29%29%20AND%20%28AREA%5BStudyFirstPostDate%5DRANGE%5B2022-07-31,2024-09-02%5D%29&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 61,
+          "total_count": 531,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=%28AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29%29%20AND%20%28AREA%5BStudyFirstPostDate%5DRANGE%5BMIN,2018-05-22%5D%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate",
+          "status": 200,
+          "duration_ms": 685,
+          "total_count": 792,
+          "records_returned": 792,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=%28AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29%29%20AND%20%28AREA%5BStudyFirstPostDate%5DRANGE%5B2018-05-23,2020-06-25%5D%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate",
+          "status": 200,
+          "duration_ms": 565,
+          "total_count": 508,
+          "records_returned": 508,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=%28AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29%29%20AND%20%28AREA%5BStudyFirstPostDate%5DRANGE%5B2020-06-26,2022-07-30%5D%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate",
+          "status": 200,
+          "duration_ms": 529,
+          "total_count": 572,
+          "records_returned": 572,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=%28AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29%29%20AND%20%28AREA%5BStudyFirstPostDate%5DRANGE%5B2022-07-31,2024-09-02%5D%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate",
+          "status": 200,
+          "duration_ms": 417,
+          "total_count": 531,
+          "records_returned": 531,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=%28AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29%29%20AND%20%28AREA%5BStudyFirstPostDate%5DRANGE%5B2024-09-03,MAX%5D%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate",
+          "status": 200,
+          "duration_ms": 492,
+          "total_count": 474,
+          "records_returned": 474,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=%28NOT%20%28AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29%29%29%20AND%20%28NOT%20%28AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29%29%29&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 66,
+          "total_count": 94,
+          "records_returned": 1,
           "is_cached": false,
           "origin": "execution"
         }
@@ -5627,7 +5682,7 @@
         {
           "scope": "edges",
           "shown": 60,
-          "total": 4905,
+          "total": 776,
           "rule": "Links of at least 2 trials, the 60 heaviest."
         }
       ]
@@ -5648,10 +5703,10 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 4048,
-      "plan_ms": 1592,
+      "total_ms": 3268,
+      "plan_ms": 2031,
       "resolve_ms": 2,
-      "fetch_ms": 2445,
+      "fetch_ms": 1231,
       "build_ms": 1
     },
     "debug": {
@@ -5660,7 +5715,7 @@
           "index": 0,
           "type": "plan",
           "summary": "Link drugs that share an arm with pembrolizumab in combination studies.",
-          "duration_ms": 1592,
+          "duration_ms": 2031,
           "request_indexes": [],
           "detail": {}
         },
@@ -5684,12 +5739,22 @@
         {
           "index": 2,
           "type": "execute",
-          "summary": "3 requests",
-          "duration_ms": 2445,
+          "summary": "13 requests",
+          "duration_ms": 1231,
           "request_indexes": [
             8,
             9,
-            10
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
           ],
           "detail": {}
         }
