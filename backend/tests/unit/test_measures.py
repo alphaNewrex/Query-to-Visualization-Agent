@@ -108,7 +108,7 @@ def test_a_bar_chart_of_a_statistic_names_the_measure_and_the_unit_everywhere() 
         ("PHASE2", 15.0, 2),
         ("PHASE3", 40.0, 1),
     ]
-    assert response.message == "PHASE3 has the highest median duration (months): 40.0 (1 trials measured)."
+    assert response.message == "PHASE3 has the highest median duration (months): 40.0 (1 trial measured)."
     assert response.meta.interpretation is not None
     interpretation = response.meta.interpretation
     assert interpretation.measure is not None

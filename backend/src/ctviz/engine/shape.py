@@ -163,7 +163,7 @@ def _shape_grids(result: EngineResult, plan: EnginePlan) -> ShapedResult:
     truncation: list[TruncationItem] = []
     window = result.window
     axis = _axis(plan.dimensions[0], result, plan, 0, window, plan.top_n, truncation, "categories")
-    if axis.dimension.spec.kind == "date" and window is not None and plan.public.filters.year_from is None:
+    if axis.dimension.spec.kind == "date" and window is not None and plan.axis_years[0] is None:
         axis, window = _trim_leading_empty(axis, result, window)
     series = None
     if plan.relation == "series":
@@ -191,8 +191,16 @@ def _axis(
     totals: Counter[str] = Counter()
     labels: dict[str, str] = {}
     for frame in result.frames:
+        # What a value is ranked by is its trials, each once. The cells of a multi-valued split count a
+        # trial in each of its values, so their sum is more than the trials; the marginal does not.
+        marginal = frame.marginals[position] if position < len(frame.marginals) else {}
+        if marginal:
+            for key, found in marginal.items():
+                totals[key] += found.trials
+        else:
+            for cell in frame.cells.values():
+                totals[cell.key[position]] += cell.trials
         for cell in frame.cells.values():
-            totals[cell.key[position]] += cell.trials
             labels[cell.key[position]] = cell.labels[position]
     buckets: Sequence[Bucket] = spec.buckets(dimension, window) if spec.buckets is not None else ()
     labels = {**{bucket.key: bucket.label for bucket in buckets}, **labels}
@@ -218,12 +226,13 @@ def _axis(
         keep = limit - 1 if spec.is_exclusive and scope == "series" else limit
         kept = set(sorted(keys, key=lambda key: (-totals[key], key))[:keep])
         rest_summed = ", the rest summed as Other" if spec.is_exclusive else ""
+        together = " of all compared groups together" if len(result.frames) > 1 else ""
         truncation.append(
             TruncationItem(
                 scope=scope,
                 shown=keep,
                 total=len(keys),
-                rule=f"The {keep} largest by trials{rest_summed}.",
+                rule=f"The {keep} largest by trials{together}{rest_summed}.",
             )
         )
         dropped = tuple(key for key in keys if key not in kept)
@@ -284,6 +293,7 @@ def _cell(frame: Frame, axes: Sequence[tuple[_Axis, str]], sample_size: int) -> 
         sample=sample[:sample_size],
         expr=expr,
         values=[value for part in parts for value in part.values],
+        is_rest=any(axis.merged and position_key == OTHER_KEY for axis, position_key in axes),
     )
 
 

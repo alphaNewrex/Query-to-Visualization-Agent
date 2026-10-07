@@ -88,7 +88,8 @@ async def test_a_date_axis_gives_the_same_frame_by_walk_and_by_fan_out() -> None
 async def test_two_closed_dimensions_give_the_same_grid_by_walk_and_by_fan_out() -> None:
     walked, counted = await both_ways((bound(START_DATE), bound(PHASE, "series")), WINDOW)
 
-    assert counts(walked) == {key: n for key, n in counts(counted).items() if n}
+    # Both give every cell of the closed grid, the empty ones with a count of zero.
+    assert counts(walked) == counts(counted)
     assert counts(counted)[("2020", "PHASE2")] == 1
     assert counts(counted)[("2019", "PHASE2")] == 0  # the fan-out counts every cell, even an empty one
 
@@ -170,7 +171,8 @@ async def test_compared_scopes_are_series_and_an_empty_group_is_a_zero_frame() -
 
     result = await execute_plan(plan, ExecutionPlan(runs, None, ()), FakeClient(trials), FakeContext())
 
-    assert [counts(frame) for frame in result.frames] == [{("PHASE1",): 2}, {("PHASE1",): 1}, {}]
+    nonzero = [{key: n for key, n in counts(frame).items() if n} for frame in result.frames]
+    assert nonzero == [{("PHASE1",): 2}, {("PHASE1",): 1}, {}]
     assert [step.upstream_requests for step in result.steps] == [1, 1, 0]
     assert [step.series for step in result.steps] == ["Acme", "Beta", "Gone"]
 

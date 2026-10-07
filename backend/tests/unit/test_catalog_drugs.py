@@ -22,6 +22,16 @@ from .catalog_samples import pembrolizumab
         ("Pembrolizumab and high dose interferon alfa-2b (HDI)", "pembrolizumab and interferon alfa-2b"),
         ("lenvatinib", "lenvatinib"),
         ("Dexamethasone 0.9% injection", "dexamethasone"),
+        # A leading sign or configuration is part of the name: these are different compounds.
+        ("(+)-Epicatechin", "pos-epicatechin"),
+        ("(\u2212)-Epicatechin", "neg-epicatechin"),  # the Unicode minus sign
+        ("(-)-epicatechin 100 mg", "neg-epicatechin"),
+        ("(\u00b1)-Epicatechin", "rac-epicatechin"),
+        ("(S)-Ketamine", "s-ketamine"),
+        ("( R )-ketamine", "r-ketamine"),
+        # A bracket that is not a descriptor is still an aside.
+        ("Epicatechin (+)", "epicatechin"),
+        ("(Keytruda) pembrolizumab", "pembrolizumab"),
     ],
 )
 def test_normalise(raw: str, normalised: str) -> None:
@@ -131,3 +141,57 @@ def test_a_drug_whose_arm_is_named_after_it_is_kept() -> None:
     assert not is_arm_label(
         _intervention("Alpha (extension of cohort 1)", "BIOLOGICAL", ("alpha (extension of cohort 1)",))
     )
+
+
+def test_the_parts_of_one_combination_string_pair_by_arm_even_when_the_record_lists_no_arm_label() -> None:
+    from ctviz.catalog.fields import CATALOG, BoundDimension
+    from ctviz.engine.aggregate import cells
+
+    from .engine_memory import record
+
+    studies = [
+        record(1, names=["alpha"], arms={"alpha": []}),
+        record(2, names=["beta"], arms={"beta": []}),
+        record(3, names=["alpha + beta"], arms={"alpha + beta": []}),  # no arm label at all
+        record(4, names=["alpha + beta"], arms={"alpha + beta": ["Arm 1"]}),
+        record(5, names=["alpha", "beta"], types=("DRUG", "DRUG"), arms={"alpha": ["A"], "beta": ["B"]}),
+    ]
+    fitted = DrugNormalizer.fit(studies)
+    dims = (BoundDimension(CATALOG["drug"], None, "node"),) * 2
+
+    pairs = {
+        study.nct_id: [(a.key, b.key) for a, b in cells([fitted.values(study)], dims, "same_arm")]
+        for study in studies[2:]
+    }
+
+    assert pairs == {
+        "NCT00000003": [("alpha", "beta")],  # one string: given together
+        "NCT00000004": [("alpha", "beta")],
+        "NCT00000005": [],  # two interventions in two different arms: not given together
+    }
+
+
+def test_the_two_forms_of_one_molecule_are_two_drugs_and_the_commonest_spelling_labels_each() -> None:
+    from .engine_memory import record
+
+    studies = [
+        record(1, names=["(+)-epicatechin"]),
+        record(2, names=["(+)-Epicatechin"]),
+        record(3, names=["(\u2212)-epicatechin"]),
+        record(4, names=["(-)-epicatechin"]),
+        record(5, names=["epicatechin"]),
+    ]
+    fitted = DrugNormalizer.fit(studies)
+
+    keys = {study.nct_id: [v.key for v in fitted.values(study)] for study in studies}
+
+    assert keys == {
+        "NCT00000001": ["pos-epicatechin"],
+        "NCT00000002": ["pos-epicatechin"],
+        "NCT00000003": ["neg-epicatechin"],
+        "NCT00000004": ["neg-epicatechin"],
+        "NCT00000005": ["epicatechin"],
+    }
+    assert fitted.labels["pos-epicatechin"] == "(+)-Epicatechin" or fitted.labels[
+        "pos-epicatechin"
+    ].startswith("(+)")

@@ -115,7 +115,7 @@ def _evidence(
         if found is None:
             return None
         evidence.extend(found.evidence)
-    return tuple(evidence)
+    return tuple(dict.fromkeys(evidence))  # one string can be the evidence of both ends of a pair
 
 
 def _value_of(study: Study, dimension: BoundDimension, bucket: Bucket) -> Value | None:
@@ -137,13 +137,17 @@ def _bucket_lists(plan: EnginePlan, window: Window | None) -> list[Sequence[Buck
 
 
 def _probes(plan: EnginePlan, scope: Scope, window: Window | None) -> list[Probe]:
-    """Counts of the trials that fit no bucket: before or after the window, or with no value at all."""
-    probes: list[Probe] = []
+    """Counts of the trials that fit no bucket, as disjoint groups in the order the walk excludes them.
+
+    The walk gives each trial one reason, the first that applies: for each dimension in turn, no value,
+    then before the window, then after it. Probes that overlap would take a trial twice off the analysed
+    count, so each probe also leaves out every trial an earlier one selects: the first reason wins here
+    too, and both executors report the same exclusions.
+    """
+    raw: list[Probe] = []
     for dimension in plan.dimensions:
         spec = dimension.spec
         piece = spec.pieces[0]
-        if spec.kind == "date" and window is not None:
-            probes.extend(_window_probes(scope, piece, window))
         # A date range on the same field already leaves out the trials that have no date.
         is_ranged = scope.date_range is not None and scope.date_range.piece == piece
         if (
@@ -153,11 +157,21 @@ def _probes(plan: EnginePlan, scope: Scope, window: Window | None) -> list[Probe
             and not is_ranged
         ):
             reason, message = missing_reason(dimension)
-            probes.append((reason, message, essie.missing(piece)))
-    return probes
+            raw.append((reason, message, essie.missing(piece)))
+        if spec.kind == "date" and window is not None:
+            raw.extend(window_probes(scope, piece, window))
+    return disjoint(raw)
 
 
-def _window_probes(scope: Scope, piece: str, window: Window) -> list[Probe]:
+def disjoint(stages: Sequence[Probe]) -> list[Probe]:
+    """The stages made disjoint: each selects the trials it names that no earlier stage selects."""
+    return [
+        (reason, message, essie.and_(expr, *(essie.not_(earlier) for _, _, earlier in stages[:position])))
+        for position, (reason, message, expr) in enumerate(stages)
+    ]
+
+
+def window_probes(scope: Scope, piece: str, window: Window) -> list[Probe]:
     first = date.fromisoformat(period_range(window.first)[0])
     last = date.fromisoformat(period_range(window.last)[1])
     own = scope.date_range if scope.date_range is not None and scope.date_range.piece == piece else None

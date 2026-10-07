@@ -24,7 +24,7 @@ _TERM_PIECES: Final = {
 }
 _NUMERIC_PIECES: Final = {
     "enrollment": ("EnrollmentCount", "EnrollmentType"),
-    "duration_months": ("StartDate", "CompletionDate"),
+    "duration_months": ("StartDate", "StartDateType", "CompletionDate", "CompletionDateType"),
     "site_count": ("LocationCountry",),
 }
 # The trial list's columns, and the piece each sortable field is sorted by.
@@ -34,6 +34,7 @@ LIST_PIECES: Final = (
     "OverallStatus",
     "StartDate",
     "EnrollmentCount",
+    "EnrollmentType",
     "LeadSponsorName",
 )
 SORT_PIECES: Final = {

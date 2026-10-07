@@ -6,7 +6,7 @@ here from the plan (periods from the window, bins from the shaper), so a missing
 a hole in the grid.
 """
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
 from typing import Literal
@@ -47,8 +47,10 @@ from ctviz.contract.response import (
 )
 from ctviz.ctgov.client import ApiVersion
 from ctviz.ctgov.params import Scope
+from ctviz.engine.aggregate import AFTER_WINDOW
 from ctviz.engine.frame import Cell, Frame
 from ctviz.engine.lower import EnginePlan, ListRows, PointRows
+from ctviz.engine.rows import LISTED_COLUMNS
 from ctviz.viz import measure as measures
 from ctviz.viz import text
 from ctviz.viz.choose import ChartChoice
@@ -61,7 +63,6 @@ SPLIT_SERIES_FIELD = "group_split"
 SHARE_FIELD = "share"
 SHOWN_SHARE_FIELD = "share_of_shown"  # a state's count over the sum of the counts of the bars drawn
 _ColumnType = Literal["nominal", "temporal", "quantitative"]
-_TABLE_COLUMNS = ("phase", "overall_status", "start_date", "enrollment", "lead_sponsor")
 
 
 @dataclass(frozen=True)
@@ -135,11 +136,23 @@ def scope_filters(plan: EnginePlan, scope: Scope) -> list[str]:
     return text.scope_filters(scope, skip_date_piece=skip)
 
 
+def current_period(window: Window | None, version: ApiVersion) -> str | None:
+    """The period of the axis' unit that the data date falls in; None without a date axis."""
+    return None if window is None else period_of(version.data_timestamp[:10], window.unit)
+
+
 def is_partial(window: Window | None, version: ApiVersion) -> bool:
     """Whether the last period of an axis is the one the data date falls in, so it is still running."""
-    if window is None:
-        return False
-    return period_of(version.data_timestamp[:10], window.unit) == window.last
+    return window is not None and current_period(window, version) == window.last
+
+
+def _is_settled(i: _Inputs, period: str) -> bool:
+    """Whether a period has ended by the data date: it is neither the running one nor one still to come.
+
+    Labels of one unit sort as text, so `2026-Q4` is later than `2026-Q3`.
+    """
+    current = current_period(i.plan.window, i.version)
+    return current is None or period < current
 
 
 def _y_channel(i: _Inputs, count_title: str = "Trials") -> QuantitativeChannel:
@@ -222,7 +235,7 @@ class _Grid:
 def _drawn_periods(i: _Inputs, window: Window) -> list[str]:
     """The periods of the window, less the empty ones before the first trial unless a start year was named."""
     labels = _periods(window)
-    if i.plan.public.filters.year_from is not None:
+    if i.plan.axis_years[0] is not None:
         return labels
     populated = {cell.key[0] for frame in i.shaped.frames for cell in frame.cells.values() if cell.trials}
     return labels[next((n for n, label in enumerate(labels) if label in populated), 0) :]
@@ -368,6 +381,13 @@ def _grid_row(
 
 
 def _trials_phrase(i: _Inputs) -> str:
+    if isinstance(i.plan.rows, ListRows):
+        # A list shows the first rows of what matches: say how many of how many.
+        listed = [
+            (frame.scope.label if i.is_comparison else None, frame.analyzed, frame.matched)
+            for frame in i.shaped.frames
+        ]
+        return text.listed_phrase(listed)
     parts = [(frame.scope.label if i.is_comparison else None, frame.analyzed) for frame in i.shaped.frames]
     return text.trials_phrase(parts, "trials measured" if i.plan.measure is not None else "trials")
 
@@ -385,8 +405,8 @@ def _data_date(version: ApiVersion) -> str:
     return date.fromisoformat(version.data_timestamp[:10]).isoformat()
 
 
-def _top_mark(i: _Inputs, grid: _Grid) -> _Mark:
-    """The mark with the highest statistic; a mark that holds no trial has none."""
+def _top_marks(i: _Inputs, grid: _Grid) -> list[_Mark]:
+    """The marks with the highest statistic; a mark that holds no trial has none."""
     measure = i.plan.measure
     if measure is None:
         raise ValueError("Only a statistic has a highest value.")
@@ -395,18 +415,48 @@ def _top_mark(i: _Inputs, grid: _Grid) -> _Mark:
         found = measures.value_of(mark.cell.values, measure)
         return float("-inf") if found is None else float(found)
 
-    return max(grid.marks, key=value)
+    return _leaders(_ranked(grid.marks), value)
+
+
+def _leaders[T](items: Sequence[T], value: Callable[[T], float]) -> list[T]:
+    """Every item that reaches the highest value, in their order: a tie names all of them."""
+    best = max(value(item) for item in items)
+    return [item for item in items if value(item) == best]
+
+
+def _ranked(marks: Sequence[_Mark]) -> Sequence[_Mark]:
+    """The marks a superlative is chosen among: a row that sums the rest of a top-N is never the largest."""
+    named = [mark for mark in marks if not mark.cell.is_rest]
+    return named or marks
+
+
+def has_overlapping_groups(plan: EnginePlan) -> bool:
+    """Whether a sum is drawn per group of a field whose groups share trials, with the trial's own number.
+
+    Such a total gives a trial's whole number to every group it is in. A count of sites within a country or
+    a state is the group's own number, so it is no such total.
+    """
+    measure = plan.measure
+    if measure is None:
+        return False
+    return any(
+        not dimension.spec.is_exclusive and not (measure.field == "site_count" and dimension.spec.sites_of)
+        for dimension in plan.dimensions
+    )
 
 
 def _measure_peak_message(i: _Inputs, grid: _Grid) -> str:
     measure = i.plan.measure
-    top = _top_mark(i, grid)
+    tops = _top_marks(i, grid)
     if measure is None:
         raise ValueError("Only a statistic has a highest value.")
     label = text.measure_label(measure.statistic, measure.field)
-    value = text.measure_value(measures.value_of(top.cell.values, measure), measure.statistic)
-    where = top.x if top.series is None else f"{top.series} in {top.x}"
-    return text.measure_top_message(label, where, value, top.cell.trials)
+    value = text.measure_value(measures.value_of(tops[0].cell.values, measure), measure.statistic)
+    wheres = [top.x if top.series is None else f"{top.series} in {top.x}" for top in tops]
+    is_overlapping = measure.statistic == "sum" and has_overlapping_groups(i.plan)
+    return text.measure_top_message(
+        label, wheres, value, [top.cell.trials for top in tops], is_overlapping=is_overlapping
+    )
 
 
 # --- time_series ------------------------------------------------------------------------------------------
@@ -452,15 +502,44 @@ def _time_series_title(i: _Inputs, axis: BoundDimension, unit: str, grid: _Grid)
 
 
 def _time_series_message(i: _Inputs, date_key: str, grid: _Grid) -> str:
+    """The headline of a time series: about the periods that have ended, said to be so where others are shown.
+
+    The running period and the ones still to come are drawn but never the subject of a headline: the first
+    is incomplete and the rest are counted from planned dates. Trials that fall after the axis, on an axis
+    that the data date ends, are not in any bar, so a sentence about the biggest bar says what it covers.
+    """
     if i.plan.measure is not None:
         return _measure_peak_message(i, grid)
-    peak = max(grid.marks, key=lambda mark: mark.cell.trials)
-    if peak.series is not None:
-        return text.series_peak_message(date_key, peak.series, peak.x, peak.cell.trials)
-    # A period that is still running is not the one to quote as the latest.
-    is_running = len(grid.marks) > 1 and is_partial(i.plan.window, i.version)
-    last = grid.marks[-2] if is_running else grid.marks[-1]
-    return text.time_series_message(date_key, last.x, last.cell.trials, peak.x, peak.cell.trials)
+    settled = [mark for mark in grid.marks if _is_settled(i, mark.x)] or grid.marks
+    peaks = _leaders(settled, lambda mark: mark.cell.trials)
+    peak_count = peaks[0].cell.trials
+    if peaks[0].series is not None:
+        message = text.series_peak_message(
+            date_key, [(mark.series or "", mark.x) for mark in peaks], peak_count
+        )
+    else:
+        last = settled[-1]
+        message = text.time_series_message(
+            date_key, last.x, last.cell.trials, [mark.x for mark in peaks], peak_count
+        )
+    note = _coverage_note(i, date_key, [mark.x for mark in settled])
+    if len(settled) < len(grid.marks):
+        message = message.replace("of any period shown", "of any period that has ended")
+    return f"{message.removesuffix('.')}{note}." if note else message
+
+
+def _coverage_note(i: _Inputs, date_key: str, settled: list[str]) -> str:
+    """What the sentence about the biggest bar leaves out: periods not yet over, and trials after the axis."""
+    window = i.plan.window
+    if window is None:
+        return ""
+    drawn = len(_drawn_periods(i, window))
+    beyond = sum(
+        frame.excluded[AFTER_WINDOW[0]].count
+        for frame in i.shaped.frames
+        if AFTER_WINDOW[0] in frame.excluded
+    )
+    return text.coverage_note(date_key, settled, drawn, window.last, beyond)
 
 
 # --- bar_chart --------------------------------------------------------------------------------------------
@@ -524,11 +603,14 @@ def _bar_chart(i: _Inputs) -> Built:
     )
     if measure is not None:
         return Built(viz, _measure_peak_message(i, grid), len(rows))
-    top = max(grid.marks, key=lambda mark: mark.cell.trials)
-    if top.series is None:
-        message = text.largest_category_message(top.x, top.cell.trials, top.analyzed)
+    tops = _leaders(_ranked(grid.marks), lambda mark: mark.cell.trials)
+    if tops[0].series is None:
+        message = text.largest_category_message(
+            [top.x for top in tops], tops[0].cell.trials, tops[0].analyzed
+        )
     else:
-        message = text.largest_in_series_message(top.x, top.series, top.cell.trials)
+        leaders = [(top.x, top.series or "") for top in tops]
+        message = text.largest_in_series_message(leaders, tops[0].cell.trials)
     return Built(viz, message, len(rows))
 
 
@@ -587,8 +669,9 @@ def _compared_totals(i: _Inputs) -> Built:
         ),
         data=rows,
     )
-    top = max(zip(names, rows, strict=True), key=lambda pair: pair[1].citation_count)
-    return Built(viz, text.compared_totals_message(top[0], top[1].citation_count), len(rows))
+    leaders = _leaders(list(zip(names, rows, strict=True)), lambda pair: pair[1].citation_count)
+    message = text.compared_totals_message([name for name, _ in leaders], leaders[0][1].citation_count)
+    return Built(viz, message, len(rows))
 
 
 def _compared_measures(i: _Inputs, names: list[str]) -> Built:
@@ -622,9 +705,12 @@ def _compared_measures(i: _Inputs, names: list[str]) -> Built:
     )
     values = [measures.value_of(cell.values, measure) for cell in cells]
     ranked = [float("-inf") if value is None else float(value) for value in values]
-    top = ranked.index(max(ranked))
+    tops = _leaders(list(range(len(names))), lambda position: ranked[position])
     message = text.measure_top_message(
-        label, names[top], text.measure_value(values[top], measure.statistic), cells[top].trials
+        label,
+        [names[position] for position in tops],
+        text.measure_value(values[tops[0]], measure.statistic),
+        [cells[position].trials for position in tops],
     )
     return Built(viz, message, len(rows))
 
@@ -692,8 +778,9 @@ def _histogram(i: _Inputs) -> Built:
         ),
         data=rows,
     )
-    top_bin, top_cell = max(zip(bins, cells, strict=True), key=lambda pair: pair[1].trials)
-    return Built(viz, text.histogram_message(top_bin.label, top_cell.trials), len(rows))
+    tops = _leaders(list(zip(bins, cells, strict=True)), lambda pair: pair[1].trials)
+    message = text.histogram_message([top_bin.label for top_bin, _ in tops], tops[0][1].trials)
+    return Built(viz, message, len(rows))
 
 
 # --- scatter_plot, table ----------------------------------------------------------------------------------
@@ -716,7 +803,9 @@ def _scatter_plot(i: _Inputs) -> Built:
         raise ValueError("A scatter plot needs a plan that relates two numeric fields.")
     options = i.choice.options
     groups = list(dict.fromkeys(row.group for row in i.shaped.trials if row.group is not None))
-    series = _category_channel(spec.color, groups) if spec.color is not None else None
+    series = _group_channel(i, groups) if i.is_comparison else None
+    if series is None and spec.color is not None:
+        series = _category_channel(spec.color, groups)
     rows = []
     for trial in i.shaped.trials:
         fields: dict[str, Scalar] = {
@@ -747,7 +836,19 @@ def _scatter_plot(i: _Inputs) -> Built:
     return Built(viz, text.scatter_message(len(rows), x.title, y.title), len(rows))
 
 
-def _trial_column(name: str) -> FieldDef:
+def _group_channel(i: _Inputs, groups: list[str]) -> CategoryChannel:
+    """The compared groups of per-trial rows: each row says which group's list it is in."""
+    return CategoryChannel(
+        field=GROUP_FIELD,
+        type="nominal",
+        title=text.KIND_TITLES.get(i.plan.compare_kind or "", "Group"),
+        domain=groups,
+        sort=None,
+        is_exclusive=False,
+    )
+
+
+def _trial_column(name: str, i: _Inputs | None = None) -> FieldDef:
     definitions: dict[str, tuple[str, _ColumnType, str | None, str | None]] = {
         "nct_id": ("NCT ID", "nominal", None, "url"),
         "title": ("Title", "nominal", None, None),
@@ -758,6 +859,12 @@ def _trial_column(name: str) -> FieldDef:
         "first_posted_date": ("First posted", "temporal", None, None),
         "enrollment": ("Enrollment", "quantitative", "participants", None),
         "lead_sponsor": ("Lead sponsor", "nominal", None, None),
+        GROUP_FIELD: (
+            text.KIND_TITLES.get(i.plan.compare_kind or "", "Group") if i else "Group",
+            "nominal",
+            None,
+            None,
+        ),
     }
     title, kind, unit, href = definitions[name]
     return FieldDef(
@@ -774,25 +881,32 @@ def _trial_table(i: _Inputs) -> Built:
     spec = i.plan.rows
     if not isinstance(spec, ListRows):
         raise ValueError("A trial table needs a plan that lists trials.")
-    names = ["nct_id", "title", spec.sort_by, *(c for c in _TABLE_COLUMNS if c != spec.sort_by)]
+    names = ["nct_id", "title", spec.sort_by, *(c for c in LISTED_COLUMNS if c != spec.sort_by)]
+    if i.is_comparison:
+        names.insert(2, GROUP_FIELD)  # the list of each compared group follows the one before
     rows = []
     for trial in i.shaped.trials:
         fields: dict[str, Scalar] = {
             "nct_id": trial.nct_id,
             "title": trial.title,
             "url": STUDY_URL.format(nct_id=trial.nct_id),
-            **{name: trial.values.get(name) for name in names[2:]},
+            **{name: trial.values.get(name) for name in names[2:] if name != GROUP_FIELD},
         }
+        if i.is_comparison:
+            fields[GROUP_FIELD] = trial.group
         rows.append(_datum(fields, i.book.for_trial(trial.nct_id, trial.evidence)))
     viz = Table(
         type="table",
         title=text.table_title(spec.sort_by, spec.order, i.labels),
         subtitle=_subtitle(i),
-        encoding=TableEncoding(columns=[_trial_column(name) for name in names]),
+        encoding=TableEncoding(columns=[_trial_column(name, i) for name in names]),
         data=rows,
     )
-    total = i.shaped.frames[0].analyzed
-    return Built(viz, text.table_message(len(rows), total, spec.sort_by), len(rows))
+    listed = [
+        (frame.scope.label if i.is_comparison else None, frame.analyzed, frame.matched)
+        for frame in i.shaped.frames
+    ]
+    return Built(viz, text.table_message(listed, spec.sort_by, spec.order), len(rows))
 
 
 def _aggregate_as_table(built: Built) -> Built:
@@ -896,9 +1010,12 @@ def _network_graph(i: _Inputs) -> Built:
         ),
         data=NetworkData(nodes=nodes, edges=edges),
     )
-    strongest = max(shaped.edges, key=lambda edge: edge.cell.trials)
+    strongest = _leaders(shaped.edges, lambda edge: edge.cell.trials)
     message = text.network_message(
-        len(nodes), len(edges), strongest.source.label, strongest.target.label, strongest.cell.trials
+        len(nodes),
+        len(edges),
+        [(edge.source.label, edge.target.label) for edge in strongest],
+        strongest[0].cell.trials,
     )
     return Built(viz, message, len(nodes) + len(edges))
 

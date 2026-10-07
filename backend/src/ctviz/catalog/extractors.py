@@ -12,8 +12,8 @@ from ctviz.catalog import periods, vocab
 from ctviz.catalog.conditions import ConditionLabels, fold
 from ctviz.catalog.drugs import DrugNormalizer
 from ctviz.catalog.fields import BoundDimension, Evidence, FieldContext, Value
-from ctviz.catalog.states import StateScope
-from ctviz.ctgov.study import Study, StudyDate
+from ctviz.catalog.states import StateScope, fold_state
+from ctviz.ctgov.study import Location, Study, StudyDate
 
 Extractor = Callable[[Study, FieldContext | None, BoundDimension], Sequence[Value]]
 
@@ -124,24 +124,42 @@ def country(study: Study, _context: FieldContext | None, _dimension: BoundDimens
     return list(found.values())
 
 
+def country_sites(study: Study, _context: FieldContext | None, key: str) -> Sequence[Location]:
+    """The sites in one country, the ones `country` counts that country's trial for."""
+    return [location for location in study.locations if (location.country or "").strip() == key]
+
+
+def state_sites(study: Study, context: FieldContext | None, key: str) -> Sequence[Location]:
+    """The sites in one state, within the countries the question names (every country when it names none)."""
+    scope = context if isinstance(context, StateScope) else StateScope(())
+    return [
+        location
+        for location in study.locations
+        if location.state is not None
+        and fold_state(location.state) == key
+        and scope.includes(location.country)
+    ]
+
+
 def state(study: Study, context: FieldContext | None, _dimension: BoundDimension) -> Sequence[Value]:
     """Each distinct state with a site once, however many sites it has there, read at its first site.
 
     Only sites in the countries the question names count (every site when it names none). A site's
-    evidence is its state and its country, both quoted from the record.
+    evidence is its state and its country, both quoted from the record. Spellings that differ only in
+    case, accents or punctuation are one state.
     """
     scope = context if isinstance(context, StateScope) else StateScope(())
     found: dict[str, Value] = {}
     for location in study.locations:
         if location.state is None or not scope.includes(location.country):
             continue
-        name = location.state.strip()
-        if name and name not in found:
+        key = fold_state(location.state)
+        if key and key not in found:
             base = f"{PROTOCOL}.contactsLocationsModule.locations[{location.index}]"
             evidence = [Evidence(f"{base}.state", location.state)]
             if location.country is not None:
                 evidence.append(Evidence(f"{base}.country", location.country))
-            found[name] = Value(name, name, tuple(evidence))
+            found[key] = Value(key, scope.labels.get(key, location.state.strip()), tuple(evidence))
     return list(found.values())
 
 

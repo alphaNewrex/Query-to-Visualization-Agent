@@ -112,13 +112,6 @@ def _country_bucket(name: str) -> Bucket | None:
     return Bucket(name, name, area("LocationCountry", name)) if name in load_country_table() else None
 
 
-def _state_bucket(name: str) -> Bucket | None:
-    try:
-        return Bucket(name, name, area("LocationState", name))
-    except ValueError:
-        return None
-
-
 def _entries() -> list[FieldSpec]:
     status = f"{extractors.STATUS}"
     design_info = f"{extractors.DESIGN}.designInfo"
@@ -237,6 +230,7 @@ def _entries() -> list[FieldSpec]:
             is_ordinal=False,
             bucket_for=_country_bucket,
             presence=_present("LocationCountry"),
+            sites_of=extractors.country_sites,
             notes=(
                 "A trial counts once for each country with a site, so the bars can overlap. "
                 "Trials whose locations were removed after completion are not attributed to a country.",
@@ -250,14 +244,19 @@ def _entries() -> list[FieldSpec]:
             extract=extractors.state,
             is_exclusive=False,
             is_ordinal=False,
-            bucket_for=_state_bucket,
+            bucket_for=states.bucket_for,
+            bucket_in_scope=states.bucket_in,
+            is_loosely_matched=True,
             presence=_present("LocationState"),
             prepare_in_scope=states.fit,
+            sites_of=extractors.state_sites,
             hint="the state, province or region of a trial's sites, for any country; a country the "
             "question names is also an entity of kind country with role filter, and limits the sites",
             notes=(
                 "A trial counts once for each state with a site, so the bars can overlap. "
-                "Trials with no state on any counted site are left out, as are sites with no state.",
+                "Trials with no state on any counted site are left out, as are sites with no state. "
+                "State names that differ only in case, accents or punctuation are one state, shown under "
+                "the spelling the records use most.",
             ),
         ),
         FieldSpec(

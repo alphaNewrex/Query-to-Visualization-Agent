@@ -319,6 +319,8 @@ async def test_an_answer_whose_walk_read_other_trials_than_the_registry_counted_
         ("upstream_throttled", False),
         ("walk_count_mismatch", False),
         ("counts_not_reconciled", False),
+        ("window_shortened_for_time", False),  # the axis was cut by the time left on one request
+        ("window_clamped", True),  # the fixed cut at 60 periods is the same every time
         ("recent_subset", True),
     ],
 )
@@ -329,6 +331,28 @@ async def test_which_warnings_keep_an_answer_out_of_the_cache(code: str, is_kept
     response.meta.warnings.append(Note(code=code, message="A caveat."))
 
     assert _is_cacheable(response) is is_kept
+
+
+async def test_a_too_broad_clarification_is_not_cached() -> None:
+    from ctviz.contract.response import Clarification, ClarificationResponse
+
+    async with serving(application(Registry(), FakePlanner([PLAN]))) as http:
+        document = (await http.post("/v1/query", json=QUESTION)).json()
+    kept = RESPONSES.validate_python(document)
+    broad = ClarificationResponse(
+        message="Too broad.",
+        clarification=Clarification(reason="too_broad", missing_fields=[], options=[]),
+        meta=kept.meta,
+    )
+    other = ClarificationResponse(
+        message="Which drug?",
+        clarification=Clarification(reason="missing_entity", missing_fields=[], options=[]),
+        meta=kept.meta,
+    )
+
+    # What the time left allowed on one request says nothing about the next request.
+    assert _is_cacheable(broad) is False
+    assert _is_cacheable(other) is True
 
 
 # --- identical requests in flight -----------------------------------------------------------------------

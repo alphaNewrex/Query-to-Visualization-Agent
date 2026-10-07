@@ -5636,7 +5636,10 @@
       "is_enabled": true,
       "max_per_datum": 5,
       "selection": "trials naming the searched entity first, then most recently first-posted, then by NCT ID",
-      "trials_cited": 156
+      "trials_cited": 156,
+      "source_url_reasons": [
+        "A network's nodes and links count the drugs, conditions or sponsors read from the records; no search returns exactly the trials of a node or a link, so they have no source_url."
+      ]
     },
     "suggested_followups": [],
     "cache": {

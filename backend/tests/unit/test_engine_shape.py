@@ -160,7 +160,7 @@ def test_network_pruning_drops_weak_links_and_nodes_left_without_one() -> None:
     ]  # D has only a weight-1 link
     assert {(item.scope, item.shown, item.total) for item in shaped.truncation} == {
         ("nodes", 3, 4),
-        ("edges", 3, 4),
+        ("edges", 3, 3),  # the weight-1 link to D is not one the rule "at least 2 trials" could show
     }
     assert shaped.outcome is None
 

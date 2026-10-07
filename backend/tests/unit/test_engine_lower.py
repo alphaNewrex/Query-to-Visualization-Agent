@@ -2,7 +2,9 @@
 
 from dataclasses import dataclass, field
 
-from ctviz.catalog.fields import Window
+import ctviz.catalog  # noqa: F401  (fills the real catalogue)
+from ctviz.catalog.fields import CATALOG as REAL_CATALOG
+from ctviz.catalog.fields import FieldSpec, Window
 from ctviz.contract.plan import Aggregate, Analysis, Entity, Network, QueryPlan, Relate, TrialList
 from ctviz.contract.request import QueryRequest, RequestOptions
 from ctviz.engine.lower import EnginePlan, ListRows, PointRows, Resolved, lower_plan
@@ -25,7 +27,9 @@ class Planned:
     options: RequestOptions = field(default_factory=lambda: RequestOptions(citations_per_datum=3))
 
 
-def lower(analysis: Analysis, **filters: int | None) -> EnginePlan:
+def lower(
+    analysis: Analysis, catalog: dict[str, FieldSpec] = CATALOG, **filters: int | str | None
+) -> EnginePlan:
     plan = PUBLIC_PLAN.model_copy(
         update={
             "analysis": analysis,
@@ -36,7 +40,7 @@ def lower(analysis: Analysis, **filters: int | None) -> EnginePlan:
             ],
         }
     )
-    return lower_plan(Planned(plan), RESOLVED, CATALOG, Version())
+    return lower_plan(Planned(plan), RESOLVED, catalog, Version())
 
 
 def aggregate(
@@ -69,6 +73,22 @@ def test_stated_years_make_the_window_and_a_quarter_axis_counts_quarters() -> No
     assert quarters == Window("quarter", "2024-Q1", "2026-Q4")
     months = lower(aggregate("start_date", unit="month")).window
     assert months is not None and (months.first, months.last) == ("2024-10", "2026-10")
+
+
+def test_a_year_range_on_another_date_field_is_not_the_window_of_the_axis() -> None:
+    # "Of the trials that started in 2020, how many completed in each year?"
+    other = lower(
+        aggregate("completion_date"), REAL_CATALOG, date_field="start_date", year_from=2020, year_to=2020
+    )
+    own = lower(
+        aggregate("completion_date"), REAL_CATALOG, date_field="completion_date", year_from=2020, year_to=2022
+    )
+    unnamed = lower(aggregate("completion_date"), REAL_CATALOG, year_from=2020, year_to=2022)
+
+    assert other.window == Window("year", "2002", "2026")
+    assert other.axis_years == (None, None)
+    assert own.window == unnamed.window == Window("year", "2020", "2022")
+    assert own.axis_years == (2020, 2022)
 
 
 def test_a_category_has_no_window_and_a_series_makes_a_two_dimension_relation() -> None:

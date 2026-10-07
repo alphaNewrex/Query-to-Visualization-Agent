@@ -64,7 +64,13 @@ def test_the_sponsor_and_drug_network_before_alias_merging() -> None:
             sponsors.update(value.key for value in found_sponsors)
             drugs.update(value.key for value in found_drugs)
             links.update((s.key, d.key) for s, d in itertools.product(found_sponsors, found_drugs))
-    assert (len(sponsors), len(drugs), len(links), contributing) == (114, 187, 224, 279)
+    # (+)-epicatechin and (-)-epicatechin are two drugs, so this is one more than a name-only merge gives.
+    assert (len(sponsors), len(drugs), len(links), contributing) == (
+        114,
+        188,
+        225,
+        279,
+    )  # (+)- and (-)-epicatechin are two drugs
     assert links.most_common(3) == [
         (("PTC Therapeutics", "ataluren"), 13),
         (("Sarepta Therapeutics, Inc.", "delandistrogene moxeparvovec"), 9),

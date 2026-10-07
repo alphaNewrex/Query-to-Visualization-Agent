@@ -10,26 +10,17 @@ from collections.abc import Iterable, Iterator, Sequence
 from typing import Final
 
 from ctviz.catalog.fields import BoundDimension, FieldContexts, Value, Window
-from ctviz.contract.plan import Pairing
+from ctviz.contract.plan import NumericField, Pairing
 from ctviz.ctgov.params import Scope
 from ctviz.ctgov.study import Study
 from ctviz.engine.evidence import citation_rank
 from ctviz.engine.frame import Cell, Frame, TrialEvidence
 from ctviz.engine.lower import EnginePlan
-from ctviz.engine.rows import numeric_value
+from ctviz.engine.rows import NO_MEASURE, Reading, reading
 
 # Told apart because only the earlier trials are what a longer axis would show.
 BEFORE_WINDOW: Final = ("before_window", "Before the periods shown")
 AFTER_WINDOW: Final = ("after_window", "After the periods shown")
-# The trials a statistic cannot use, by the field it is taken of.
-NO_MEASURE: Final = {
-    "enrollment": ("no_enrollment", "No enrollment count on record"),
-    "duration_months": (
-        "no_duration_months",
-        "No start and completion date to measure a duration from, or a completion before the start",
-    ),
-    "site_count": ("no_site_count", "No site listed"),
-}
 
 
 def missing_reason(dimension: BoundDimension) -> tuple[str, str]:
@@ -71,11 +62,13 @@ def aggregate(
             continue
         measured = None
         if plan.measure is not None:
-            measured = numeric_value(study, plan.measure.field)
+            measured = reading(study, plan.measure.field)
             if measured is None:
                 frame.exclude(*NO_MEASURE[plan.measure.field])
                 continue
         frame.analyzed += 1
+        if measured is not None:
+            frame.basis.update(measured.basis)
         rank = citation_rank(study, scope)
         for table, values in zip(frame.marginals, per_dim, strict=False):
             for value in values:
@@ -83,15 +76,42 @@ def aggregate(
                 marginal.add(TrialEvidence(study.nct_id, value.evidence, rank), sample_size)
         for combo in cells(per_dim, dims, plan.pairing):
             evidence = tuple(item for value in combo for item in value.evidence)
-            if measured is not None:
-                evidence += measured[1]
+            number = None
+            if measured is not None and plan.measure is not None:
+                own = _own_reading(study, plan.measure.field, dims, combo, contexts)
+                number = (own or measured).value
+                evidence += (own or measured).evidence
             cell = frame.cell(tuple(value.key for value in combo), tuple(value.label for value in combo))
-            cell.add(
-                TrialEvidence(study.nct_id, evidence, rank),
-                sample_size,
-                None if measured is None else measured[0],
-            )
+            cell.add(TrialEvidence(study.nct_id, tuple(dict.fromkeys(evidence)), rank), sample_size, number)
     return frame
+
+
+def _own_reading(
+    study: Study,
+    field: NumericField,
+    dims: Sequence[BoundDimension],
+    combo: Sequence[Value],
+    contexts: FieldContexts,
+) -> Reading | None:
+    """A count of sites within a cell counts the cell's own sites, where its dimensions locate sites.
+
+    A trial with ten sites, two of them in France, is two in France and eight in Germany: not ten in each.
+    Any other number is the trial's own and is the same in every cell the trial is in.
+    """
+    if field != "site_count":
+        return None
+    located = [
+        (dimension.spec.sites_of, contexts.get(dimension.spec.key), value.key)
+        for dimension, value in zip(dims, combo, strict=False)
+        if dimension.spec.sites_of is not None
+    ]
+    if not located:
+        return None
+    sites = list(study.locations)
+    for sites_of, context, key in located:
+        here = {site.index for site in sites_of(study, context, key)}
+        sites = [site for site in sites if site.index in here]
+    return reading(study, field, sites)
 
 
 def _is_one_dimension_twice(dims: Sequence[BoundDimension]) -> bool:

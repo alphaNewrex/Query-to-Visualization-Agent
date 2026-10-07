@@ -11,6 +11,7 @@ from ctviz.ctgov import essie
 from ctviz.ctgov.params import DateRange, Params
 from ctviz.engine.lower import Resolved
 from ctviz.engine.resolve import EntityResolver, bind_term, resolve_entities
+from ctviz.errors import UpstreamRejectedQuery
 
 from .engine_support import PUBLIC_PLAN, FakeClient, FakeContext
 
@@ -383,3 +384,30 @@ async def test_only_entities_the_model_classified_are_read_again() -> None:
     assert [r.entities[0].kind for r in (from_plan, from_field, from_question)] == [
         "condition", "condition", "drug"
     ]  # fmt: skip
+
+
+class _Rejecting(FakeClient):
+    """A registry that answers 400 to a search with a word it reads as an operator that the service does not
+    know to escape (here QUIRK), as the real one did to COVER."""
+
+    async def count(self, params: Params, ctx, *, origin):  # type: ignore[no-untyped-def]
+        if any("QUIRK" in value.split() for _, value in params.texts):
+            raise UpstreamRejectedQuery("ClinicalTrials.gov rejected a query that this service built.")
+        return await super().count(params, ctx, origin=origin)
+
+
+async def test_words_the_registry_rejects_become_an_answer_that_names_them_and_not_a_500() -> None:
+    client = _Rejecting([])
+    deps = Deps(client, EntityResolver(client, Countries(), low_match_threshold=10))
+    cover = Entity(kind="condition", value="QUIRK", role="filter")
+
+    outcome = await resolve_entities(Planned(plan_of(cover)), deps, FakeContext())
+
+    assert isinstance(outcome, Outcome) and outcome.kind == "clarification"
+    assert "'QUIRK'" in outcome.message and "could not read" in outcome.message
+
+
+def test_every_operator_word_the_registry_reads_is_escaped() -> None:
+    for word in ("COVER", "EXPAND", "COVERAGE", "EXPANSION", "NOT"):
+        assert essie.literal(word) == f"\\{word}"
+    assert essie.literal("cover") == "cover"  # lower-case, it is a word like any other

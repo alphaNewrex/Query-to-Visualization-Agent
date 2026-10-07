@@ -930,7 +930,7 @@ export interface Citation {
    */
   field: string;
   /**
-   * The value at that path, verbatim; numbers and booleans in JSON notation. Null means the field is absent and the absence is the evidence.
+   * The value at that path, verbatim; numbers and booleans in JSON notation. Null means the field is absent and the absence is the evidence. A count of sites is evidenced by the last listed site (`locations[n-1].country`) and the absence of `locations[n]`, which together give the length of the locations list; a count within one country or state also quotes the first and the last site counted, and the sites between them are not each quoted.
    */
   excerpt: string | null;
 }
@@ -1500,7 +1500,7 @@ export interface Counts {
   data_points: number;
   series: SeriesCounts[];
   /**
-   * Filled for a two-group comparison.
+   * The trials in both groups of a two-group comparison. Null for one group, and for three or more groups, where the overlap is not computed; also null when the count failed (see `overlap_not_counted` in the warnings).
    */
   trials_in_several_series: number | null;
 }
@@ -1545,6 +1545,10 @@ export interface CitationsInfo {
    * The size of `references`.
    */
   trials_cited: number;
+  /**
+   * Why some data rows have a null `source_url`: one sentence for each kind of row that carries none in this response (statistics, network nodes and links, the 'Other' row, a state whose search cannot be checked); empty when every row has one.
+   */
+  source_url_reasons: string[];
 }
 /**
  * A complete request body a button can post; built by rules, never by the model.

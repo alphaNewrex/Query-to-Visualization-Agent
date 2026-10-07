@@ -88,10 +88,13 @@ def _rows_frame(rows: RowsResult) -> Frame:
 
 
 def _trials(rows: RowsResult, plan: EnginePlan) -> list[TrialRow]:
-    return [_trial(row, plan) for row in rows.rows]
+    # Compared groups are listed one after the other, and a trial of both is listed in each: the group
+    # says which list a row belongs to.
+    group = (rows.scope.label or rows.scope.id) if len(plan.scopes) > 1 else None
+    return [_trial(row, plan, group) for row in rows.rows]
 
 
-def _trial(row: RowOfTrial, plan: EnginePlan) -> TrialRow:
+def _trial(row: RowOfTrial, plan: EnginePlan, compared: str | None) -> TrialRow:
     study = row.study
     values: dict[str, Scalar] = {}
     match plan.rows:
@@ -99,7 +102,7 @@ def _trial(row: RowOfTrial, plan: EnginePlan) -> TrialRow:
             values = {x: _whole(row.x), y: _whole(row.y)}
         case ListRows():
             values = _listed(study)
-    group = row.color.label if row.color is not None else None
+    group = compared if compared is not None else (row.color.label if row.color is not None else None)
     return TrialRow(study.nct_id, study.brief_title or "", values, row.evidence, group)
 
 

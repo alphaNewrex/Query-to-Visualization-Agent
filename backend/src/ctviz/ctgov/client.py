@@ -27,7 +27,7 @@ from ctviz.ctgov.params import Params, canonical_url
 from ctviz.ctgov.partition import PIECE, SEQUENTIAL_PAGES, Partition, as_day, partition
 from ctviz.ctgov.ratelimit import TokenBucket
 from ctviz.ctgov.study import JsonObject, Study
-from ctviz.errors import AppError
+from ctviz.errors import UpstreamRejectedQuery
 from ctviz.settings import Settings
 
 _USER_AGENT: Final = "ctviz/0.1 (ClinicalTrials.gov query-to-visualization take-home)"
@@ -395,7 +395,7 @@ class CtGovClient:
         # Any other answer, 400 and 414 included, means that a URL this service built is wrong. That is
         # a bug here: it is neither retried nor explained to the client.
         _log.error("upstream_rejected_query", url=url, status=status, upstream_message=response.text[:300])
-        raise AppError("ClinicalTrials.gov rejected a query that this service built.")
+        raise UpstreamRejectedQuery("ClinicalTrials.gov rejected a query that this service built.")
 
     def _note_throttled(self) -> None:
         self._concurrency = max(1, self._concurrency // 2)

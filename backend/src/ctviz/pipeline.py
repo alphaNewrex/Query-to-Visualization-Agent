@@ -30,6 +30,7 @@ from ctviz.contract.request import QueryRequest
 from ctviz.contract.response import (
     AppliedFilters,
     CacheInfo,
+    ClarificationResponse,
     EntityResolution,
     Note,
     Outcome,
@@ -50,7 +51,7 @@ from ctviz.engine.lower import EnginePlan, lower_plan
 from ctviz.engine.overlap import shared_trials
 from ctviz.engine.resolve import EntityResolver, resolve_entities
 from ctviz.engine.shape import shape
-from ctviz.engine.strategy import ExecutionPlan, Limits, choose_strategy
+from ctviz.engine.strategy import SHORTENED_FOR_TIME, ExecutionPlan, Limits, choose_strategy
 from ctviz.errors import InvariantViolation
 from ctviz.planning.conversation import describe
 from ctviz.planning.service import PlannedQuery, PlanService
@@ -65,7 +66,7 @@ DEFAULT_RESPONSE_CACHE_SIZE: Final = 256
 # the other two say that its numbers moved while the answer was being read (a data refresh), so the
 # answer describes no single version of the data.
 _UNCACHEABLE_WARNINGS: Final = frozenset(
-    {"upstream_throttled", "walk_count_mismatch", "counts_not_reconciled"}
+    {"upstream_throttled", "walk_count_mismatch", "counts_not_reconciled", SHORTENED_FOR_TIME}
 )
 
 # Seconds of the request deadline kept for grouping what a walk read and building the response.
@@ -252,8 +253,11 @@ def _response_key(planned: PlannedQuery, version: ApiVersion) -> str:
 
 
 def _is_cacheable(response: QueryResponse) -> bool:
-    """Whether to keep an answer: not one built while the registry limited requests or changed under it."""
+    """Whether to keep an answer: not one built while the registry limited requests or changed under it, nor
+    one the time left on that request shaped (a `too_broad` clarification, an axis shortened for time)."""
     volatile = sorted(_UNCACHEABLE_WARNINGS & {note.code for note in response.meta.warnings})
+    if isinstance(response, ClarificationResponse) and response.clarification.reason == "too_broad":
+        volatile.append("too_broad")
     if volatile:
         _log.info("response_not_cached", warnings=volatile)
     return not volatile
@@ -356,7 +360,11 @@ async def _run(
 
     shown = present(shaped, plan)
     overlap = await shared_trials(plan, resolved.matched, deps.ctgov, ctx)
-    drawn = replace(shown.shaped, trials_in_several_series=overlap)
+    drawn = replace(
+        shown.shaped,
+        trials_in_several_series=overlap.shared,
+        warnings=(*shown.shaped.warnings, *overlap.warnings),
+    )
     _emit(progress, "build", "started", "Building the chart")
     response = build_response(context.build(), shown.plan, drawn, version, titles=ctx.titles)
     if isinstance(response, VisualizationResponse):

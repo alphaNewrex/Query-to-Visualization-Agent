@@ -56,9 +56,11 @@ def prune_network(frame: Frame, plan: EnginePlan) -> PrunedNetwork:
     candidates = [
         cell for cell in all_links if all(key in keys for key, keys in zip(cell.key, end_keys, strict=True))
     ]
-    links = _heaviest(candidates, plan.min_link_weight, plan.max_links)
-    if len(links) < MIN_LINKS and plan.min_link_weight > 1:
-        links = _heaviest(candidates, 1, plan.max_links)
+    minimum = plan.min_link_weight
+    links = _heaviest(candidates, minimum, plan.max_links)
+    if len(links) < MIN_LINKS and minimum > 1:
+        minimum = 1
+        links = _heaviest(candidates, minimum, plan.max_links)
         assumptions.append(
             "Links that join two nodes in a single trial are shown because few trials share more."
         )
@@ -85,8 +87,10 @@ def prune_network(frame: Frame, plan: EnginePlan) -> PrunedNetwork:
         TruncationItem(
             scope="edges",
             shown=len(links),
-            total=len(all_links),
-            rule=f"Links of at least {plan.min_link_weight} trials, the {plan.max_links} heaviest.",
+            # Only the links the stated rule could show are counted: a link of fewer trials is not cut by it.
+            total=sum(1 for cell in all_links if cell.trials >= minimum),
+            rule=f"Links of at least {minimum} {'trial' if minimum == 1 else 'trials'}, "
+            f"the {plan.max_links} heaviest.",
         ),
     )
     return PrunedNetwork(links, nodes, truncation, tuple(warnings), tuple(assumptions), is_sparse)

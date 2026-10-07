@@ -1171,7 +1171,8 @@
       "is_enabled": true,
       "max_per_datum": 5,
       "selection": "trials naming the searched entity first, then most recently first-posted, then by NCT ID",
-      "trials_cited": 54
+      "trials_cited": 54,
+      "source_url_reasons": []
     },
     "suggested_followups": [
       {

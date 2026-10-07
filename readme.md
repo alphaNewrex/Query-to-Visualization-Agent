@@ -253,7 +253,8 @@ The service matched 2,971 trials with 36 requests to ClinicalTrials.gov and answ
       "is_enabled": true,
       "max_per_datum": 5,
       "selection": "most relevant trials by ClinicalTrials.gov's own ranking",
-      "trials_cited": 77
+      "trials_cited": 77,
+      "source_url_reasons": []
     },
     "suggested_followups": "...",
     "cache": "...",

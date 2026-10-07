@@ -5,12 +5,14 @@
 """
 
 import time
+from collections import Counter
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from datetime import date, datetime
 from typing import Final, Literal
 
 from ctviz.applied import MAX_COMPARED
+from ctviz.catalog.periods import window_labels
 from ctviz.catalog.states import StateScope
 from ctviz.contract.plan import Clarify, QueryPlan, Unsupported
 from ctviz.contract.request import CompareSpec, QueryRequest, RequestOptions
@@ -32,6 +34,7 @@ from ctviz.contract.response import (
     Measure,
     MessageResponse,
     Meta,
+    NetworkData,
     Note,
     Outcome,
     PlannerInfo,
@@ -47,9 +50,9 @@ from ctviz.contract.response import (
 from ctviz.ctgov.client import ApiVersion
 from ctviz.engine.aggregate import BEFORE_WINDOW
 from ctviz.engine.frame import Frame
-from ctviz.engine.lower import EnginePlan, PointRows
+from ctviz.engine.lower import EnginePlan, ListRows, PointRows
 from ctviz.viz import text
-from ctviz.viz.build import Built, build_visualization, is_partial, scope_filters
+from ctviz.viz.build import Built, build_visualization, current_period, has_overlapping_groups, scope_filters
 from ctviz.viz.choose import ChartChoice, choose_chart
 from ctviz.viz.citations import CitationBook
 from ctviz.viz.shaped import ShapedResult
@@ -210,15 +213,14 @@ def build_meta(
     if plan is not None:
         assumptions.extend(_assumptions(plan, shaped))
         warnings.extend(_dimension_warnings(plan))
+        warnings.extend(_measure_warnings(plan))
     if choice is not None:
         warnings.extend(choice.warnings)
     if shaped is not None:
         warnings.extend(shaped.warnings)
         warnings.extend(note for frame in shaped.frames for note in frame.warnings)
     if plan is not None and version is not None and choice is not None:
-        partial = _partial_period(plan, choice, version)
-        if partial is not None:
-            warnings.append(partial)
+        warnings.extend(_period_warnings(plan, version))
     warnings = list(dict.fromkeys(warnings))
     assumptions = list(dict.fromkeys(assumptions))
     truncation_items = list(shaped.truncation) if shaped is not None else []
@@ -243,12 +245,39 @@ def build_meta(
             max_per_datum=citations_per_datum,
             selection=text.citation_selection([step.name for step in context.strategy]),
             trials_cited=len(book.references()) if book is not None else 0,
+            source_url_reasons=_source_url_reasons(plan, shaped, built),
         ),
         suggested_followups=[*_followups(context, plan, shaped), *extra_followups],
         cache=context.cache,
         timing=context.timing,
         debug=Debug(trace=list(context.trace)) if context.trace is not None else None,
     )
+
+
+def _source_url_reasons(
+    plan: EnginePlan | None, shaped: ShapedResult | None, built: Built | None
+) -> list[str]:
+    """A sentence for each kind of row that has no `source_url`, so that a null is never unexplained."""
+    if plan is None or shaped is None or built is None:
+        return []
+    viz = built.visualization
+    data = viz.data
+    rows = [*data.nodes, *data.edges] if isinstance(data, NetworkData) else list(data)
+    bare = [row for row in rows if row.source_url is None]
+    if not bare:
+        return []
+    kinds: list[str] = []
+    if plan.measure is not None:
+        kinds.append("statistic")
+    if plan.relation == "network":
+        kinds.append("network")
+    if any(cell.is_rest for frame in shaped.frames for cell in frame.cells.values()):
+        kinds.append("rest")
+    if any(dimension.spec.is_loosely_matched for dimension in plan.dimensions):
+        kinds.append("state")
+    if not kinds and not isinstance(plan.rows, ListRows | PointRows):
+        kinds.append("other")
+    return [text.SOURCE_URL_REASONS[kind] for kind in kinds]
 
 
 def _counts(shaped: ShapedResult, built: Built | None) -> tuple[Counts, list[Note]]:
@@ -328,12 +357,17 @@ def _compare(plan: EnginePlan) -> CompareSpec | None:
     return CompareSpec(field=field, values=values)
 
 
-def _partial_period(plan: EnginePlan, choice: ChartChoice, version: ApiVersion) -> Note | None:
-    """A time axis whose last period contains the data date has not finished yet."""
+def _period_warnings(plan: EnginePlan, version: ApiVersion) -> list[Note]:
+    """A date axis whose window reaches the data date is partly unfinished, or partly still to come."""
     window = plan.window
-    if (choice.table_of or choice.type) != "time_series" or window is None or not is_partial(window, version):
-        return None
-    return text.partial_period(window.last, date.fromisoformat(version.data_timestamp[:10]).isoformat())
+    current = current_period(window, version)
+    if window is None or current is None or plan.dimensions[0].spec.kind != "date":
+        return []
+    labels = window_labels(window)
+    data_date = date.fromisoformat(version.data_timestamp[:10]).isoformat()
+    notes = [text.partial_period(current, data_date)] if current in labels else []
+    ahead = [label for label in labels if label > current]
+    return [*notes, *([text.future_periods(ahead, data_date)] if ahead else [])]
 
 
 def _assumptions(plan: EnginePlan, shaped: ShapedResult | None) -> list[str]:
@@ -344,9 +378,10 @@ def _assumptions(plan: EnginePlan, shaped: ShapedResult | None) -> list[str]:
         notes.append(text.PHASE_FILTER_NOTE)
     window = plan.window
     if window is not None:
-        if filters.year_to is None:
+        year_from, year_to = plan.axis_years
+        if year_to is None:
             notes.append(text.no_end_period(window.last))
-        if filters.year_from is None and shaped is not None and _left_before_window(shaped):
+        if year_from is None and shaped is not None and _left_before_window(shaped):
             notes.append(text.default_window(window.first))
     if plan.relation == "network":
         first, second = plan.dimensions[0].spec.key, plan.dimensions[1].spec.key
@@ -357,12 +392,25 @@ def _assumptions(plan: EnginePlan, shaped: ShapedResult | None) -> list[str]:
         label = text.measure_label(plan.measure.statistic, plan.measure.field)
         notes.append(text.statistic_note(plan.measure.statistic, label))
         notes.append(text.MEASURE_NOTES[plan.measure.field])
+        basis: Counter[str] = Counter()
+        for frame in shaped.frames if shaped is not None else ():
+            basis.update(frame.basis)
+        if (basis_note := text.measure_basis_note(plan.measure.field, basis)) is not None:
+            notes.append(basis_note)
     if isinstance(plan.rows, PointRows):
         notes.extend(text.NUMBER_NOTES[field] for field in dict.fromkeys((plan.rows.x, plan.rows.y)))
     if shaped is not None and shaped.trials_in_several_series:
         labels = [text.scope_name(scope) or scope.id for scope in plan.scopes]
         notes.append(text.overlap_note(shaped.trials_in_several_series, labels))
+    if len(plan.scopes) > 2:
+        notes.append(text.overlap_not_computed(len(plan.scopes)))
+    if shaped is not None and len(plan.scopes) > 1 and _is_cut(shaped):
+        notes.append(text.compared_top_n_note())
     return notes
+
+
+def _is_cut(shaped: ShapedResult) -> bool:
+    return any(item.scope in ("categories", "series") for item in shaped.truncation)
 
 
 def _state_notes(plan: EnginePlan) -> list[str]:
@@ -391,6 +439,19 @@ def _dimension_warnings(plan: EnginePlan) -> list[Note]:
         )
         if key in keys
     ]
+
+
+def _measure_warnings(plan: EnginePlan) -> list[Note]:
+    """A total of a trial's own number, drawn for groups that share trials, is not a split of anything."""
+    measure = plan.measure
+    if measure is None or measure.statistic != "sum" or not has_overlapping_groups(plan):
+        return []
+    overlapping = next(
+        d.spec.title
+        for d in plan.dimensions
+        if not d.spec.is_exclusive and not (measure.field == "site_count" and d.spec.sites_of)
+    )
+    return [text.overlapping_total_note(measure.field, overlapping)]
 
 
 def _followups(

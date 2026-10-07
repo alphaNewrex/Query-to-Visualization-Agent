@@ -39,7 +39,7 @@ class Intervention:
 
 @dataclass(frozen=True)
 class Location:
-    index: int  # position in the record's `locations` array
+    index: int  # position in the record's `locations` array; a site shown as `{}` has no country or state
     country: str | None
     state: str | None = None
 
@@ -143,7 +143,7 @@ def parse_study(record: JsonObject) -> Study:
         ),
         locations=tuple(
             Location(index=index, country=_text(item.get("country")), state=_text(item.get("state")))
-            for index, item in _items(_dig(protocol, "contactsLocationsModule", "locations"))
+            for index, item in _entries(_dig(protocol, "contactsLocationsModule", "locations"))
         ),
         sex=_text(_dig(eligibility, "sex")),
         std_ages=_strings(_dig(eligibility, "stdAges")),
@@ -185,6 +185,17 @@ def _strings(value: object) -> tuple[str, ...]:
 def _date(value: object) -> StudyDate | None:
     day = _text(_dig(value, "date"))
     return None if day is None else StudyDate(date=day, type=_text(_dig(value, "type")))
+
+
+def _entries(value: object) -> Iterator[tuple[int, JsonObject]]:
+    """Every object of a list with its position, the `{}` of a projected-away entry included.
+
+    A site that the projection shows as `{}` is still a site of the trial, and counts as one.
+    """
+    if isinstance(value, list):
+        for index, item in enumerate(value):
+            if isinstance(item, Mapping):
+                yield index, item
 
 
 def _items(value: object) -> Iterator[tuple[int, JsonObject]]:

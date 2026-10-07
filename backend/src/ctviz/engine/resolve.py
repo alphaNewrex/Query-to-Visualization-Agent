@@ -28,6 +28,7 @@ from ctviz.ctgov.params import BoundTerm, DateRange, Params, Scope
 from ctviz.engine.gather import gather
 from ctviz.engine.lower import PlannedLike, Resolved
 from ctviz.engine.registry import Registry
+from ctviz.errors import UpstreamRejectedQuery
 
 # Another reading must be this many times larger than the one used before the answer says so.
 _OTHER_READING_FACTOR: Final = 5
@@ -370,6 +371,11 @@ async def resolve_entities(planned: PlannedLike, deps: ResolveDeps, ctx: Request
         )
     except ValueError as error:
         return _clarify(f"A name in the question could not be searched: {error}")
+    except _RejectedName as error:
+        return _clarify(
+            f"ClinicalTrials.gov could not read '{error.text}' as a search term, so nothing was counted. "
+            "Rephrase it in plain words, without brackets or search operators."
+        )
     resolutions = [
         resolution.model_copy(update={"source": _source(planned.request, entity)})
         for entity, resolution in zip(plan.entities, resolutions, strict=True)
@@ -413,13 +419,30 @@ async def resolve_entities(planned: PlannedLike, deps: ResolveDeps, ctx: Request
     )
 
 
+class _RejectedName(Exception):
+    """The registry answered 400 to a search made of one entity's words: they are what it rejected."""
+
+    def __init__(self, text: str) -> None:
+        super().__init__(text)
+        self.text = text
+
+
 def _resolver_call(
     deps: ResolveDeps, entity: Entity, ctx: RequestLog, drug_match: DrugMatch, request: QueryRequest | None
 ) -> Callable[[], Awaitable[EntityResolution]]:
     may_reread = _source(request, entity) == "question"
-    return lambda: deps.resolver.resolve(
-        entity.kind, entity.value, ctx, drug_match=drug_match, may_reread=may_reread
-    )
+
+    async def resolve() -> EntityResolution:
+        try:
+            return await deps.resolver.resolve(
+                entity.kind, entity.value, ctx, drug_match=drug_match, may_reread=may_reread
+            )
+        except UpstreamRejectedQuery as error:
+            # Every search here is the entity's words and nothing else, so the words are the cause. Words
+            # the registry reads as an operator are a fault of the question, not of the service.
+            raise _RejectedName(entity.value) from error
+
+    return resolve
 
 
 def _probe_call(deps: ResolveDeps, scope: Scope, ctx: RequestLog) -> Callable[[], Awaitable[int]]:

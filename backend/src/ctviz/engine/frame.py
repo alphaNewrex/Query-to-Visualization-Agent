@@ -4,6 +4,7 @@ A walk feeds records to the group-by; a fan-out fills the same table from count 
 bucket. Only the types are declared here, so one builder per chart type serves both executors.
 """
 
+from collections import Counter
 from dataclasses import dataclass, field
 
 from ctviz.catalog.fields import BoundDimension, Evidence
@@ -35,6 +36,7 @@ class Cell:
     expr: Expr | None = None  # Essie selecting exactly these trials, when every bucket has one
     source_url: str | None = None  # the URL that was called (fan-out) or that can be composed (walk)
     values: list[float] = field(default_factory=list)  # a measure: the value of each of the `trials`
+    is_rest: bool = False  # the sum of the categories a top-N left out, drawn as "Other (k more)"
 
     def add(self, trial: TrialEvidence, sample_size: int, value: float | None = None) -> None:
         """Count one trial and offer it to the sample, which keeps the best-ranked `sample_size`."""
@@ -71,6 +73,9 @@ class Frame:
     excluded: dict[str, Exclusion] = field(default_factory=dict)  # by reason
     strategy: StrategyName = "walk"
     warnings: list[Note] = field(default_factory=list)  # what the executor found out about this scope
+    # A statistic: how the values it rests on were stated (`end_estimated`, `enrollment_zero`), counted once
+    # for each trial analysed.
+    basis: Counter[str] = field(default_factory=Counter)
 
     def __post_init__(self) -> None:
         if not self.marginals:

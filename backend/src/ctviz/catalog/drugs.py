@@ -46,6 +46,9 @@ SPLIT_RE: Final = re.compile(
 HAS_SEPARATOR: Final = re.compile(r"\+|/|&|,|\band\b|\bplus\b|\bwith\b|\bor\b")
 
 
+# The prefix of the synthetic arm group that the parts of one intervention string share.
+ONE_INTERVENTION: Final = "\x00intervention:"
+
 # A design word: an intervention named like this is the arm it belongs to, not a compound.
 ARM_WORD_RE: Final = re.compile(r"\b(?:groups?|arms?|cohorts?)\b", re.IGNORECASE)
 
@@ -66,13 +69,42 @@ def is_arm_label(item: Intervention) -> bool:
     return ARM_WORD_RE.search(normalise(name)) is not None and name in labels
 
 
+# A leading descriptor in brackets that tells two forms of one molecule apart: the sign of its rotation, the
+# racemate, or a configuration letter. "(+)-epicatechin" and "(-)-epicatechin" are different compounds, so
+# the descriptor is part of the name, where a bracket elsewhere is only an aside.
+_DESCRIPTOR_RE: Final = re.compile(
+    r"^\s*\(\s*(\+/-|\u00b1|rac|dl|r\s*,\s*s|[+\-\u2212\u2013rsezdl])\s*\)\s*[-\u2013\u2212]?\s*",
+    re.IGNORECASE,
+)
+_DESCRIPTOR_WORDS: Final = {
+    "+": "pos",
+    "-": "neg",
+    "\u2212": "neg",  # minus sign
+    "\u2013": "neg",  # en dash
+    "+/-": "rac",
+    "\u00b1": "rac",  # plus-minus sign
+    "rac": "rac",
+    "dl": "rac",
+    "r,s": "rac",
+}
+
+
 def normalise(name: str) -> str:
-    """Lower-case, without registered marks, asides in brackets, doses and form or route words."""
+    """Lower-case, without registered marks, asides in brackets, doses and form or route words.
+
+    A leading descriptor such as `(+)`, `(-)`, `(±)` or `(S)` is kept, as a word in front of the name.
+    """
     text = name.lower().replace("®", "").replace("™", "")
+    prefix = ""
+    if (found := _DESCRIPTOR_RE.match(text)) is not None:
+        descriptor = re.sub(r"\s+", "", found.group(1))
+        prefix = f"{_DESCRIPTOR_WORDS.get(descriptor, descriptor)}-"
+        text = text[found.end() :]
     text = re.sub(r"\[[^\]]*\]|\([^)]*\)", " ", text)
     text = FORM_RE.sub(" ", DOSE_RE.sub(" ", text))
     text = re.sub(r"[^a-z0-9+/&,\- ]", " ", text)
-    return re.sub(r"\s+", " ", text).strip(" -+/&,")
+    rest = re.sub(r"\s+", " ", text).strip(" -+/&,")
+    return f"{prefix}{rest}" if rest else ""
 
 
 def split_combination(normalised: str, known: frozenset[str]) -> list[str]:
@@ -120,9 +152,14 @@ class DrugNormalizer:
             evidence = Evidence(
                 f"protocolSection.armsInterventionsModule.interventions[{item.index}].name", raw
             )
-            for part in split_combination(key, self.known):
+            parts = split_combination(key, self.known)
+            # The parts of one intervention string are given together whatever arms the record lists, so
+            # they share a group of their own, which no arm label can equal.
+            together = frozenset({f"{ONE_INTERVENTION}{item.index}"}) if len(parts) > 1 else frozenset()
+            for part in parts:
                 earlier = found.get(part)
-                groups = frozenset(item.arm_group_labels) | (earlier.groups if earlier else frozenset())
+                arms = frozenset(item.arm_group_labels) | together
+                groups = arms | (earlier.groups if earlier else frozenset())
                 found[part] = Value(
                     key=part,
                     label=self.labels.get(part, part),

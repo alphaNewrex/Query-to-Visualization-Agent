@@ -1,10 +1,10 @@
 """Small stand-ins for the engine tests: field specs, study records, a fake registry client and plans.
 
-The fake client answers the three expression forms the specs below use (`AREA[Phase]X`, `AREA[Phase]MISSING`,
-`AREA[StartDate]RANGE[a,b]`) plus a lead-sponsor name, which is how the tests tell compared scopes apart.
+The fake client evaluates the expressions the engine writes with the model of the server in
+`engine_memory` (areas, ranges, MISSING, AND, OR and NOT), which is how the tests tell buckets, probes and
+compared scopes apart.
 """
 
-import re
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from typing import Literal
@@ -18,10 +18,11 @@ from ctviz.ctgov.params import BoundTerm, Params, Scope, canonical_url
 from ctviz.ctgov.study import Study, parse_study
 from ctviz.engine.lower import EnginePlan, MeasureSpec, RowSpec
 
+from .engine_memory import _Parser
+
 BASE = "https://registry.test/api/v2"
 _DESIGN = "protocolSection.designModule"
 _STATUS = "protocolSection.statusModule"
-_CLAUSE = re.compile(r'AREA\[(\w+)\](RANGE\[[^\]]*\]|"[^"]*"|\w+)')
 
 
 def study(
@@ -254,8 +255,9 @@ class FakeClient:
     registry: int = 1_000_000
 
     def _matching(self, params: Params) -> list[Study]:
-        clauses = _CLAUSE.findall(params.advanced or "")
-        return [study for study in self.studies if all(_holds(study, *clause) for clause in clauses)]
+        if params.advanced is None:
+            return list(self.studies)
+        return [study for study in self.studies if _Parser.of(params.advanced, study).expr()]
 
     def _log(
         self,
@@ -307,25 +309,6 @@ class FakeClient:
         matching = self._matching(params)
         self._log(ctx, params, "execution", len(matching), 1000, fields)
         return WalkResult(tuple(matching), self._total(params))
-
-
-def _holds(study: Study, piece: str, argument: str) -> bool:
-    if piece == "StartDate":
-        day = study.start_date.date if study.start_date else None
-        if argument == "MISSING" or day is None:
-            return argument == "MISSING" and day is None
-        day = f"{day}-01" if len(day) == 7 else day  # the registry reads a month as its first day
-        low, high = argument[6:-1].split(",")
-        return (low == "MIN" or day >= low) and (high == "MAX" or day <= high)
-    if piece == "LeadSponsorName":
-        return study.lead_sponsor_name == argument.strip('"')
-    if piece == "Phase":
-        return not study.phases if argument == "MISSING" else argument in study.phases
-    if piece == "LocationCountry":
-        return any(site.country == argument.strip('"') for site in study.locations)
-    if piece == "LocationState":
-        return any(site.state == argument.strip('"') for site in study.locations)
-    raise ValueError(f"The fake registry does not know {piece}.")
 
 
 def _sorted(studies: list[Study], sort: str | None) -> list[Study]:

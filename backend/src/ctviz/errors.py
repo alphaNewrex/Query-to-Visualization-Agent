@@ -89,6 +89,16 @@ class AppError(Exception):
         self.headers: Mapping[str, str] = headers or {}
 
 
+class UpstreamRejectedQuery(AppError):
+    """ClinicalTrials.gov answered 400 or 414 to a search this service built.
+
+    Whether that is a fault of the service or of a word the user wrote that the registry reads as an
+    operator is for the caller to say: a caller that can name the user's words turns it into an answer.
+    """
+
+    code = ErrorCode.INTERNAL_ERROR
+
+
 class InvalidRequest(AppError):
     """The request broke a validation rule; `details.errors` names each one."""
 

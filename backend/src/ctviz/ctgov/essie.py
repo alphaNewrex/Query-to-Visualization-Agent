@@ -26,7 +26,9 @@ _OPERATOR_WORDS: Final = frozenset(
         "MISSING",
         "MIN",
         "MAX",
+        "COVER",
         "COVERAGE",
+        "EXPAND",
         "EXPANSION",
         "TILT",
         "DISTANCE",
@@ -132,6 +134,24 @@ def and_(*parts: Expr) -> Expr:
     if len(parts) == 1:
         return parts[0]
     return Expr(" AND ".join(f"({part})" for part in parts))
+
+
+def or_(*parts: Expr) -> Expr:
+    """The expressions joined with OR, each in parentheses."""
+    if not parts:
+        raise ValueError("or_ needs at least one expression.")
+    if len(parts) == 1:
+        return parts[0]
+    return Expr(" OR ".join(f"({part})" for part in parts))
+
+
+def at_one_site(part: Expr) -> Expr:
+    """`SEARCH[Location](...)`: the areas inside hold at the same site of a study, not at any of its sites.
+
+    `AREA[LocationCountry]"X" AND AREA[LocationState]"Y"` selects a study with a site in X and, perhaps
+    elsewhere, a site in Y; this selects a study with a site in both X and Y.
+    """
+    return Expr(f"SEARCH[Location]({part})")
 
 
 def not_(part: Expr) -> Expr:

@@ -131,7 +131,7 @@ export function makeMeta(query: string, overrides: Partial<Meta> = {}): Meta {
     },
     counts: null,
     truncation: { is_truncated: false, items: [] },
-    citations: { is_enabled: true, max_per_datum: 5, selection: "most relevant trials by ClinicalTrials.gov's own ranking", trials_cited: 0 },
+    citations: { is_enabled: true, max_per_datum: 5, selection: "most relevant trials by ClinicalTrials.gov's own ranking", trials_cited: 0, source_url_reasons: [] },
     suggested_followups: [],
     conversation: { is_follow_up: false, carried_over: [], changed: [] },
     cache: { is_plan_cached: false, is_response_cached: false, cached_at: null },

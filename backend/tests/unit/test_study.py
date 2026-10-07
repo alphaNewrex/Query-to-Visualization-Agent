@@ -10,7 +10,7 @@ from typing import Any
 
 import pytest
 
-from ctviz.ctgov.study import Intervention, StudyDate, parse_study
+from ctviz.ctgov.study import Intervention, Location, StudyDate, parse_study
 
 FIXTURES = Path(__file__).parent.parent / "fixtures"
 
@@ -119,11 +119,12 @@ def test_an_empty_or_absent_module_holds_no_locations(label: str) -> None:
     assert parse_study(projected(label)).locations == ()
 
 
-def test_a_list_holding_only_an_empty_object_is_no_value() -> None:
+def test_a_site_the_projection_shows_as_an_empty_object_is_still_a_site() -> None:
     study = parse_study(projected("location_item_empty"))
 
     assert study.raw["protocolSection"]["contactsLocationsModule"]["locations"] == [{}]
-    assert study.locations == ()
+    # The registry lists one site and it has no country: it counts as a site, and names no country.
+    assert study.locations == (Location(0, None, None),)
     assert [item.name for item in study.interventions] == ["bevacizumab", "paclitaxel"]
 
 

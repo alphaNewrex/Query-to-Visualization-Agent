@@ -54,6 +54,10 @@ async def partition(
         if size <= 0:
             return
         if size <= leaf_max or lo >= hi:
+            if is_first and is_last:
+                # One range with both ends open is the whole search: every trial shares one day, or fits.
+                found.append((lo, Partition(params, size)))
+                return
             expr = essie.range_(
                 PIECE, None if is_first else lo.isoformat(), None if is_last else hi.isoformat()
             )

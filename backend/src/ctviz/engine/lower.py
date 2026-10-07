@@ -46,6 +46,7 @@ __all__ = [
     "RowSpec",
     "Scope",
     "Window",
+    "axis_years",
     "lower_plan",
 ]
 
@@ -106,6 +107,15 @@ class EnginePlan:
     citations_per_datum: int
     public: QueryPlan  # the canonical plan echoed in meta.plan
     measure: MeasureSpec | None = None  # None counts trials
+
+    @property
+    def axis_years(self) -> tuple[int | None, int | None]:
+        """The years the plan states for its time axis: the year range, when it is a range of the axis' field.
+
+        A range on another date field limits the trials and says nothing about the periods shown: of the
+        trials that started in 2020, the years they completed in are not limited to 2020.
+        """
+        return axis_years(self.public.filters, self.dimensions[0].spec.key if self.dimensions else None)
 
 
 @dataclass(frozen=True)
@@ -186,7 +196,7 @@ def lower_plan(
     axis = dimensions[0] if dimensions else None
     window = None
     if axis is not None and axis.time_unit is not None:
-        window = _window(plan.filters, axis.time_unit, version.data_timestamp)
+        window = _window(axis_years(plan.filters, axis.spec.key), axis.time_unit, version.data_timestamp)
     return EnginePlan(
         scopes=resolved.scopes,
         compare_kind=next((entity.kind for entity in plan.entities if entity.role == "compare"), None),
@@ -218,13 +228,24 @@ def _bind(
     )
 
 
-def _window(filters: PlanFilters, unit: TimeUnit, data_timestamp: str) -> Window:
+def axis_years(filters: PlanFilters, axis_key: str | None) -> tuple[int | None, int | None]:
+    """The years of a plan's range that belong to the date axis `axis_key`; none for a range on another field.
+
+    A plan that names no date field has its range on the axis' field, as the scope's date range does.
+    """
+    if filters.date_field is not None and filters.date_field != axis_key:
+        return None, None
+    return filters.year_from, filters.year_to
+
+
+def _window(years: tuple[int | None, int | None], unit: TimeUnit, data_timestamp: str) -> Window:
     """The periods of a date axis: the stated years, else the latest 25 ending where the data ends."""
-    if filters.year_to is None:
+    year_from, year_to = years
+    if year_to is None:
         last = windows.label_of_day(unit, data_timestamp[:10])
     else:
-        last = windows.of_year(unit, filters.year_to)[1]
-    if filters.year_from is None:
+        last = windows.of_year(unit, year_to)[1]
+    if year_from is None:
         return windows.ending_at(unit, last, DEFAULT_WINDOW_PERIODS)
-    first = windows.of_year(unit, filters.year_from)[0]
+    first = windows.of_year(unit, year_from)[0]
     return Window(unit, first, max(first, last))

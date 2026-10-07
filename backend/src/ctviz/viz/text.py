@@ -121,6 +121,11 @@ def count(number: int) -> str:
     return f"{number:,}"
 
 
+def n_trials(number: int) -> str:
+    """`1 trial`, `0 trials`, `12 trials`."""
+    return f"{count(number)} trial" if number == 1 else f"{count(number)} trials"
+
+
 def share(fraction: float) -> str:
     return f"{fraction:.1%}"
 
@@ -260,11 +265,9 @@ def scatter_title(x_title: str, y_title: str, labels: Sequence[str | None]) -> s
 
 def table_title(sort_by: str, order: str, labels: Sequence[str | None]) -> str:
     if sort_by == "enrollment":
-        ordering = (
-            "Trials with the largest enrollment" if order == "desc" else "Trials with the smallest enrollment"
-        )
+        ordering = f"Trials with the {sort_phrase(sort_by, order)}"
     else:
-        ordering = f"Trials by {SORT_TITLES[sort_by]}, {'latest' if order == 'desc' else 'earliest'} first"
+        ordering = f"Trials by {sort_phrase(sort_by, order)}"
     return f"{ordering}{scope_suffix(labels)}"
 
 
@@ -286,8 +289,18 @@ def window_phrase(date_title: str, unit: str, first: str, last: str) -> str:
 
 def trials_phrase(parts: Sequence[tuple[str | None, int]], noun: str = "trials") -> str:
     if len(parts) == 1 and parts[0][0] is None:
-        return f"{count(parts[0][1])} {noun}"
+        return f"{count(parts[0][1])} {noun.replace('trials', 'trial') if parts[0][1] == 1 else noun}"
     return ", ".join(f"{label}: {count(n)}" for label, n in parts) + f" {noun}"
+
+
+def listed_phrase(listed: Sequence[tuple[str | None, int, int]]) -> str:
+    """`5 of 30 trials`, or `France: 3 of 30, Spain: 3 of 10 trials` for compared groups."""
+    if len(listed) == 1 and listed[0][0] is None:
+        shown, total = listed[0][1:]
+        return f"{count(shown)} of {n_trials(total)}" if shown < total else n_trials(total)
+    return (
+        ", ".join(f"{label}: {count(shown)} of {count(total)}" for label, shown, total in listed) + " trials"
+    )
 
 
 def subtitle(*parts: str | None, data_date: str) -> str:
@@ -305,28 +318,83 @@ def edge_weight_title() -> str:
 # --- One-sentence messages ----------------------------------------------------------------------------
 
 
-def time_series_message(date_key: str, last: str, last_count: int, peak: str, peak_count: int) -> str:
+def joined(names: Sequence[str], *, limit: int = 4) -> str:
+    """`A`, `A and B`, `A, B and C`; a long list is cut to its first three and a count of the rest."""
+    if len(names) > limit:
+        return f"{', '.join(names[:3])} and {len(names) - 3} more"
+    if len(names) <= 2:
+        return " and ".join(names)
+    return f"{', '.join(names[:-1])} and {names[-1]}"
+
+
+def time_series_message(
+    date_key: str, last: str, last_count: int, peaks: Sequence[str], peak_count: int
+) -> str:
+    """The latest period against the peak; periods that share the peak are all named, not the first."""
     verb = DATE_VERBS[date_key]
-    if last == peak:
-        return f"{count(last_count)} trials {verb} in {last}, the most of any period shown."
-    return f"{count(last_count)} trials {verb} in {last}; the peak was {count(peak_count)} in {peak}."
+    if len(peaks) == 1:
+        if last == peaks[0]:
+            return f"{n_trials(last_count)} {verb} in {last}, the most of any period shown."
+        return f"{n_trials(last_count)} {verb} in {last}; the peak was {count(peak_count)} in {peaks[0]}."
+    if last in peaks:
+        others = [period for period in peaks if period != last]
+        return (
+            f"{n_trials(last_count)} {verb} in {last}, tied with {joined(others)} "
+            "for the most of any period shown."
+        )
+    return (
+        f"{n_trials(last_count)} {verb} in {last}; the peak was {count(peak_count)}, "
+        f"tied between {joined(peaks)}."
+    )
 
 
-def series_peak_message(date_key: str, series: str, period: str, peak_count: int) -> str:
-    return f"{series} peaked at {count(peak_count)} trials {DATE_VERBS[date_key]} in {period}."
+def coverage_note(date_key: str, settled: Sequence[str], drawn: int, window_last: str, beyond: int) -> str:
+    """The periods a headline is about, when others are drawn or trials fall after the axis.
+
+    Nothing is added where the headline covers every period drawn and no trial lies beyond them.
+    """
+    parts = []
+    if len(settled) < drawn and settled:
+        parts.append(f"counted over the periods that have ended, {settled[0]} to {settled[-1]}")
+    if beyond:
+        verb = "is" if beyond == 1 else "are"
+        parts.append(f"{n_trials(beyond)} {DATE_VERBS[date_key]} after {window_last} {verb} not shown")
+    return f" ({'; '.join(parts)})" if parts else ""
 
 
-def largest_category_message(label: str, trials: int, analyzed: int) -> str:
+def series_peak_message(date_key: str, peaks: Sequence[tuple[str, str]], peak_count: int) -> str:
+    """`peaks` are (series, period) pairs that reach the highest count."""
+    verb = DATE_VERBS[date_key]
+    if len(peaks) == 1:
+        series, period = peaks[0]
+        return f"{series} peaked at {n_trials(peak_count)} {verb} in {period}."
+    where = joined([f"{series} in {period}" for series, period in peaks])
+    return f"{where} are tied at the peak of {n_trials(peak_count)} {verb}."
+
+
+def largest_category_message(labels: Sequence[str], trials: int, analyzed: int) -> str:
     fraction = trials / analyzed if analyzed else 0.0
-    return f"{label} is the largest group: {count(trials)} of {count(analyzed)} trials ({share(fraction)})."
+    if len(labels) > 1:
+        return (
+            f"{joined(labels)} are tied as the largest groups: {count(trials)} of {n_trials(analyzed)} "
+            f"each ({share(fraction)})."
+        )
+    return f"{labels[0]} is the largest group: {count(trials)} of {n_trials(analyzed)} ({share(fraction)})."
 
 
-def largest_in_series_message(label: str, series: str, trials: int) -> str:
-    return f"The largest group is {label} for {series}, with {count(trials)} trials."
+def largest_in_series_message(leaders: Sequence[tuple[str, str]], trials: int) -> str:
+    """`leaders` are (category, series) pairs that reach the highest count."""
+    if len(leaders) > 1:
+        where = joined([f"{label} for {series}" for label, series in leaders])
+        return f"The largest groups are tied at {n_trials(trials)} each: {where}."
+    label, series = leaders[0]
+    return f"The largest group is {label} for {series}, with {n_trials(trials)}."
 
 
-def compared_totals_message(label: str, trials: int) -> str:
-    return f"{label} has the most trials: {count(trials)}."
+def compared_totals_message(labels: Sequence[str], trials: int) -> str:
+    if len(labels) > 1:
+        return f"{joined(labels)} are tied with the most trials: {count(trials)} each."
+    return f"{labels[0]} has the most trials: {count(trials)}."
 
 
 def metric_message(trials: int, labels: Sequence[str | None], filters: Sequence[str] = ()) -> str:
@@ -336,33 +404,56 @@ def metric_message(trials: int, labels: Sequence[str | None], filters: Sequence[
     return f"{count(trials)} {verb}: {detail}." if detail else f"{count(trials)} {verb}."
 
 
-def measure_top_message(label: str, where: str, value: str, trials: int) -> str:
-    return f"{where} has the highest {label.lower()}: {value} ({count(trials)} trials measured)."
+def measure_top_message(
+    label: str, wheres: Sequence[str], value: str, trials: Sequence[int], *, is_overlapping: bool = False
+) -> str:
+    """The highest value of a statistic; marks that share it are all named, with the trials of each."""
+    detail = "; each trial counts in full in every group it is in" if is_overlapping else ""
+    if len(wheres) > 1:
+        measured = ", ".join(count(n) for n in trials[:3]) + (" ..." if len(trials) > 3 else "")
+        return (
+            f"{joined(wheres)} are tied for the highest {label.lower()}: {value} "
+            f"(trials measured: {measured}{detail})."
+        )
+    return f"{wheres[0]} has the highest {label.lower()}: {value} ({n_trials(trials[0])} measured{detail})."
 
 
 def measure_metric_message(label: str, value: str, trials: int, labels: Sequence[str | None]) -> str:
     named = [name for name in labels if name]
     scope = f" for {' vs '.join(named)}" if named else ""
-    return f"{label}{scope}: {value}, over {count(trials)} trials."
+    return f"{label}{scope}: {value}, over {n_trials(trials)}."
 
 
-def histogram_message(label: str, trials: int) -> str:
-    return f"The most common size range is {label}, with {count(trials)} trials."
+def histogram_message(labels: Sequence[str], trials: int) -> str:
+    if len(labels) > 1:
+        return f"The most common size ranges are tied: {joined(labels)}, with {n_trials(trials)} each."
+    return f"The most common size range is {labels[0]}, with {n_trials(trials)}."
 
 
 def scatter_message(points: int, x_title: str, y_title: str) -> str:
-    return f"{count(points)} trials plotted, {y_title.lower()} against {x_title.lower()}."
+    return f"{n_trials(points)} plotted, {y_title.lower()} against {x_title.lower()}."
 
 
-def table_message(rows: int, total: int, sort_by: str) -> str:
-    return f"{count(rows)} of {count(total)} trials, ordered by {SORT_TITLES[sort_by]}."
+def sort_phrase(sort_by: str, order: str) -> str:
+    """How a list is ordered, in the direction it runs: `largest enrollment`, `start date, latest first`."""
+    if sort_by == "enrollment":
+        return "largest enrollment" if order == "desc" else "smallest enrollment"
+    return f"{SORT_TITLES[sort_by]}, {'latest' if order == 'desc' else 'earliest'} first"
 
 
-def network_message(nodes: int, links: int, a: str, b: str, trials: int) -> str:
-    return (
-        f"{count(nodes)} nodes and {count(links)} links; the strongest link joins {a} and {b} "
-        f"in {count(trials)} trials."
-    )
+def table_message(listed: Sequence[tuple[str | None, int, int]], sort_by: str, order: str) -> str:
+    """`listed` is (group, rows shown, trials that match) per scope; the list shows the first rows of each."""
+    return f"{listed_phrase(listed)}, ordered by {sort_phrase(sort_by, order)}."
+
+
+def network_message(nodes: int, links: int, strongest: Sequence[tuple[str, str]], trials: int) -> str:
+    """`strongest` are the links that reach the highest weight, as (a, b) pairs."""
+    head = f"{count(nodes)} nodes and {count(links)} links; "
+    if len(strongest) > 1:
+        pairs = joined([f"{a} with {b}" for a, b in strongest])
+        return f"{head}{len(strongest)} links tie as the strongest, each in {n_trials(trials)}: {pairs}."
+    a, b = strongest[0]
+    return f"{head}the strongest link joins {a} and {b} in {n_trials(trials)}."
 
 
 def interpretation_summary(
@@ -418,6 +509,17 @@ STATE_SHARE_NOTE: Final = (
 
 def partial_period(period: str, data_date: str) -> Note:
     return Note(code="partial_period", message=f"{period} is incomplete: data as of {data_date}.")
+
+
+def future_periods(periods: Sequence[str], data_date: str) -> Note:
+    """Periods after the data date are drawn: what a count there means, and does not."""
+    where = periods[0] if len(periods) == 1 else f"{periods[0]} to {periods[-1]}"
+    return Note(
+        code="future_periods",
+        message=f"{where} {'is' if len(periods) == 1 else 'are'} after the data date ({data_date}). Trials "
+        "counted there have planned (estimated) dates, and a zero there says only that none is dated "
+        "there yet.",
+    )
 
 
 def chart_preference_ignored(preference: str, chosen: str) -> Note:
@@ -479,21 +581,69 @@ PHASE_FILTER_NOTE: Final = (
     "A phase filter keeps the trials that list that phase, so Phase 2 also includes Phase 1/Phase 2 and "
     "Phase 2/Phase 3 trials."
 )
+# What a plotted number is, for a scatter plot: a trial without a value of a plotted field is left out.
 NUMBER_NOTES: Final = {
-    "enrollment": "Enrollment counts, estimated and actual, are both used.",
-    "duration_months": "Duration runs from the start date to the completion date, a month counting as its "
-    "first day.",
-    "site_count": "Sites are the locations listed in each record.",
-}
-
-
-MEASURE_NOTES: Final = {
-    "enrollment": "Enrollment counts, estimated and actual, are both used; a trial with no enrollment count "
+    "enrollment": "Enrollment is the count in each record, actual or estimated; a trial with no enrollment "
+    "count is left out.",
+    "duration_months": "Duration runs from the start date to the completion date, whether each is actual or "
+    "estimated, in calendar months with the days of the two dates as parts of a month; a date given only as "
+    "a month counts as its first day, and a trial without both dates or one that completes before it starts "
     "is left out.",
-    "duration_months": "Duration runs from the start date to the completion date, a month counting as its "
-    "first day; a trial without both dates, or one that completes before it starts, is left out.",
     "site_count": "Sites are the locations listed in each record; a trial that lists no site is left out.",
 }
+
+
+# What a statistic is the statistic of, and which trials it leaves out.
+MEASURE_NOTES: Final = {
+    "enrollment": "Enrollment is the count in each record, actual or estimated; a trial with no enrollment "
+    "count is left out, and a trial that reports zero (a withdrawn trial) is kept.",
+    "duration_months": "Duration runs from the start date to the completion date, whether each is actual or "
+    "estimated, in calendar months with the days of the two dates as parts of a month; a date given only as "
+    "a month counts as its first day, and a trial without both dates or one that completes before it starts "
+    "is left out.",
+    "site_count": "Sites are the locations listed in each record; a trial that lists no site is left out. "
+    "Within a country or a state, the sites counted are those in it.",
+}
+
+
+def measure_basis_note(field: str, basis: Mapping[str, int]) -> str | None:
+    """How the values of a statistic are stated in the records: how many are planned and how many actual."""
+
+    def split(prefix: str) -> str:
+        parts = [
+            f"{basis[key]:,} {word}"
+            for word, key in (
+                ("actual", f"{prefix}_actual"),
+                ("estimated (planned)", f"{prefix}_estimated"),
+                ("not stated as either", f"{prefix}_unstated"),
+            )
+            if basis.get(key)
+        ]
+        return ", ".join(parts)
+
+    if field == "enrollment":
+        found = split("enrollment")
+        zeros = basis.get("enrollment_zero", 0)
+        if not found:
+            return None
+        kept = f"; {zeros:,} of them are zero and kept" if zeros else ""
+        return f"Enrollment counts used: {found}{kept}."
+    if field == "duration_months":
+        starts, ends = split("start"), split("end")
+        if not starts and not ends:
+            return None
+        return f"Durations used: start dates {starts}; completion dates {ends}."
+    return None
+
+
+def overlapping_total_note(field: str, group_title: str) -> Note:
+    """A sum of a number that belongs to the trial, drawn per group of a field that overlaps."""
+    return Note(
+        code="sum_over_overlapping_groups",
+        message=f"Each trial's {MEASURE_PHRASES[field].replace(' per trial', '')} counts in full in every "
+        f"{group_title.lower()} group it belongs to, so these totals overlap: they do not add up to the "
+        f"grand total, and they are not the {NUMBER_TITLES[field].lower()} within each group.",
+    )
 
 
 def statistic_note(statistic: str, label: str) -> str:
@@ -517,7 +667,24 @@ def default_window(first: str) -> str:
 
 
 def overlap_note(shared: int, labels: Sequence[str]) -> str:
-    return f"{count(shared)} trials involve both {' and '.join(labels)} and appear in both groups."
+    verb = "involves" if shared == 1 else "involve"
+    return f"{n_trials(shared)} {verb} both {' and '.join(labels)} and appear in both groups."
+
+
+def overlap_not_computed(groups: int) -> str:
+    return (
+        f"With {groups} compared groups the trials that belong to more than one are not counted; a trial "
+        "can be in several groups, so the bars can add up to more than the trials that match."
+    )
+
+
+def compared_top_n_note() -> str:
+    return (
+        "With compared groups the categories shown are the largest by the trials of all groups together, "
+        "the same for every group, so a trial in two groups counts twice in the ranking. 'Other (k more)' "
+        "sums, in each group, the categories left out of the chart, and k is the number of categories left "
+        "out of all groups together."
+    )
 
 
 def link_note(source: str, target: str, pairing: str) -> str:
@@ -532,6 +699,19 @@ def link_note(source: str, target: str, pairing: str) -> str:
             "agents lists both, so some links are alternatives."
         )
     return f"Two {kind} are linked when one trial lists both."
+
+
+SOURCE_URL_REASONS: Final = {
+    "statistic": "A statistic is computed here from the trial records that were read; no search returns "
+    "exactly the trials it was computed from, so its rows have no source_url.",
+    "network": "A network's nodes and links count the drugs, conditions or sponsors read from the records; "
+    "no search returns exactly the trials of a node or a link, so they have no source_url.",
+    "rest": "The 'Other' row sums several values; no single search returns exactly its trials, so it has "
+    "no source_url.",
+    "state": "A state is searched by its name, which the registry matches more loosely than the spellings "
+    "are grouped here; a state has a source_url only when the registry's own count for it equals the bar.",
+    "other": "A row has no source_url where no search returns exactly its trials.",
+}
 
 
 def citation_selection(strategies: Sequence[str]) -> str:

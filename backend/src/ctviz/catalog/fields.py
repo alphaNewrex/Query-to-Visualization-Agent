@@ -17,7 +17,7 @@ from ctviz.ctgov.essie import Expr
 
 if TYPE_CHECKING:
     from ctviz.ctgov.params import Scope
-    from ctviz.ctgov.study import Study
+    from ctviz.ctgov.study import Location, Study
 
 
 @dataclass(frozen=True)
@@ -91,11 +91,20 @@ class FieldSpec:
     is_ordinal: bool  # bucket order is meaningful: phase, dates, bins
     buckets: Callable[[BoundDimension, Window | None], Sequence[Bucket]] | None = None  # closed lists only
     bucket_for: Callable[[str], Bucket | None] | None = None  # open but countable: country
+    # Instead of `bucket_for`, for a value whose search depends on the scope: a state, at a site of the
+    # countries the question names.
+    bucket_in_scope: Callable[[str, Scope], Bucket | None] | None = None
+    # The registry matches this field's text more loosely than the values are grouped (a state search also
+    # finds "Madrid, Comunidad de"), so a composed URL is checked with a count before it is given.
+    is_loosely_matched: bool = False
     missing: Bucket | None = None  # where trials without a value go; None means excluded and counted
     presence: Expr | None = None  # true when the field has a value; pushed down before a walk
     prepare: Callable[[Sequence[Study]], FieldContext] | None = None  # the fit step
     # Instead of `prepare`, for a field whose values depend on what the question scopes to: state.
     prepare_in_scope: Callable[[Sequence[Study], Scope], FieldContext] | None = None
+    # The sites of a trial that belong to one value of this field, for a count of sites by the field: a
+    # trial with ten sites in two countries has its own number of sites in each, not ten in both.
+    sites_of: Callable[[Study, FieldContext | None, str], Sequence[Location]] | None = None
     hint: str | None = (
         None  # a sentence for the planner's glossary, where the title alone does not say enough
     )

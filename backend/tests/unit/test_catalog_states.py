@@ -67,27 +67,27 @@ TRIALS = [
 def test_a_state_is_counted_once_per_trial_and_quotes_its_site() -> None:
     found = STATE.extract(TRIALS[1], StateScope((US,)), dimension())
     [value] = found
-    assert (value.key, value.label) == ("California", "California")
+    assert (value.key, value.label) == ("california", "California")
     assert [(e.path, e.excerpt) for e in value.evidence] == [
         (f"{SITES}[0].state", "California"),
         (f"{SITES}[0].country", US),
     ]
     assert [v.key for v in STATE.extract(TRIALS[0], StateScope((US,)), dimension())] == [
-        "California",
-        "Texas",
-        "Ohio",
+        "california",
+        "texas",
+        "ohio",
     ]
 
 
 def test_only_sites_in_the_named_country_are_grouped() -> None:
-    assert [v.key for v in STATE.extract(TRIALS[3], StateScope((US,)), dimension())] == ["Texas"]
-    assert [v.key for v in STATE.extract(TRIALS[3], StateScope((AU,)), dimension())] == ["Victoria"]
+    assert [v.key for v in STATE.extract(TRIALS[3], StateScope((US,)), dimension())] == ["texas"]
+    assert [v.key for v in STATE.extract(TRIALS[3], StateScope((AU,)), dimension())] == ["victoria"]
     assert STATE.extract(TRIALS[2], StateScope((US,)), dimension()) == []
 
 
 def test_with_no_country_named_every_site_is_grouped() -> None:
-    assert [v.key for v in STATE.extract(TRIALS[3], StateScope(()), dimension())] == ["Texas", "Victoria"]
-    assert [v.key for v in STATE.extract(TRIALS[3], None, dimension())] == ["Texas", "Victoria"]
+    assert [v.key for v in STATE.extract(TRIALS[3], StateScope(()), dimension())] == ["texas", "victoria"]
+    assert [v.key for v in STATE.extract(TRIALS[3], None, dimension())] == ["texas", "victoria"]
 
 
 def test_the_countries_come_from_the_scope_as_registry_names() -> None:
@@ -96,10 +96,10 @@ def test_the_countries_come_from_the_scope_as_registry_names() -> None:
     assert StateScope.of(country_scope()).countries == ()
 
 
-def test_a_state_bucket_is_a_quoted_phrase() -> None:
+def test_a_state_bucket_is_a_quoted_phrase_of_the_folded_name() -> None:
     assert STATE.bucket_for is not None
-    bucket = STATE.bucket_for("New York")
-    assert bucket is not None and bucket.expr == 'AREA[LocationState]"New York"'
+    bucket = STATE.bucket_for("new york")
+    assert bucket is not None and bucket.expr == 'AREA[LocationState]"new york"'
 
 
 async def test_a_walk_counts_each_trial_once_per_state_and_counts_the_ones_left_out() -> None:
@@ -108,20 +108,25 @@ async def test_a_walk_counts_each_trial_once_per_state_and_counts_the_ones_left_
     frame = await walk_frame(run, plan, None, FakeClient(TRIALS), FakeContext())
 
     assert {key[0]: cell.trials for key, cell in frame.cells.items()} == {
-        "California": 2,
-        "Texas": 2,
-        "Ohio": 1,
+        "california": 2,
+        "texas": 2,
+        "ohio": 1,
     }
     assert frame.analyzed == 3
     assert {reason: item.count for reason, item in frame.excluded.items()} == {"no_state": 1}
     excluded = sum(item.count for item in frame.excluded.values())
     assert frame.analyzed + excluded == frame.seen == 4  # two trials have no US site: not in the scope
-    california = frame.cells[("California",)]
-    assert california.expr == 'AREA[LocationState]"California"'
+    california = frame.cells[("california",)]
+    # A country and a state must hold at one site, or a trial with a site in each of two countries counts.
+    assert (
+        california.expr
+        == 'SEARCH[Location]((AREA[LocationCountry]"United States") AND (AREA[LocationState]"california"))'
+    )
     assert california.source_url is not None
     query = parse_qs(urlparse(california.source_url).query)
     assert query["filter.advanced"] == [
-        '(AREA[LocationCountry]"United States") AND (AREA[LocationState]"California")'
+        '(AREA[LocationCountry]"United States") AND '
+        '(SEARCH[Location]((AREA[LocationCountry]"United States") AND (AREA[LocationState]"california")))'
     ]
 
 

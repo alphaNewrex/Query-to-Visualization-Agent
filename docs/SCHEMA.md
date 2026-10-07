@@ -680,7 +680,7 @@ A pointer into the trial record that a value was computed from.
 | --- | --- | --- |
 | `nct_id` | string | Key into the top-level `references` map. |
 | `field` | string | Path in `GET /api/v2/studies/{nct_id}` with [i] for list items, addressing one value. |
-| `excerpt` | string \| null | The value at that path, verbatim; numbers and booleans in JSON notation. Null means the field is absent and the absence is the evidence. |
+| `excerpt` | string \| null | The value at that path, verbatim; numbers and booleans in JSON notation. Null means the field is absent and the absence is the evidence. A count of sites is evidenced by the last listed site (`locations[n-1].country`) and the absence of `locations[n]`, which together give the length of the locations list; a count within one country or state also quotes the first and the last site counted, and the sites between them are not each quoted. |
 
 ### TrialReference
 
@@ -941,7 +941,7 @@ One request to ClinicalTrials.gov, in the order issued.
 | --- | --- | --- |
 | `data_points` | integer | Rows, or nodes plus links. |
 | `series` | [`SeriesCounts`](#seriescounts)[] |  |
-| `trials_in_several_series` | integer \| null | Filled for a two-group comparison. |
+| `trials_in_several_series` | integer \| null | The trials in both groups of a two-group comparison. Null for one group, and for three or more groups, where the overlap is not computed; also null when the count failed (see `overlap_not_counted` in the warnings). |
 
 ### SeriesCounts
 
@@ -988,6 +988,7 @@ Trials of a series that were not drawn, and why.
 | `max_per_datum` | integer |  |
 | `selection` | string | Which trials are cited, as the strategy chose them. |
 | `trials_cited` | integer | The size of `references`. |
+| `source_url_reasons` | string[] | Why some data rows have a null `source_url`: one sentence for each kind of row that carries none in this response (statistics, network nodes and links, the 'Other' row, a state whose search cannot be checked); empty when every row has one. |
 
 ### CacheInfo
 

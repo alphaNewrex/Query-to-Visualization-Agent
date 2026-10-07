@@ -138,7 +138,8 @@ def test_a_date_axis_too_big_to_read_is_counted_and_its_window_is_shortened_to_f
     # Three phase buckets and three extra counts: the longest window with 3 * periods + 3 <= 60 is 19.
     assert xp.runs[0].strategy == "count_fan_out"
     assert xp.window == Window("year", "1996", "2014")
-    assert [note.code for note in xp.warnings] == ["window_clamped"]
+    # Not `window_clamped`: this cut is the time left on one request, so the answer must not be cached.
+    assert [note.code for note in xp.warnings] == ["window_shortened_for_time"]
 
 
 def test_a_date_axis_that_cannot_be_counted_even_for_five_periods_asks_for_a_narrower_question() -> None:
@@ -166,3 +167,26 @@ def test_the_fan_out_bill_includes_the_counts_of_trials_outside_the_window() -> 
     assert fan_out_bill(plan, window) == 3 + 3  # before, after, no start date
     # A scope limited to the window's years has nothing before it, after it or without a date.
     assert fan_out_bill(replace(plan, scopes=(limited,)), window) == 3
+
+
+def test_every_series_states_its_own_size_in_the_reason_for_its_strategy() -> None:
+    scopes = (scope("A", scope_id="s0"), scope("B", scope_id="s1"))
+
+    xp = chosen(
+        engine_plan(bound(COUNTRY), scopes=scopes),
+        {"s0": 2971, "s1": 2029},
+        replace(LIMITS, one_page_max=100),
+    )
+
+    assert [run.reason for run in xp.runs] == [
+        "All 2,971 trials were read and grouped here.",
+        "All 2,029 trials were read and grouped here.",
+    ]
+
+
+def test_a_fan_out_states_each_series_own_count_too() -> None:
+    scopes = (scope("A", scope_id="s0"), scope("B", scope_id="s1"))
+
+    xp = chosen(engine_plan(bound(PHASE), scopes=scopes), {"s0": 5000, "s1": 3000})
+
+    assert [run.reason.split(" trials ")[0] for run in xp.runs] == ["5,000", "3,000"]

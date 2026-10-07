@@ -28,6 +28,8 @@ from ctviz.engine.lower import EnginePlan, ListRows
 from ctviz.settings import Settings
 
 MAX_WALK_PERIODS: Final = 60
+# The warning of an axis shortened because of the time left on one request; the answer is not kept.
+SHORTENED_FOR_TIME: Final = "window_shortened_for_time"
 MIN_FAN_OUT_PERIODS: Final = 5
 # A split walk makes about one count request for every page it reads, on top of the pages.
 _COUNTS_PER_PAGE: Final = 1.0
@@ -128,12 +130,14 @@ def _choose(
     can_fan_out = plan.rows is None and plan.relation != "network" and plan.measure is None
     bill = fan_out_bill(plan, window) if can_fan_out else None
     fits = bill is not None and bill <= limits.max_fanout_requests
+    # `{matched}` is each scope's own count, filled in by `_run`: scopes of one question differ in size.
     fan_out = _Choice(
         "count_fan_out",
-        f"{biggest:,} trials is more than one page; the registry counted each group with {bill} requests.",
+        "{matched} trials is more than one page; the registry counted each group "
+        f"({bill} requests for all of them).",
         window=window,
     )
-    walk = _Choice("walk", f"All {biggest:,} trials were read and grouped here.", window=window)
+    walk = _Choice("walk", "All {matched} trials were read and grouped here.", window=window)
     if biggest <= limits.one_page_max:
         return walk
     if fits and not prefer_walk:
@@ -176,9 +180,7 @@ def _shortened(
             candidate = windows.latest(window, count)
             bill = fan_out_bill(plan, candidate)
             if bill is not None and bill <= limits.max_fanout_requests:
-                reason = (
-                    f"{max(counts):,} trials is too many to read; the latest {count} periods were counted."
-                )
+                reason = f"{{matched}} trials is too many to read; the latest {count} periods were counted."
                 return _Choice("count_fan_out", reason, window=candidate)
     return _too_broad(counts, seconds, limits)
 
@@ -198,15 +200,21 @@ def _window(window: Window | None) -> tuple[Window | None, list[Note]]:
 
 
 def _clamped(plan: EnginePlan, window: Window) -> Note:
+    """The axis was cut because the time left did not allow reading the trials: it depends on the request.
+
+    This is not `window_clamped`, which is the fixed cut at the most periods a walk honours and gives the
+    same axis every time. An answer carrying this one is not cached.
+    """
     first = plan.window.first if plan.window is not None else window.first
     return Note(
-        code="window_clamped",
-        message=f"Too many periods to count one by one: the axis shows {window.first} to {window.last} "
-        f"instead of {first} to {window.last}.",
+        code=SHORTENED_FOR_TIME,
+        message=f"Too many periods to count in the time available: the axis shows {window.first} to "
+        f"{window.last} instead of {first} to {window.last}.",
     )
 
 
 def _run(plan: EnginePlan, scope: Scope, matched: int, choice: _Choice, limits: Limits) -> ScopeRun:
+    choice = dataclasses.replace(choice, reason=choice.reason.replace("{matched}", f"{matched:,}"))
     if choice.strategy == "sorted_page" and isinstance(plan.rows, ListRows):
         sort = f"{SORT_PIECES[plan.rows.sort_by]}:{plan.rows.order}"
         return ScopeRun(

@@ -10,6 +10,7 @@ import pytest
 
 from ctviz.ctgov.client import CtGovClient
 from ctviz.ctgov.params import Params
+from ctviz.ctgov.partition import partition
 from tests.client.conftest import FakeContext, Registry
 
 pytestmark = pytest.mark.anyio
@@ -138,3 +139,24 @@ async def test_a_split_walk_is_cached_whole(
 
     assert len(registry.requests) == sent and len(again.studies) == 6000
     assert ctx.requests[-1].is_cached
+
+
+async def test_trials_that_share_one_first_posted_day_are_one_unsplit_range() -> None:
+    async def count(_: Params) -> int:
+        raise AssertionError("a single day cannot be cut, so nothing is counted")
+
+    day = date(1999, 11, 2)
+
+    parts = await partition(SEARCH, 5000, day, day, leaf_max=1000, count=count)
+
+    assert [(part.params, part.expected) for part in parts] == [(SEARCH, 5000)]
+
+
+async def test_a_long_walk_of_trials_posted_on_one_day_reads_them_all(
+    client: CtGovClient, registry: Registry, ctx: FakeContext
+) -> None:
+    fake = dated_registry([date(2010, 5, 5)] * 2500)
+
+    result = await run(fake, registry, client, ctx)
+
+    assert result.total == 2500 and len(result.studies) == 2500 and result.is_consistent
