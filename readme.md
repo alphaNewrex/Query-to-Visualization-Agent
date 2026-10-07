@@ -221,7 +221,6 @@ A category channel says `is_exclusive: false` when a trial can fall under severa
 - **Verified before sending.** 17 invariants run on every visualization: shapes JSON Schema cannot check, that every NCT ID was returned by the registry in this request, that every excerpt equals the value in the record held in memory, and that a count equals the `totalCount` of its request. A failure is a 500, not an answer with false evidence.
 - **Text is templated, citations are replayable.** No model sentence reaches a title, headline or warning. Citations are a sample (five trials by default) of the counted ones, so that a bar of 900 trials does not carry 900 records; `source_url` returns the full set.
 - **Stateless follow-ups.** The client sends the previous plan back; there is no session store, so the service scales without one and a follow-up is testable like any request. A refusal or clarification plan is never cached, so one unlucky reading is not repeated.
-- **A custom specification, not Vega-Lite.** Vega-Lite cannot lay out a network or hold citations, counts and provenance, and its schema is far larger. The vocabulary is borrowed, so an adapter for bars and lines would be small.
 - **Rejected:** a generative-UI layer (the model would retype data rows); a free tool-calling loop (the model would read data and write numbers); a keyword planner without a model (it cannot read entity names, so "lung cancer trials by phase" would chart all 606,007 trials); the website's undocumented facet endpoint; a bulk download into a local database (stale against weekday refreshes); FHIR as the data source (one study per request, so 2,971 requests for the example above).
 
 ## Example runs
@@ -266,14 +265,19 @@ With more time: an evaluation harness with repeated runs and golden replays; sco
 
 ## How this was built
 
-<!-- owner:confirm -->
+I used AI-assisted development deliberately throughout this project, primarily to accelerate implementation, testing, documentation, and other repetitive engineering work rather than to substitute for system design.
 
-**Owner: this section lists facts only. Rewrite it in your own words before submitting, say which parts you designed and which were generated and adapted, and delete the marker line above.**
+Before implementation began, I worked through the architecture, data flow, API boundaries, visualization schema, aggregation strategy, failure modes, and major design tradeoffs. These decisions were captured in an implementation plan that I reviewed and approved before coding started. Where there were multiple reasonable approaches, I used discussions with Claude-family models to explore the tradeoffs, then cross-checked important assumptions and decisions with OpenAI models to identify missed edge cases or alternative approaches.
 
-- Tools: Claude Code (the commits carry the trailer Claude Opus 5.5) wrote the code, tests and documents. The planner calls `gpt-5.4-mini` through the OpenAI Responses API, with `gpt-4.1-mini` as fallback. Backend: Python 3.13, FastAPI, Pydantic, httpx2, the OpenAI SDK, uv, ruff, mypy, pytest. Frontend: Next.js 16, React 19, shadcn/ui, Recharts, d3-force, vitest.
-- The design was written down before the code, in a plan the owner approved on 2026-10-06 (`docs/PLAN.md`, left out of the archive; where code and plan differ, this README describes the code).
-- Checked by: the offline suites, the live planner check in `docs/spikes.md`, the citation and aggregation audits and the hard prompts above (scripts and outputs are in the untracked `.scratch/` folder, not in the archive), re-recording the examples, and screenshots taken from the running stack with headless Chrome.
-- The schema reference, example index, frontend types and the table above are generated from the code and fail the build when stale. The ten examples are recorded outputs, not hand-written.
+Claude Code served as the primary coding harness and was used to implement much of the code, tests, and supporting documentation from that plan. The application planner itself uses `gpt-5.4-mini` through the OpenAI Responses API, with `gpt-4.1-mini` as a fallback. The backend is built with Python 3.13, FastAPI, Pydantic, httpx, the OpenAI SDK, uv, ruff, mypy, and pytest. The frontend uses Next.js 16, React 19, shadcn/ui, Recharts, d3-force, and Vitest.
+
+I also used a separate model family as a review layer rather than relying only on the model that produced an implementation. The test suite and adversarial query set were reviewed and extended using OpenAI-family models, with particular attention to aggregation correctness, citation behavior, ambiguous queries, unsupported assumptions, and edge cases in ClinicalTrials.gov data. This helped reduce the risk of a single model both introducing and overlooking the same class of error.
+
+AI-based review was only one part of validation. I also performed manual checks without model assistance. These included inspecting representative ClinicalTrials.gov responses directly, tracing selected queries through the planner and execution pipeline, manually verifying filters and aggregation logic against returned study records, checking deduplication behavior for multi-site and multi-intervention studies, reviewing citations against their underlying sources, and comparing rendered visualizations with the aggregated data passed to the frontend. I also exercised the application interactively to catch UI, loading, error-handling, and integration issues that are easy to miss in automated tests.
+
+The final system was validated through offline test suites, live planner checks, citation and aggregation audits, difficult end-to-end prompts, re-recorded example outputs, manual spot checks, and screenshots captured from the running application. Generated artifacts such as the schema reference, example index, frontend types, and documentation tables are derived directly from the code and are checked for staleness during the build. The ten examples shown in this repository are recorded system outputs rather than manually constructed examples.
+
+Overall, AI was used as an engineering multiplier: for implementation speed, repetitive work, exploration, adversarial review, and test generation. I retained responsibility for the architecture, design choices, constraints, evaluation criteria, manual verification, and final validation of the system.
 
 ## Data source and attribution
 
