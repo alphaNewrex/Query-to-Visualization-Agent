@@ -4292,10 +4292,10 @@
           },
           "citations_per_datum": {
             "type": "integer",
-            "maximum": 20.0,
+            "maximum": 100.0,
             "minimum": 0.0,
             "title": "Citations Per Datum",
-            "description": "Trials cited for each datum; 0 disables citations.",
+            "description": "Trials cited for each datum; 0 disables citations. A larger value is a bigger page for the sample call each cell already makes: the answer grows, the request count does not.",
             "default": 5
           },
           "drug_match": {

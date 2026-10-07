@@ -419,7 +419,7 @@ Small supporting types, all frozen dataclasses unless they are contract models: 
 | `top_n` | integer 1 to 50 | null | How many categories or rows to keep; default 15 (10 for the rows of a trial list). Network sizes are fixed in v1, because the `network` plan shape has no `top_n` |
 | `chart_type` | one of the seven visualization types | null | A preference. Honoured when valid for the data shape, otherwise ignored with a warning |
 | `options.planner` | `llm`, `structured` | `llm` | `llm`: the model writes the plan (503 `planner_unavailable` when no model is configured). `structured`: never call a model; the plan is built from the fields above and `group_by` is required. The question text is then not interpreted, and the response says so |
-| `options.citations_per_datum` | integer 0 to 20 | 5 | 0 disables citations |
+| `options.citations_per_datum` | integer 0 to 100 | 5 | 0 disables citations |
 | `options.drug_match` | `broad`, `name_only` | `broad` | `broad`: the registry's intervention search (names, other names, titles, descriptions, synonyms). `name_only`: intervention names and their synonyms only. For pembrolizumab the two give 2,971 and 2,567 trials, so the definition used is always stated in the response |
 | `options.include_trace` | boolean | true | Include the step list in `meta.debug.trace` |
 | `options.use_cache` | boolean | true | `false` bypasses the plan cache and the response cache of section 4.9 for this request; the registry-call cache stays. The planner evaluation sends `false`, because it measures how plans vary between runs |

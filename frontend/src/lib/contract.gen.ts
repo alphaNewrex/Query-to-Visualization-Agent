@@ -764,7 +764,7 @@ export interface RequestOptions {
    */
   planner?: "llm" | "structured";
   /**
-   * Trials cited for each datum; 0 disables citations.
+   * Trials cited for each datum; 0 disables citations. A larger value is a bigger page for the sample call each cell already makes: the answer grows, the request count does not.
    */
   citations_per_datum?: number;
   /**

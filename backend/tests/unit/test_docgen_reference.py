@@ -68,7 +68,7 @@ def test_defaults_and_limits_are_read_inside_unions_and_arrays(reference: str) -
     assert request["top_n"][4] == "1 to 50"
     assert request["start_year"][4] == "1900 to 2100"
     assert request["group_by"][4] == "1 to 2 items"
-    assert options["citations_per_datum"][3:5] == ["`5`", "0 to 20"]
+    assert options["citations_per_datum"][3:5] == ["`5`", "0 to 100"]
     assert options["planner"][3] == "`llm`"
     assert options["include_trace"][3] == "`true`"
 

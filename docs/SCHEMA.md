@@ -96,7 +96,7 @@ Behaviour switches of one request; `meta.options` echoes the effective values.
 | Field | Type | Required | Default | Constraints | Description |
 | --- | --- | --- | --- | --- | --- |
 | `planner` | `llm` \| `structured` | no | `llm` |  | 'llm': the model writes the plan (503 `planner_unavailable` when no model is configured). 'structured': never call a model; the plan is built from the request fields and `group_by` is required. The question text is then not interpreted, and the response says so. Ignored by `POST /v1/analyses`. |
-| `citations_per_datum` | integer | no | `5` | 0 to 20 | Trials cited for each datum; 0 disables citations. |
+| `citations_per_datum` | integer | no | `5` | 0 to 100 | Trials cited for each datum; 0 disables citations. A larger value is a bigger page for the sample call each cell already makes: the answer grows, the request count does not. |
 | `drug_match` | `broad` \| `name_only` | no | `broad` |  | 'broad': the registry's intervention search (names, other names, titles, descriptions, synonyms). 'name_only': intervention names and their synonyms only. The two give different counts, so the definition used is always stated in the response. |
 | `include_trace` | boolean | no | `true` |  | Include the step list in `meta.debug.trace`. |
 | `use_cache` | boolean | no | `true` |  | false bypasses the plan cache and the response cache for this request; the registry-call cache stays. |

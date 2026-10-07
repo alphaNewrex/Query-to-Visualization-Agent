@@ -3687,8 +3687,8 @@
         },
         "citations_per_datum": {
           "default": 5,
-          "description": "Trials cited for each datum; 0 disables citations.",
-          "maximum": 20,
+          "description": "Trials cited for each datum; 0 disables citations. A larger value is a bigger page for the sample call each cell already makes: the answer grows, the request count does not.",
+          "maximum": 100,
           "minimum": 0,
           "type": "integer"
         },

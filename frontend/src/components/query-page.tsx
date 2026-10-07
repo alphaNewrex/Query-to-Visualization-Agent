@@ -13,7 +13,8 @@ import {
   type Turn,
 } from "@/lib/conversation";
 import { EMPTY_FORM, type FormValues, toRequest } from "@/lib/request-form";
-import type { AnalysisRequest, DatumSelection, QueryRequest } from "@/lib/types";
+import { fullRequest } from "@/lib/citations";
+import type { AnalysisRequest, DatumSelection, QueryRequest, QueryResponse } from "@/lib/types";
 
 import { Button } from "@/components/ui/button";
 
@@ -39,6 +40,9 @@ export function QueryPage() {
   // What each turn runs, so that "Try again" repeats exactly that.
   const jobs = React.useRef(new Map<number, Job>());
   const end = React.useRef<HTMLDivElement>(null);
+  // The same answer run again with up to 100 trials per datum, by the answer it belongs to: a second mark
+  // of one answer does not fetch again, and a turn that is run again has a new answer and so a new entry.
+  const larger = React.useRef(new WeakMap<QueryResponse, Promise<QueryResponse>>());
 
   const turns = thread.turns;
   const running = turns.find((turn) => turn.state.tag === "running") ?? null;
@@ -166,6 +170,19 @@ export function QueryPage() {
     void execute(turn.id, async (signal) => ({ response: await postAnalysis(sent, signal), sent, source: "live-same-plan", example }));
   };
 
+  /** "Show all" in the citation panel: the answer's own plan, without a model, with the most citations a datum can have. */
+  const loadAll = (response: QueryResponse): Promise<QueryResponse> => {
+    const cached = larger.current.get(response);
+    const request = fullRequest(response.meta);
+    if (cached || !request) {
+      return cached ?? Promise.reject(new Error("The answer has no plan to run again."));
+    }
+    const pending = postAnalysis(request);
+    larger.current.set(response, pending);
+    pending.catch(() => larger.current.delete(response));
+    return pending;
+  };
+
   const retry = (turn: Turn) => {
     const job = jobs.current.get(turn.id);
     if (busy || !job) {
@@ -264,7 +281,7 @@ export function QueryPage() {
       </div>
 
       {selectedResponse ?? lastResponse ? (
-        <CitationSheet selection={selected ? (selection?.datum ?? null) : null} response={(selectedResponse ?? lastResponse)!} onClose={() => setSelection(null)} />
+        <CitationSheet selection={selected ? (selection?.datum ?? null) : null} response={(selectedResponse ?? lastResponse)!} onClose={() => setSelection(null)} onLoadAll={loadAll} />
       ) : null}
     </div>
   );

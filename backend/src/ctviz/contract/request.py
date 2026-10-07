@@ -131,7 +131,11 @@ class RequestOptions(BaseModel):
         "Ignored by `POST /v1/analyses`.",
     )
     citations_per_datum: int = Field(
-        5, ge=0, le=20, description="Trials cited for each datum; 0 disables citations."
+        5,
+        ge=0,
+        le=100,
+        description="Trials cited for each datum; 0 disables citations. A larger value is a bigger "
+        "page for the sample call each cell already makes: the answer grows, the request count does not.",
     )
     drug_match: Literal["broad", "name_only"] = Field(
         "broad",
