@@ -116,8 +116,8 @@ def test_a_scope_with_nothing_in_it_has_no_parameters() -> None:
 
 
 def test_a_filter_without_a_piece_of_its_own_is_refused() -> None:
-    with pytest.raises(ValueError, match="No filter is defined for 'has_results'"):
-        scope(enum_filters={"has_results": ("true",)}).params()
+    with pytest.raises(ValueError, match="No filter is defined for 'enrollment'"):
+        scope(enum_filters={"enrollment": ("5",)}).params()
 
 
 @pytest.mark.parametrize(

@@ -12,8 +12,8 @@
   },
   "references": {},
   "meta": {
-    "request_id": "83604f32-d1b1-4483-86ea-79ef1779d957",
-    "generated_at": "2026-10-07T00:59:46.699843Z",
+    "request_id": "1ac95bab-b4f3-4e8e-a0f8-f311d41f7d1c",
+    "generated_at": "2026-10-07T02:20:18.647359Z",
     "query": "How has the number of trials for this drug changed over time?",
     "filters": {
       "drug_name": [],
@@ -26,21 +26,44 @@
       "study_type": [],
       "sponsor_class": [],
       "intervention_type": [],
+      "sex": [],
+      "age_group": [],
+      "allocation": [],
+      "masking": [],
+      "primary_purpose": [],
+      "has_results": [],
+      "intervention_model": [],
       "start_year": null,
       "end_year": null,
       "date_field": null,
-      "compare": null
+      "compare": null,
+      "exclude": {
+        "drug_name": [],
+        "condition": [],
+        "sponsor": [],
+        "country": [],
+        "term": [],
+        "status": []
+      }
     },
     "interpretation": null,
     "plan": {
-      "interpretation": "Count trials for an unnamed drug by time.",
+      "interpretation": "Count trials for an unnamed drug by start year.",
       "entities": [],
       "filters": {
         "phases": [],
         "statuses": [],
+        "exclude_statuses": [],
         "study_types": [],
         "sponsor_classes": [],
         "intervention_types": [],
+        "sexes": [],
+        "age_groups": [],
+        "allocations": [],
+        "maskings": [],
+        "primary_purposes": [],
+        "has_results": [],
+        "intervention_models": [],
         "evidence": [],
         "date_field": null,
         "year_from": null,
@@ -66,15 +89,15 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v1",
+      "prompt_version": "plan-v2",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 4148,
-        "output_tokens": 102,
+        "input_tokens": 7109,
+        "output_tokens": 139,
         "reasoning_tokens": 10,
-        "cached_tokens": 3840
+        "cached_tokens": 6912
       }
     },
     "assumptions": [],
@@ -98,8 +121,8 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 1201,
-      "plan_ms": 1201,
+      "total_ms": 1105,
+      "plan_ms": 1105,
       "resolve_ms": 0,
       "fetch_ms": 0,
       "build_ms": 0
@@ -109,8 +132,8 @@
         {
           "index": 0,
           "type": "plan",
-          "summary": "Count trials for an unnamed drug by time.",
-          "duration_ms": 1201,
+          "summary": "Count trials for an unnamed drug by start year.",
+          "duration_ms": 1105,
           "request_indexes": [],
           "detail": {}
         }

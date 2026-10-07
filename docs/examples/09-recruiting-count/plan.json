@@ -12,9 +12,17 @@
     "statuses": [
       "RECRUITING"
     ],
+    "exclude_statuses": [],
     "study_types": [],
     "sponsor_classes": [],
     "intervention_types": [],
+    "sexes": [],
+    "age_groups": [],
+    "allocations": [],
+    "maskings": [],
+    "primary_purposes": [],
+    "has_results": [],
+    "intervention_models": [],
     "evidence": [
       {
         "family": "statuses",
@@ -26,7 +34,9 @@
     "year_to": null
   },
   "analysis": {
-    "kind": "total"
+    "kind": "total",
+    "statistic": null,
+    "of": null
   },
   "chart_preference": null
 }

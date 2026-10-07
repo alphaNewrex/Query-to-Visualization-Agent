@@ -128,6 +128,15 @@ def masking() -> Vocabulary:
 
 
 @cache
+def intervention_model() -> Vocabulary:
+    return _vocabulary(
+        "InterventionalAssignment",
+        "DesignInterventionModel",
+        ("PARALLEL", "CROSSOVER", "FACTORIAL", "SEQUENTIAL", "SINGLE_GROUP"),
+    )
+
+
+@cache
 def primary_purpose() -> Vocabulary:
     return _vocabulary("PrimaryPurpose", "DesignPrimaryPurpose")
 
@@ -167,6 +176,10 @@ PHASE_COMBINATIONS: Final = {
     frozenset({"PHASE4"}): "PHASE4",
     frozenset({"NA"}): "NA",
 }
+
+
+# The phase tokens each bucket stands for, to tell which buckets a phase filter can leave non-empty.
+PHASE_TOKENS_OF: Final = {key: tokens for tokens, key in PHASE_COMBINATIONS.items()}
 
 
 @dataclass(frozen=True)

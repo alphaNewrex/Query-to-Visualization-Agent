@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Final, Literal, Protocol
 
-from ctviz.contract.plan import EntityKind, Phase
+from ctviz.contract.plan import FAMILY_FIELDS, EntityKind, Phase
 from ctviz.contract.request import QueryRequest
 
 Mode = Literal["model", "structured", "supplied"]
@@ -135,6 +135,8 @@ def request_words(request: QueryRequest | None) -> list[str]:
     if request is None:
         return []
     words = [value for name in ENTITY_FIELDS for value in getattr(request, name) or []]
+    if request.exclude is not None:
+        words.extend(value for name in ENTITY_FIELDS for value in getattr(request.exclude, name) or [])
     if request.compare is not None:
         words.extend(request.compare.values)
     numbers = (request.start_year, request.end_year, request.top_n)
@@ -177,13 +179,8 @@ class Facts:
         request = self.request
         if request is None:
             return frozenset()
-        fields = {
-            "phases": request.trial_phase,
-            "statuses": request.status,
-            "study_types": request.study_type,
-            "sponsor_classes": request.sponsor_class,
-            "intervention_types": request.intervention_type,
-        }
+        fields = {family: getattr(request, name) for family, name in FAMILY_FIELDS.items()}
+        fields["exclude_statuses"] = request.exclude.status if request.exclude is not None else None
         return frozenset(family for family, values in fields.items() if values)
 
 

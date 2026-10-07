@@ -32,6 +32,8 @@ Probe = tuple[str, str, Expr]  # exclusion reason, its message, the expression s
 
 def fan_out_bill(plan: EnginePlan, window: Window | None) -> int | None:
     """How many requests a fan-out of the plan needs, or None when some bucket has no server expression."""
+    if plan.measure is not None:
+        return None  # a count call cannot give a median, a mean or a sum
     lists = _bucket_lists(plan, window)
     if lists is None:
         return None

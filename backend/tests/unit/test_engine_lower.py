@@ -42,7 +42,15 @@ def lower(analysis: Analysis, **filters: int | None) -> EnginePlan:
 def aggregate(
     dimension: str, series: str | None = None, unit: str | None = None, top_n: int | None = None
 ) -> Aggregate:
-    return Aggregate(kind="aggregate", dimension=dimension, series=series, time_unit=unit, top_n=top_n)
+    return Aggregate(
+        kind="aggregate",
+        dimension=dimension,
+        series=series,
+        time_unit=unit,
+        top_n=top_n,
+        statistic=None,
+        of=None,
+    )
 
 
 def test_a_date_axis_defaults_to_the_latest_25_years_ending_where_the_data_ends() -> None:

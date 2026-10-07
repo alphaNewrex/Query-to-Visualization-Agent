@@ -66,6 +66,19 @@ def test_the_service_is_configured_with_nothing_set() -> None:
     assert settings.request_deadline_s == 45.0
 
 
+def test_the_caches_have_sizes_that_can_be_changed_but_not_emptied(monkeypatch: pytest.MonkeyPatch) -> None:
+    settings = Settings()
+    assert (settings.plan_cache_size, settings.response_cache_size) == (512, 256)
+
+    export(monkeypatch, CTVIZ_PLAN_CACHE_SIZE="8", CTVIZ_RESPONSE_CACHE_SIZE="4")
+    resized = Settings()
+    assert (resized.plan_cache_size, resized.response_cache_size) == (8, 4)
+
+    export(monkeypatch, CTVIZ_RESPONSE_CACHE_SIZE="0")
+    with pytest.raises(ValidationError):
+        Settings()
+
+
 def test_owner_variables_are_read_unprefixed_and_the_rest_only_with_the_prefix(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

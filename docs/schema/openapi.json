@@ -28,6 +28,35 @@
         }
       }
     },
+    "/readyz": {
+      "get": {
+        "summary": "Readiness: the registry answers, and the configured models are listed by the key",
+        "description": "Ask the registry for its version and the model provider for its list, each within a few seconds.\n\n503 only when the registry is unreachable. The model list is reported and never decides the status.",
+        "operationId": "readyz_readyz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "ClinicalTrials.gov does not answer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/query": {
       "post": {
         "summary": "Answer a question with a visualization specification",
@@ -283,6 +312,7 @@
               "masking",
               "primary_purpose",
               "has_results",
+              "intervention_model",
               "country",
               "sponsor",
               "drug",
@@ -311,7 +341,8 @@
                   "allocation",
                   "masking",
                   "primary_purpose",
-                  "has_results"
+                  "has_results",
+                  "intervention_model"
                 ]
               },
               {
@@ -351,6 +382,40 @@
             ],
             "title": "Top N",
             "description": "Only when the user asks for a number of items; otherwise null."
+          },
+          "statistic": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "median",
+                  "mean",
+                  "sum"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statistic",
+            "description": "Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead."
+          },
+          "of": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "enrollment",
+                  "duration_months",
+                  "site_count"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Of",
+            "description": "The numeric field of a statistic; null when counting."
           }
         },
         "additionalProperties": false,
@@ -360,7 +425,9 @@
           "dimension",
           "series",
           "time_unit",
-          "top_n"
+          "top_n",
+          "statistic",
+          "of"
         ],
         "title": "Aggregate"
       },
@@ -380,6 +447,80 @@
         ],
         "title": "AnalysisRequest",
         "description": "A typed plan to answer without a model: the body of `POST /v1/analyses`.\n\nNothing is checked against a question; the plan is validated for shape and limits only. Posting\n`{\"plan\": meta.plan, \"options\": meta.options}` from an earlier response reproduces its visualization\nfor the same data timestamp."
+      },
+      "AppliedExclusions": {
+        "properties": {
+          "drug_name": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Drug Name"
+          },
+          "condition": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Condition"
+          },
+          "sponsor": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sponsor"
+          },
+          "country": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Country"
+          },
+          "term": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Term"
+          },
+          "status": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "NOT_YET_RECRUITING",
+                "RECRUITING",
+                "ENROLLING_BY_INVITATION",
+                "ACTIVE_NOT_RECRUITING",
+                "COMPLETED",
+                "SUSPENDED",
+                "TERMINATED",
+                "WITHDRAWN",
+                "AVAILABLE",
+                "NO_LONGER_AVAILABLE",
+                "TEMPORARILY_NOT_AVAILABLE",
+                "APPROVED_FOR_MARKETING",
+                "WITHHELD",
+                "UNKNOWN"
+              ]
+            },
+            "type": "array",
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "drug_name",
+          "condition",
+          "sponsor",
+          "country",
+          "term",
+          "status"
+        ],
+        "title": "AppliedExclusions",
+        "description": "What the answer leaves out, in request field names (`exclude` of the request)."
       },
       "AppliedFilters": {
         "properties": {
@@ -506,6 +647,100 @@
             "type": "array",
             "title": "Intervention Type"
           },
+          "sex": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "FEMALE",
+                "MALE",
+                "ALL"
+              ]
+            },
+            "type": "array",
+            "title": "Sex"
+          },
+          "age_group": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "CHILD",
+                "ADULT",
+                "OLDER_ADULT"
+              ]
+            },
+            "type": "array",
+            "title": "Age Group"
+          },
+          "allocation": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "RANDOMIZED",
+                "NON_RANDOMIZED",
+                "NA"
+              ]
+            },
+            "type": "array",
+            "title": "Allocation"
+          },
+          "masking": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "NONE",
+                "SINGLE",
+                "DOUBLE",
+                "TRIPLE",
+                "QUADRUPLE"
+              ]
+            },
+            "type": "array",
+            "title": "Masking"
+          },
+          "primary_purpose": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "TREATMENT",
+                "PREVENTION",
+                "DIAGNOSTIC",
+                "ECT",
+                "SUPPORTIVE_CARE",
+                "SCREENING",
+                "HEALTH_SERVICES_RESEARCH",
+                "BASIC_SCIENCE",
+                "DEVICE_FEASIBILITY",
+                "OTHER"
+              ]
+            },
+            "type": "array",
+            "title": "Primary Purpose"
+          },
+          "has_results": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "type": "array",
+            "title": "Has Results"
+          },
+          "intervention_model": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "PARALLEL",
+                "CROSSOVER",
+                "FACTORIAL",
+                "SEQUENTIAL",
+                "SINGLE_GROUP"
+              ]
+            },
+            "type": "array",
+            "title": "Intervention Model"
+          },
           "start_year": {
             "anyOf": [
               {
@@ -554,6 +789,9 @@
                 "type": "null"
               }
             ]
+          },
+          "exclude": {
+            "$ref": "#/components/schemas/AppliedExclusions"
           }
         },
         "additionalProperties": false,
@@ -569,10 +807,18 @@
           "study_type",
           "sponsor_class",
           "intervention_type",
+          "sex",
+          "age_group",
+          "allocation",
+          "masking",
+          "primary_purpose",
+          "has_results",
+          "intervention_model",
           "start_year",
           "end_year",
           "date_field",
-          "compare"
+          "compare",
+          "exclude"
         ],
         "title": "AppliedFilters",
         "description": "The effective scope in request field names: it can be sent back as request fields."
@@ -1011,7 +1257,7 @@
               "minLength": 1
             },
             "type": "array",
-            "maxItems": 4,
+            "maxItems": 5,
             "minItems": 2,
             "title": "Values"
           }
@@ -1024,6 +1270,21 @@
         ],
         "title": "CompareSpec",
         "description": "Values of one entity kind to compare side by side, one series each."
+      },
+      "ConfigurationReadiness": {
+        "properties": {
+          "is_loaded": {
+            "type": "boolean",
+            "title": "Is Loaded",
+            "description": "The settings were read and passed their checks at start-up."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "is_loaded"
+        ],
+        "title": "ConfigurationReadiness"
       },
       "Counts": {
         "properties": {
@@ -1233,10 +1494,11 @@
             "type": "string",
             "enum": [
               "filter",
-              "compare"
+              "compare",
+              "exclude"
             ],
             "title": "Role",
-            "description": "'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison."
+            "description": "'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison. 'exclude': no counted trial may match ('excluding', 'without', 'not involving')."
           }
         },
         "additionalProperties": false,
@@ -1351,6 +1613,135 @@
         ],
         "title": "EntityResolution",
         "description": "What the registry made of one entity of the plan."
+      },
+      "ExcludeSpec": {
+        "properties": {
+          "drug_name": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                },
+                "type": "array",
+                "maxItems": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drug Name",
+            "description": "Drugs to leave out; same searches as the filter fields."
+          },
+          "condition": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                },
+                "type": "array",
+                "maxItems": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition",
+            "description": "Conditions to leave out."
+          },
+          "sponsor": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                },
+                "type": "array",
+                "maxItems": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sponsor",
+            "description": "Lead sponsors to leave out."
+          },
+          "country": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                },
+                "type": "array",
+                "maxItems": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country",
+            "description": "Countries to leave out (any site there)."
+          },
+          "term": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                },
+                "type": "array",
+                "maxItems": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term",
+            "description": "Other search words to leave out."
+          },
+          "status": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "NOT_YET_RECRUITING",
+                    "RECRUITING",
+                    "ENROLLING_BY_INVITATION",
+                    "ACTIVE_NOT_RECRUITING",
+                    "COMPLETED",
+                    "SUSPENDED",
+                    "TERMINATED",
+                    "WITHDRAWN",
+                    "AVAILABLE",
+                    "NO_LONGER_AVAILABLE",
+                    "TEMPORARILY_NOT_AVAILABLE",
+                    "APPROVED_FOR_MARKETING",
+                    "WITHHELD",
+                    "UNKNOWN"
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status",
+            "description": "Overall statuses to leave out."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ExcludeSpec",
+        "description": "Trials to leave out: those that match any of these entities or have any of these statuses."
       },
       "ExclusionCount": {
         "properties": {
@@ -1472,9 +1863,17 @@
             "enum": [
               "phases",
               "statuses",
+              "exclude_statuses",
               "study_types",
               "sponsor_classes",
-              "intervention_types"
+              "intervention_types",
+              "sexes",
+              "age_groups",
+              "allocations",
+              "maskings",
+              "primary_purposes",
+              "has_results",
+              "intervention_models"
             ],
             "title": "Family"
           },
@@ -1721,20 +2120,36 @@
         "properties": {
           "aggregate": {
             "type": "string",
-            "const": "count",
+            "enum": [
+              "count",
+              "median",
+              "mean",
+              "sum"
+            ],
             "title": "Aggregate"
           },
           "of": {
             "type": "string",
-            "const": "trials",
+            "enum": [
+              "trials",
+              "enrollment",
+              "duration_months",
+              "site_count"
+            ],
             "title": "Of"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit",
+            "description": "What `of` is counted in: trials, participants, months or sites."
           }
         },
         "additionalProperties": false,
         "type": "object",
         "required": [
           "aggregate",
-          "of"
+          "of",
+          "unit"
         ],
         "title": "Measure"
       },
@@ -2377,6 +2792,30 @@
             "title": "Statuses",
             "description": "Empty unless the question restricts status. 'recruiting' means RECRUITING only."
           },
+          "exclude_statuses": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "NOT_YET_RECRUITING",
+                "RECRUITING",
+                "ENROLLING_BY_INVITATION",
+                "ACTIVE_NOT_RECRUITING",
+                "COMPLETED",
+                "SUSPENDED",
+                "TERMINATED",
+                "WITHDRAWN",
+                "AVAILABLE",
+                "NO_LONGER_AVAILABLE",
+                "TEMPORARILY_NOT_AVAILABLE",
+                "APPROVED_FOR_MARKETING",
+                "WITHHELD",
+                "UNKNOWN"
+              ]
+            },
+            "type": "array",
+            "title": "Exclude Statuses",
+            "description": "Empty unless the question leaves statuses out, e.g. 'exclude terminated studies'."
+          },
           "study_types": {
             "items": {
               "type": "string",
@@ -2429,6 +2868,107 @@
             "type": "array",
             "title": "Intervention Types",
             "description": "Empty unless the question restricts the kind of intervention."
+          },
+          "sexes": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "FEMALE",
+                "MALE",
+                "ALL"
+              ]
+            },
+            "type": "array",
+            "title": "Sexes",
+            "description": "Empty unless the question restricts the sexes eligible."
+          },
+          "age_groups": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "CHILD",
+                "ADULT",
+                "OLDER_ADULT"
+              ]
+            },
+            "type": "array",
+            "title": "Age Groups",
+            "description": "Empty unless the question restricts the age group."
+          },
+          "allocations": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "RANDOMIZED",
+                "NON_RANDOMIZED",
+                "NA"
+              ]
+            },
+            "type": "array",
+            "title": "Allocations",
+            "description": "Empty unless the question restricts allocation: 'randomized' is RANDOMIZED."
+          },
+          "maskings": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "NONE",
+                "SINGLE",
+                "DOUBLE",
+                "TRIPLE",
+                "QUADRUPLE"
+              ]
+            },
+            "type": "array",
+            "title": "Maskings",
+            "description": "Empty unless the question restricts masking, e.g. 'double-blind' is DOUBLE."
+          },
+          "primary_purposes": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "TREATMENT",
+                "PREVENTION",
+                "DIAGNOSTIC",
+                "ECT",
+                "SUPPORTIVE_CARE",
+                "SCREENING",
+                "HEALTH_SERVICES_RESEARCH",
+                "BASIC_SCIENCE",
+                "DEVICE_FEASIBILITY",
+                "OTHER"
+              ]
+            },
+            "type": "array",
+            "title": "Primary Purposes",
+            "description": "Empty unless the question restricts the primary purpose, e.g. 'prevention trials'."
+          },
+          "has_results": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "type": "array",
+            "title": "Has Results",
+            "description": "Empty unless the question restricts whether results are posted: ['true'] or ['false']."
+          },
+          "intervention_models": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "PARALLEL",
+                "CROSSOVER",
+                "FACTORIAL",
+                "SEQUENTIAL",
+                "SINGLE_GROUP"
+              ]
+            },
+            "type": "array",
+            "title": "Intervention Models",
+            "description": "Empty unless the question restricts the assignment model, e.g. 'crossover'."
           },
           "evidence": {
             "items": {
@@ -2490,9 +3030,17 @@
         "required": [
           "phases",
           "statuses",
+          "exclude_statuses",
           "study_types",
           "sponsor_classes",
           "intervention_types",
+          "sexes",
+          "age_groups",
+          "allocations",
+          "maskings",
+          "primary_purposes",
+          "has_results",
+          "intervention_models",
           "evidence",
           "date_field",
           "year_from",
@@ -2582,6 +3130,51 @@
         ],
         "title": "PlannerInfo",
         "description": "How the plan was produced."
+      },
+      "PlannerReadiness": {
+        "properties": {
+          "is_available": {
+            "type": "boolean",
+            "title": "Is Available",
+            "description": "A model is configured to write plans."
+          },
+          "models": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Models",
+            "description": "The configured models: the planner, then its fallback."
+          },
+          "models_check": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "missing",
+              "unavailable",
+              "skipped"
+            ],
+            "title": "Models Check",
+            "description": "`ok`: the key lists every configured model (it may list more). `missing`: it lists some but not all. `unavailable`: the list could not be read in two seconds. `skipped`: no model is configured. None of them makes the service unready."
+          },
+          "missing_models": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing Models",
+            "description": "The configured models the key does not list."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "is_available",
+          "models",
+          "models_check",
+          "missing_models"
+        ],
+        "title": "PlannerReadiness"
       },
       "QuantitativeChannel": {
         "properties": {
@@ -2955,6 +3548,156 @@
             "title": "Intervention Type",
             "description": "Trials with at least one intervention of these types, any of."
           },
+          "sex": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "FEMALE",
+                    "MALE",
+                    "ALL"
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sex",
+            "description": "Sexes the trials accept, any of."
+          },
+          "age_group": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "CHILD",
+                    "ADULT",
+                    "OLDER_ADULT"
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age Group",
+            "description": "Age groups the trials include, any of."
+          },
+          "allocation": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "RANDOMIZED",
+                    "NON_RANDOMIZED",
+                    "NA"
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allocation",
+            "description": "Allocation of interventional trials, any of (RANDOMIZED, NON_RANDOMIZED, NA)."
+          },
+          "masking": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "NONE",
+                    "SINGLE",
+                    "DOUBLE",
+                    "TRIPLE",
+                    "QUADRUPLE"
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Masking",
+            "description": "Masking of interventional trials, any of."
+          },
+          "primary_purpose": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "TREATMENT",
+                    "PREVENTION",
+                    "DIAGNOSTIC",
+                    "ECT",
+                    "SUPPORTIVE_CARE",
+                    "SCREENING",
+                    "HEALTH_SERVICES_RESEARCH",
+                    "BASIC_SCIENCE",
+                    "DEVICE_FEASIBILITY",
+                    "OTHER"
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Purpose",
+            "description": "Primary purposes, any of."
+          },
+          "has_results": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "true",
+                    "false"
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Results",
+            "description": "'true': results posted; 'false': none posted."
+          },
+          "intervention_model": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "PARALLEL",
+                    "CROSSOVER",
+                    "FACTORIAL",
+                    "SEQUENTIAL",
+                    "SINGLE_GROUP"
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intervention Model",
+            "description": "Assignment models of interventional trials, any of."
+          },
           "start_year": {
             "anyOf": [
               {
@@ -3012,6 +3755,17 @@
             ],
             "description": "Compare these as series. Replaces any comparison found in the question."
           },
+          "exclude": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExcludeSpec"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Leave out trials that match any listed entity or have any listed status ('excluding diabetes', 'without terminated studies'). Replaces what the planner read for the same entity kind or for statuses; an empty object is no exclusion."
+          },
           "group_by": {
             "anyOf": [
               {
@@ -3029,6 +3783,7 @@
                     "masking",
                     "primary_purpose",
                     "has_results",
+                    "intervention_model",
                     "country",
                     "sponsor",
                     "drug",
@@ -3049,7 +3804,7 @@
               }
             ],
             "title": "Group By",
-            "description": "Analysis hint: the first key is the axis, the second the series. The second key must be one of the closed dimensions (phase, overall_status, study_type, sponsor_class, intervention_type, sex, age_group, allocation, masking, primary_purpose, has_results). Overrides what the planner chose. Required when `options.planner` is 'structured'."
+            "description": "Analysis hint: the first key is the axis, the second the series. The second key must be one of the closed dimensions (phase, overall_status, study_type, sponsor_class, intervention_type, sex, age_group, allocation, masking, primary_purpose, has_results, intervention_model). Overrides what the planner chose. Required when `options.planner` is 'structured'."
           },
           "time_unit": {
             "anyOf": [
@@ -3143,6 +3898,90 @@
           }
         }
       },
+      "Readiness": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "not_ready"
+            ],
+            "title": "Status",
+            "description": "`not_ready` only when the registry is unreachable."
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/ConfigurationReadiness"
+          },
+          "registry": {
+            "$ref": "#/components/schemas/RegistryReadiness"
+          },
+          "planner": {
+            "$ref": "#/components/schemas/PlannerReadiness"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "configuration",
+          "registry",
+          "planner"
+        ],
+        "title": "Readiness"
+      },
+      "RegistryReadiness": {
+        "properties": {
+          "is_reachable": {
+            "type": "boolean",
+            "title": "Is Reachable",
+            "description": "`GET /version` of ClinicalTrials.gov answered. It is cached for five minutes."
+          },
+          "api_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Version"
+          },
+          "data_timestamp": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Timestamp",
+            "description": "As the registry wrote it; every answer is cached under it."
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "The error code of the failure when the registry is not reachable."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "is_reachable",
+          "api_version",
+          "data_timestamp",
+          "reason"
+        ],
+        "title": "RegistryReadiness"
+      },
       "Relate": {
         "properties": {
           "kind": {
@@ -3183,7 +4022,8 @@
                   "allocation",
                   "masking",
                   "primary_purpose",
-                  "has_results"
+                  "has_results",
+                  "intervention_model"
                 ]
               },
               {
@@ -3825,12 +4665,48 @@
             "type": "string",
             "const": "total",
             "title": "Kind"
+          },
+          "statistic": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "median",
+                  "mean",
+                  "sum"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statistic",
+            "description": "Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead."
+          },
+          "of": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "enrollment",
+                  "duration_months",
+                  "site_count"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Of",
+            "description": "The numeric field of a statistic; null when counting."
           }
         },
         "additionalProperties": false,
         "type": "object",
         "required": [
-          "kind"
+          "kind",
+          "statistic",
+          "of"
         ],
         "title": "Total"
       },

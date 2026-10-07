@@ -2,11 +2,15 @@
 
 The model path makes at most three model calls: a first attempt, a retry or the fallback after a failure,
 and the one repair turn. Every call is stateless.
+
+A plan that passed its checks is remembered for a day (the plan cache), so a repeated question costs no
+model call and, because model output is not repeatable, gets the same plan again.
 """
 
+import time
 from collections import deque
-from collections.abc import Sequence
-from dataclasses import dataclass
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass, replace
 from datetime import date
 from typing import Final, Literal, Protocol
 
@@ -16,6 +20,7 @@ from structlog.typing import FilteringBoundLogger
 from ctviz.contract.plan import PlanIssue, QueryPlan, Unsupported
 from ctviz.contract.request import AnalysisRequest, QueryRequest, RequestOptions
 from ctviz.contract.response import Adjustment, Note, Outcome, PlannerInfo, Usage
+from ctviz.ctgov.cache import SingleFlightCache
 from ctviz.errors import FieldError, InvalidRequest, PlannerUnavailableError
 from ctviz.planning.grounding import CountryTable, Mode
 from ctviz.planning.outcomes import DECLINED_MESSAGE, unsupported
@@ -37,6 +42,7 @@ from ctviz.settings import Settings
 FIRST_TOKEN_CAP: Final = 1500
 RETRY_TOKEN_CAP: Final = 3000
 MAX_MODEL_CALLS: Final = 3
+PLAN_TTL_S: Final = 24 * 60 * 60
 _MISSING_MODEL: Final = (
     "No planning model is configured. Use options.planner 'structured', POST /v1/analyses or the examples."
 )
@@ -62,6 +68,15 @@ class PlannedQuery:
     adjustments: tuple[Adjustment, ...]
     warnings: tuple[Note, ...]
     outcome: Outcome | None  # a clarification or unsupported outcome decided before any data is fetched
+    is_cached: bool = False  # the plan is another request's: from the plan cache, or from its model call
+
+
+@dataclass(frozen=True)
+class _Attempt:
+    """One model-backed planning attempt: what it produced, and whether the plan may be remembered."""
+
+    planned: PlannedQuery
+    is_checked: bool  # the plan passed its checks, as written or after the repair turn
 
 
 @dataclass(frozen=True)
@@ -105,24 +120,67 @@ class PlanService:
         settings: Settings,
         *,
         countries: CountryTable | None = None,
+        clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self._planner = planner
         self._fallback = fallback
         self._countries = countries
         self._instructions = build_instructions()
+        self._model = settings.planner_model
+        self._effort = settings.planner_effort
+        self._plans = SingleFlightCache[_Attempt](settings.plan_cache_size, PLAN_TTL_S, clock)
+
+    async def listed_models(self, *, timeout_s: float) -> frozenset[str] | None:
+        """The models the key lists, or None when no model is configured; a `PlannerError` when unreadable."""
+        if self._planner is None:
+            return None
+        return await self._planner.list_models(timeout_s=timeout_s)
 
     async def produce(self, request: QueryRequest, today: date, ctx: PlanningContext) -> PlannedQuery:
         self._reject_unknown_countries(request)
         if request.options.planner == "structured":
             return self._from_fields(request, today)
-        planned = await self._from_model(request, today)
+        planned = await self._from_cache_or_model(request, today)
         _log.info(
             "plan_produced",
             request_id=ctx.request_id,
             attempts=planned.info.attempts,
             model=planned.info.model,
+            is_cached=planned.is_cached,
         )
         return planned
+
+    async def _from_cache_or_model(self, request: QueryRequest, today: date) -> PlannedQuery:
+        """The plan cache of section 4.9. `options.use_cache: false` neither reads nor writes it.
+
+        Concurrent identical requests share one model call. Only a checked plan is kept: a failure, a
+        refusal and a plan settled after the repair turn was spent are asked for again next time.
+        """
+        if not request.options.use_cache:
+            return (await self._from_model(request, today)).planned
+        attempt, is_shared = await self._plans.get(
+            self._key(request, today),
+            lambda: self._from_model(request, today),
+            keep=lambda fresh: fresh.is_checked,
+        )
+        # The key holds the question and every field, so the plan fits any request that differs from the
+        # first only in its options, which neither the model nor the checks read.
+        return replace(attempt.planned, request=request, options=request.options, is_cached=is_shared)
+
+    def _key(self, request: QueryRequest, today: date) -> tuple[str, ...]:
+        """What the plan is a function of: the question and fields, the prompt, the model and the date.
+
+        The request is dumped without its options and in canonical form, since validation has already
+        collapsed whitespace, spelled phases and turned empty lists into null. The date is the model's
+        "today", so a plan never outlives the day it was written for.
+        """
+        return (
+            request.model_dump_json(exclude={"options"}),
+            PROMPT_VERSION,
+            self._model,
+            self._effort or "",
+            today.isoformat(),
+        )
 
     def accept(self, body: AnalysisRequest, today: date) -> PlannedQuery:
         """A supplied plan: checked for shape and limits only, and a broken rule is a 422."""
@@ -150,7 +208,7 @@ class PlanService:
             check.outcome,
         )
 
-    async def _from_model(self, request: QueryRequest, today: date) -> PlannedQuery:
+    async def _from_model(self, request: QueryRequest, today: date) -> _Attempt:
         if self._planner is None:
             raise PlannerUnavailableError(_MISSING_MODEL, reason="not_configured")
         calls = _Calls()
@@ -160,9 +218,10 @@ class PlanService:
         except PlannerRefused:
             calls.add()
             outcome = Outcome(kind="unsupported", reason="other", message=DECLINED_MESSAGE)
-            return PlannedQuery(
+            declined = PlannedQuery(
                 _declined_plan(), request, request.options, _info("llm", None, calls), (), (), outcome
             )
+            return _Attempt(declined, is_checked=False)  # no plan was written, and a refusal may not recur
         check = self._check(draft.result.plan, request, "model", today)
         final = draft.result
         repaired: tuple[Adjustment, ...] = ()
@@ -177,10 +236,11 @@ class PlanService:
                     for issue in first_issues
                     if issue.code not in persisting
                 )
-        if check.blocking:  # the repair turn is spent or could not run
+        is_unrepaired = bool(check.blocking)  # the repair turn is spent or could not run
+        if is_unrepaired:
             check = self._check(final.plan, request, "model", today, after_repair=True)
         info = _info("llm", final, calls, is_repaired=bool(repaired), is_fallback=draft.is_fallback)
-        return PlannedQuery(
+        planned = PlannedQuery(
             check.plan,
             request,
             request.options,
@@ -189,6 +249,7 @@ class PlanService:
             check.warnings,
             check.outcome,
         )
+        return _Attempt(planned, is_checked=not is_unrepaired)
 
     async def _first_draft(self, messages: Sequence[Message], calls: _Calls) -> _Draft:
         """The failure policy: a cut-off output is retried once with a doubled cap, then the fallback runs."""

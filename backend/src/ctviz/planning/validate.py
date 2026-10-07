@@ -94,10 +94,10 @@ def _block_unused_fields(plan: QueryPlan, request: QueryRequest, found: Findings
 
 def _drop_duplicate_entities(plan: QueryPlan, found: Findings) -> QueryPlan:
     """Rule 3: the same kind and words twice."""
-    seen: set[tuple[str, tuple[str, ...]]] = set()
+    seen: set[tuple[str, tuple[str, ...], bool]] = set()
     kept = []
     for index, entity in enumerate(plan.entities):
-        key = (entity.kind, tokens(entity.value))
+        key = (entity.kind, tokens(entity.value), entity.role == "exclude")
         if key in seen:
             found.adjust(
                 "duplicate_entity", f"/entities/{index}", "The same name was listed twice.", "dropped"

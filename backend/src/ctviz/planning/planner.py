@@ -68,6 +68,10 @@ class Planner(Protocol):
         self, *, instructions: str, messages: Sequence[Message], max_output_tokens: int
     ) -> PlannerResult: ...
 
+    async def list_models(self, *, timeout_s: float) -> frozenset[str]:
+        """The model ids the key can use, for the readiness check; raises a `PlannerError` when unknown."""
+        ...
+
 
 def effective_effort(model: str, effort: str | None) -> str | None:
     """The reasoning effort a call to `model` carries; None for the families that take none."""
@@ -144,6 +148,21 @@ class OpenAIPlanner:
             latency_ms=round((time.monotonic() - started) * 1000),
         )
 
+    async def list_models(self, *, timeout_s: float) -> frozenset[str]:
+        """`GET /models`: the ids this key lists. The client makes no retry, so a slow answer costs once."""
+        try:
+            page = await self._client.models.list(timeout=timeout_s)
+        except openai.APIStatusError as error:
+            raise _classify(error) from None
+        except openai.APIConnectionError:  # includes the SDK's timeout error
+            raise PlannerUnavailable("The model did not answer in time or could not be reached.") from None
+        models = getattr(page, "data", None)  # a gateway may answer 200 with something else
+        if not isinstance(models, list):
+            raise PlannerUnavailable("The model service sent a list that this service cannot read.")
+        return frozenset(
+            identifier for model in models if isinstance(identifier := getattr(model, "id", None), str)
+        )
+
 
 def _classify(error: openai.APIStatusError) -> PlannerError:
     """A provider error as one of ours. The provider's own text may echo configuration, so it is not kept."""
@@ -198,6 +217,12 @@ class FakePlanner:
     script: list[QueryPlan | PlannerError]
     model: str = "fake-model"
     calls: list[tuple[str, tuple[Message, ...], int]] = field(default_factory=list)
+    listed: frozenset[str] | Exception = frozenset()  # what `list_models` answers, or raises
+
+    async def list_models(self, *, timeout_s: float) -> frozenset[str]:
+        if isinstance(self.listed, Exception):
+            raise self.listed
+        return self.listed
 
     async def draft(
         self, *, instructions: str, messages: Sequence[Message], max_output_tokens: int

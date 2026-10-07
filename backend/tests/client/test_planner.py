@@ -203,6 +203,58 @@ async def test_a_timeout_and_a_refused_connection_are_unavailable() -> None:
         assert len(provider.requests) == 1
 
 
+def model_list(*ids: str) -> dict[str, object]:
+    return {
+        "object": "list",
+        "data": [{"id": name, "object": "model", "created": 0, "owned_by": "openai"} for name in ids],
+    }
+
+
+async def test_the_model_list_is_the_set_of_ids_the_key_can_use() -> None:
+    provider = Provider(ok(model_list("gpt-5.4-mini", "gpt-4.1-mini", "gpt-4o")))
+
+    listed = await provider.planner().list_models(timeout_s=2.0)
+
+    assert listed == frozenset({"gpt-5.4-mini", "gpt-4.1-mini", "gpt-4o"})
+    [request] = provider.requests
+    assert (request.method, str(request.url)) == ("GET", f"{BASE_URL}/models")
+    assert request.headers["authorization"] == f"Bearer {PLACEHOLDER_KEY}"
+
+
+@pytest.mark.parametrize(
+    ("status", "failure"),
+    [(429, PlannerUnavailable), (503, PlannerUnavailable), (401, PlannerMisconfigured)],
+)
+async def test_a_model_list_that_fails_is_one_attempt_and_one_of_our_errors(
+    status: int, failure: type[Exception]
+) -> None:
+    provider = Provider(lambda _: httpx2.Response(status, json={"error": {"message": "echo sk-secret"}}))
+
+    with pytest.raises(failure) as raised:
+        await provider.planner().list_models(timeout_s=2.0)
+
+    assert len(provider.requests) == 1 and "sk-secret" not in str(raised.value)
+
+
+@pytest.mark.parametrize("body", [{"object": "list"}, {"data": "nothing"}, {"data": None}])
+async def test_an_answer_that_is_not_a_model_list_is_unavailable(body: dict[str, object]) -> None:
+    provider = Provider(ok(body))
+
+    with pytest.raises(PlannerUnavailable):
+        await provider.planner().list_models(timeout_s=2.0)
+
+
+async def test_a_model_list_that_times_out_is_unavailable() -> None:
+    def timeout(request: httpx2.Request) -> httpx2.Response:
+        raise httpx2.ReadTimeout("slow", request=request)
+
+    provider = Provider(timeout)
+
+    with pytest.raises(PlannerUnavailable):
+        await provider.planner().list_models(timeout_s=2.0)
+    assert len(provider.requests) == 1
+
+
 def test_without_a_key_there_is_no_planner_and_no_fallback() -> None:
     assert build_planners(Settings()) == (None, None)
 

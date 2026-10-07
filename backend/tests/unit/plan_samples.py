@@ -13,9 +13,12 @@ BASE: dict[str, Any] = {
     "entities": [{"kind": "drug", "value": "pembrolizumab", "role": "filter"}],
     "filters": {
         "phases": [], "statuses": [], "study_types": [], "sponsor_classes": [], "intervention_types": [],
+        "exclude_statuses": [], "sexes": [], "age_groups": [], "allocations": [], "maskings": [],
+        "primary_purposes": [], "has_results": [], "intervention_models": [],
         "evidence": [], "date_field": None, "year_from": None, "year_to": None,
     },
-    "analysis": {"kind": "aggregate", "dimension": "phase", "series": None, "time_unit": None, "top_n": None},
+    "analysis": {"kind": "aggregate", "dimension": "phase", "series": None, "time_unit": None, "top_n": None,
+                 "statistic": None, "of": None},
     "chart_preference": None,
 }  # fmt: skip
 

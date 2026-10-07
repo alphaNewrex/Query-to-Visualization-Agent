@@ -1,19 +1,9 @@
 """Structured request fields win over what the model read (rules 3 to 5 of the plan checks)."""
 
-from typing import Final
-
-from ctviz.contract.plan import Aggregate, Entity, FilterFamily, PlanModel, QueryPlan, Total, TrialList
+from ctviz.contract.plan import FAMILY_FIELDS, Aggregate, Entity, PlanModel, QueryPlan, Total, TrialList
 from ctviz.contract.request import QueryRequest
 from ctviz.planning.findings import Findings
 from ctviz.planning.grounding import ENTITY_FIELDS, tokens
-
-_FAMILY_FIELDS: Final[dict[FilterFamily, str]] = {
-    "phases": "trial_phase",
-    "statuses": "status",
-    "study_types": "study_type",
-    "sponsor_classes": "sponsor_class",
-    "intervention_types": "intervention_type",
-}
 
 
 def merge_request(plan: QueryPlan, request: QueryRequest, found: Findings) -> QueryPlan:
@@ -67,13 +57,34 @@ def _merge_entities(entities: list[Entity], request: QueryRequest, found: Findin
             )
         entities = [e for e in entities if not (e.kind == kind and e.role == "filter")]
         entities += [Entity(kind=kind, value=value, role="filter") for value in values]
+    return _merge_excluded(entities, request, found)
+
+
+def _merge_excluded(entities: list[Entity], request: QueryRequest, found: Findings) -> list[Entity]:
+    """The exclude field replaces the excluded entities of each kind it names."""
+    if request.exclude is None:
+        return entities
+    for name, kind in ENTITY_FIELDS.items():
+        values = getattr(request.exclude, name) or []
+        if not values:
+            continue
+        wanted = {tokens(value) for value in values}
+        if any(e.kind == kind and e.role == "exclude" and tokens(e.value) not in wanted for e in entities):
+            found.adjust(
+                "field_override",
+                "/entities",
+                f"The exclude field replaced the excluded {kind} the planner read.",
+                "replaced",
+            )
+        entities = [e for e in entities if not (e.kind == kind and e.role == "exclude")]
+        entities += [Entity(kind=kind, value=value, role="exclude") for value in values]
     return entities
 
 
 def _merge_filters(plan: QueryPlan, request: QueryRequest, found: Findings) -> QueryPlan:
     changes: dict[str, object] = {}
     evidence = list(plan.filters.evidence)
-    for family, name in _FAMILY_FIELDS.items():
+    for family, name in FAMILY_FIELDS.items():
         wanted = getattr(request, name)
         if not wanted:
             continue
@@ -88,6 +99,17 @@ def _merge_filters(plan: QueryPlan, request: QueryRequest, found: Findings) -> Q
         changes[family] = list(wanted)
         evidence = [item for item in evidence if item.family != family]
     changes["evidence"] = evidence
+    if request.exclude is not None and request.exclude.status:
+        wanted_statuses = request.exclude.status
+        if plan.filters.exclude_statuses and set(plan.filters.exclude_statuses) != set(wanted_statuses):
+            found.adjust(
+                "field_override",
+                "/filters/exclude_statuses",
+                "The exclude field replaced the planner's excluded statuses.",
+                "replaced",
+            )
+        changes["exclude_statuses"] = list(wanted_statuses)
+        changes["evidence"] = [item for item in evidence if item.family != "exclude_statuses"]
     for name, attribute in (
         ("start_year", "year_from"),
         ("end_year", "year_to"),
@@ -126,6 +148,8 @@ def _merge_hints(plan: QueryPlan, request: QueryRequest, found: Findings) -> Que
             series=series,
             time_unit=analysis.time_unit if isinstance(analysis, Aggregate) else None,
             top_n=analysis.top_n if isinstance(analysis, Aggregate) else None,
+            statistic=analysis.statistic,
+            of=analysis.of,
         )
     if isinstance(analysis, Aggregate):
         analysis = _override(analysis, "time_unit", request.time_unit, found)

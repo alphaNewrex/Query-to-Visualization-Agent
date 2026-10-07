@@ -100,8 +100,8 @@ def _compose_source_urls(frame: Frame, plan: EnginePlan, window: Window | None) 
     opens it sees the cell's count as `totalCount` and a few of its trials.
     """
     dims = frame.dims
-    if not dims or len({dimension.spec.key for dimension in dims}) < len(dims):
-        return
+    if plan.measure is not None or not dims or len({d.spec.key for d in dims}) < len(dims):
+        return  # a statistic's cell holds trials that have a value; no search returns exactly those
     fields = projection(plan, frame.scope)
     sort = "@relevance" if frame.scope.terms else "StudyFirstPostDate:desc"
     for cell in frame.cells.values():

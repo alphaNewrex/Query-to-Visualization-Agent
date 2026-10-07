@@ -12,25 +12,33 @@ from typing import Final, get_args
 
 from ctviz.catalog.fields import CATALOG, FieldSpec
 from ctviz.contract.plan import (
+    AgeGroup,
     Aggregate,
+    Allocation,
     Clarify,
     ClosedDimension,
     DimensionKey,
     Entity,
     FilterEvidence,
+    InterventionModel,
     InterventionType,
+    Masking,
     Network,
     Phase,
+    PrimaryPurpose,
     QueryPlan,
+    ResultsPosted,
+    Sex,
     SponsorClass,
     Status,
     StudyType,
+    Total,
     TrialList,
 )
 from ctviz.contract.request import QueryRequest
 from ctviz.planning.structured import NO_FILTERS
 
-PROMPT_VERSION: Final = "plan-v1"
+PROMPT_VERSION: Final = "plan-v2"
 
 RULES: Final = """\
 You translate a question about clinical trials into a query plan for a service that counts
@@ -45,19 +53,23 @@ and you never write counts, trial names or identifiers.
    structured field supplies the name, use analysis "clarify". Placeholders such as "Drug A",
    "[condition]" or "two conditions" are not names.
 4. An entity every counted trial must match has role "filter". For "A vs B" about named drugs,
-   conditions, sponsors or countries, give each side role "compare".
+   conditions, sponsors or countries, give each side role "compare" (two to five sides). A class
+   of drugs such as "GLP-1 receptor agonists" is one drug entity, written as in the question.
 5. Filter lists stay empty unless the question restricts them. Listing every value is the same
    as no filter: leave the list empty. For every non-empty filter list add one filters.evidence
    item that quotes the words of the question stating it. If the question names a value that is
-   not in a list (for example "Phase 5"), do not pick a similar one: use "clarify".
+   not in a list (for example "Phase 5"), do not pick a similar one: use "clarify". Phases the
+   question names as the ones to show ("compare Phase 1, Phase 2 and Phase 3", "Phase 2 from
+   Phase 3") are also a filter: list exactly those in filters.phases, each quoted in evidence.
 6. "recruiting" means statuses ["RECRUITING"]. "since 2015" means year_from 2015. Use only
    years the user wrote or that follow from a phrase such as "the last five years".
 7. Choose one analysis:
    aggregate    count trials by one dimension (a category, a date with time_unit, or enrollment
-                size), optionally split by a second closed dimension in `series`;
+                size), optionally split by a second closed dimension in `series`. With compared
+                names the split is kept: one line or bar per name and split value;
    total        the question asks for one number with no breakdown ("how many recruiting trials
                 are there for X?"). "How many ... each year", "per phase" or "by country" asks
-                for a breakdown and is aggregate;
+                for a breakdown and is aggregate. With compared names it gives one number each;
    relate       one point per trial for two numeric fields;
    network      how two kinds of thing are connected; use the same kind twice for co-occurrence
                 ("which drugs are used together"), with link "same_arm" for combinations;
@@ -69,6 +81,34 @@ and you never write counts, trial names or identifiers.
 8. top_n, limit, time_unit and chart_preference are null unless the question asks for them.
 9. interpretation is one sentence restating what will be counted and how it is grouped. It
    contains no figures other than those in the question.
+10. Leaving out: "excluding X", "without X", "not involving X", "other than X" about a drug,
+    condition, sponsor, country or term is an entity with role "exclude", value copied from the
+    question; never give it role "filter". Leaving out statuses ("exclude terminated and withdrawn
+    studies") is filters.exclude_statuses (the codes of statuses), with a filters.evidence item of family
+    "exclude_statuses" that quotes the words. Statuses to leave out are never listed in `statuses`.
+11. Compared names of one kind (drugs, countries, sponsors, conditions) are never also the
+    dimension: "compare A, B and C by phase" is dimension phase with each name compared, and
+    "compare A, B and C per year, separately for each phase" is dimension start_date with series
+    phase. Never put the compared kind in `dimension` or `series`. With nothing to break the
+    names down by ("how many trials for A vs B"), use analysis total.
+12. Grouping words map to the glossary below. "by intervention name", "by intervention", "by drug"
+    and "by treatment" are dimension drug; "by sponsor" is sponsor; "by year" is a date dimension
+    with time_unit year; "parallel, crossover, factorial or sequential" is dimension
+    intervention_model.
+13. Every closed dimension in the glossary is also a filter, listed in the enum codes below:
+    "randomized" is allocations ["RANDOMIZED"], "double-blind" is maskings ["DOUBLE"], "prevention
+    trials" is primary_purposes ["PREVENTION"], "with posted results" is has_results ["true"],
+    "children" is age_groups ["CHILD"], "crossover trials" is intervention_models ["CROSSOVER"].
+    Words that a filter covers are never a term entity. Each is quoted in filters.evidence with the
+    family name of its list (allocations, maskings, sexes, ...).
+14. A median, an average or a total of a number is a statistic on aggregate or total: statistic
+    "median", "mean" ("average") or "sum" ("total") with `of` enrollment (planned enrollment,
+    participants), duration_months (study duration, from start to completion) or site_count (number
+    of sites or locations per trial). "Average number of sites per trial by sponsor class" is aggregate
+    with dimension sponsor_class, statistic mean, of site_count. "Median duration for A, B and C" is
+    total with A, B and C compared. Counting trials leaves statistic and of null. Never "sum" of
+    duration_months. Two or more different measures in one question are not supported: use
+    "unsupported" with category analysis_not_supported.
 """
 
 _CLOSED: Final = frozenset(get_args(ClosedDimension))
@@ -80,6 +120,13 @@ _ENUMS: Final[dict[str, tuple[str, ...]]] = {
     "study_types": get_args(StudyType),
     "sponsor_classes": get_args(SponsorClass),
     "intervention_types": get_args(InterventionType),
+    "sexes": get_args(Sex),
+    "age_groups": get_args(AgeGroup),
+    "allocations": get_args(Allocation),
+    "maskings": get_args(Masking),
+    "primary_purposes": get_args(PrimaryPurpose),
+    "has_results": get_args(ResultsPosted),
+    "intervention_models": get_args(InterventionModel),
 }
 # Codes whose label is not the code in sentence case.
 _LABELS: Final = {
@@ -136,7 +183,7 @@ class Example:
 def _plan(
     interpretation: str,
     entities: list[Entity],
-    analysis: Aggregate | Network | TrialList | Clarify,
+    analysis: Aggregate | Total | Network | TrialList | Clarify,
     *,
     filters: dict[str, object] | None = None,
 ) -> QueryPlan:
@@ -155,7 +202,15 @@ def _entity(kind: str, value: str, role: str = "filter") -> Entity:
 
 def _aggregate(dimension: str, *, time_unit: str | None = None) -> Aggregate:
     return Aggregate.model_validate(
-        {"kind": "aggregate", "dimension": dimension, "series": None, "time_unit": time_unit, "top_n": None}
+        {
+            "kind": "aggregate",
+            "dimension": dimension,
+            "series": None,
+            "time_unit": time_unit,
+            "top_n": None,
+            "statistic": None,
+            "of": None,
+        }
     )
 
 
@@ -222,6 +277,88 @@ EXAMPLES: Final = (
             TrialList.model_validate(
                 {"kind": "trial_list", "sort_by": "enrollment", "order": "desc", "limit": 10}
             ),
+        ),
+    ),
+    Example(
+        QueryRequest(
+            query="Compare secukinumab, ixekizumab and guselkumab trials for psoriasis per year since 2018, "
+            "separately for each phase, excluding withdrawn studies."
+        ),
+        _plan(
+            "Count psoriasis trials per start year since 2018 for each of three drugs, split by phase, "
+            "leaving out withdrawn studies.",
+            [
+                _entity("condition", "psoriasis"),
+                _entity("drug", "secukinumab", "compare"),
+                _entity("drug", "ixekizumab", "compare"),
+                _entity("drug", "guselkumab", "compare"),
+            ],
+            Aggregate.model_validate(
+                {
+                    "kind": "aggregate",
+                    "dimension": "start_date",
+                    "series": "phase",
+                    "time_unit": "year",
+                    "top_n": None,
+                    "statistic": None,
+                    "of": None,
+                }
+            ),
+            filters={
+                "year_from": 2018,
+                "exclude_statuses": ["WITHDRAWN"],
+                "evidence": [FilterEvidence(family="exclude_statuses", phrase="excluding withdrawn studies")],
+            },
+        ),
+    ),
+    Example(
+        QueryRequest(query="Compare Japan, South Korea and Brazil by phase for hypertension trials."),
+        _plan(
+            "Count hypertension trials by phase for each of three countries.",
+            [
+                _entity("condition", "hypertension"),
+                _entity("country", "Japan", "compare"),
+                _entity("country", "South Korea", "compare"),
+                _entity("country", "Brazil", "compare"),
+            ],
+            _aggregate("phase"),
+        ),
+    ),
+    Example(
+        QueryRequest(query="What is the average enrollment of asthma trials in each sponsor class?"),
+        _plan(
+            "Compute the mean enrollment of asthma trials for each sponsor class.",
+            [_entity("condition", "asthma")],
+            Aggregate.model_validate(
+                {
+                    "kind": "aggregate",
+                    "dimension": "sponsor_class",
+                    "series": None,
+                    "time_unit": None,
+                    "top_n": None,
+                    "statistic": "mean",
+                    "of": "enrollment",
+                }
+            ),
+        ),
+    ),
+    Example(
+        QueryRequest(
+            query="Compare the median study duration of completed trials for secukinumab, ixekizumab and "
+            "guselkumab."
+        ),
+        _plan(
+            "Compute the median duration of completed trials for each of three drugs.",
+            [
+                _entity("drug", "secukinumab", "compare"),
+                _entity("drug", "ixekizumab", "compare"),
+                _entity("drug", "guselkumab", "compare"),
+            ],
+            Total.model_validate({"kind": "total", "statistic": "median", "of": "duration_months"}),
+            filters={
+                "statuses": ["COMPLETED"],
+                "evidence": [FilterEvidence(family="statuses", phrase="completed")],
+            },
         ),
     ),
     Example(

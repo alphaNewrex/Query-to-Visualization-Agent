@@ -7,13 +7,20 @@ from typing import Annotated, Final, Literal, Self, get_args
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator, model_validator
 
 from ctviz.contract.plan import (
+    AgeGroup,
+    Allocation,
     ChartType,
     ClosedDimension,
     DateField,
     DimensionKey,
+    InterventionModel,
     InterventionType,
+    Masking,
     Phase,
+    PrimaryPurpose,
     QueryPlan,
+    ResultsPosted,
+    Sex,
     SponsorClass,
     Status,
     StudyType,
@@ -37,7 +44,19 @@ _Word = Annotated[str, Field(min_length=1, max_length=200)]
 _Words = Annotated[list[_Word], Field(max_length=5)]
 
 _ENTITY_FIELDS: Final = ("drug_name", "condition", "sponsor", "country", "term")
-_ENUM_FIELDS: Final = ("status", "study_type", "sponsor_class", "intervention_type")
+_ENUM_FIELDS: Final = (
+    "status",
+    "study_type",
+    "sponsor_class",
+    "intervention_type",
+    "sex",
+    "age_group",
+    "allocation",
+    "masking",
+    "primary_purpose",
+    "has_results",
+    "intervention_model",
+)
 
 
 def _arabic(numeral: str | None) -> str | None:
@@ -72,7 +91,31 @@ class CompareSpec(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=True)
 
     field: Literal["drug_name", "condition", "sponsor", "country"]
-    values: Annotated[list[_Word], Field(min_length=2, max_length=4)]
+    values: Annotated[list[_Word], Field(min_length=2, max_length=5)]
+
+
+class ExcludeSpec(BaseModel):
+    """Trials to leave out: those that match any of these entities or have any of these statuses."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=True)
+
+    drug_name: _Words | None = Field(
+        None, description="Drugs to leave out; same searches as the filter fields."
+    )
+    condition: _Words | None = Field(None, description="Conditions to leave out.")
+    sponsor: _Words | None = Field(None, description="Lead sponsors to leave out.")
+    country: _Words | None = Field(None, description="Countries to leave out (any site there).")
+    term: _Words | None = Field(None, description="Other search words to leave out.")
+    status: list[Status] | None = Field(None, description="Overall statuses to leave out.")
+
+    @field_validator("drug_name", "condition", "sponsor", "country", "term", "status", mode="before")
+    @classmethod
+    def _words(cls, value: object) -> object:
+        return _empty_is_no_filter([value] if isinstance(value, str) else value)
+
+    @property
+    def is_empty(self) -> bool:
+        return not any((self.drug_name, self.condition, self.sponsor, self.country, self.term, self.status))
 
 
 class RequestOptions(BaseModel):
@@ -182,6 +225,19 @@ class QueryRequest(BaseModel):
     intervention_type: list[InterventionType] | None = Field(
         None, description="Trials with at least one intervention of these types, any of."
     )
+    sex: list[Sex] | None = Field(None, description="Sexes the trials accept, any of.")
+    age_group: list[AgeGroup] | None = Field(None, description="Age groups the trials include, any of.")
+    allocation: list[Allocation] | None = Field(
+        None, description="Allocation of interventional trials, any of (RANDOMIZED, NON_RANDOMIZED, NA)."
+    )
+    masking: list[Masking] | None = Field(None, description="Masking of interventional trials, any of.")
+    primary_purpose: list[PrimaryPurpose] | None = Field(None, description="Primary purposes, any of.")
+    has_results: list[ResultsPosted] | None = Field(
+        None, description="'true': results posted; 'false': none posted."
+    )
+    intervention_model: list[InterventionModel] | None = Field(
+        None, description="Assignment models of interventional trials, any of."
+    )
     start_year: int | None = Field(
         None,
         ge=1900,
@@ -201,6 +257,12 @@ class QueryRequest(BaseModel):
     )
     compare: CompareSpec | None = Field(
         None, description="Compare these as series. Replaces any comparison found in the question."
+    )
+    exclude: ExcludeSpec | None = Field(
+        None,
+        description="Leave out trials that match any listed entity or have any listed status ('excluding "
+        "diabetes', 'without terminated studies'). Replaces what the planner read for the same entity "
+        "kind or for statuses; an empty object is no exclusion.",
     )
     group_by: Annotated[list[DimensionKey], Field(min_length=1, max_length=2)] | None = Field(
         None,

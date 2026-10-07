@@ -62,6 +62,9 @@ class Settings(BaseSettings):
     low_match_threshold: int = 10
     request_deadline_s: float = 45.0
     cache_ttl_s: int = 900
+    # How many entries the plan cache and the response cache keep; both live in this process's memory.
+    plan_cache_size: int = Field(512, ge=1)
+    response_cache_size: int = Field(256, ge=1)
     examples_dir: Path | None = None
     log_format: LogFormat = "console"
 

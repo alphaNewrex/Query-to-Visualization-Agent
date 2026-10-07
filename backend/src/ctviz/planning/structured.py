@@ -1,15 +1,23 @@
 """Structured mode: the plan built from the request's fields alone, with no model."""
 
-from ctviz.contract.plan import Aggregate, Entity, PlanFilters, QueryPlan
+from ctviz.contract.plan import FAMILY_FIELDS, Aggregate, Entity, PlanFilters, QueryPlan
 from ctviz.contract.request import QueryRequest
 from ctviz.planning.grounding import ENTITY_FIELDS, tokens
 
 NO_FILTERS = PlanFilters(
     phases=[],
     statuses=[],
+    exclude_statuses=[],
     study_types=[],
     sponsor_classes=[],
     intervention_types=[],
+    sexes=[],
+    age_groups=[],
+    allocations=[],
+    maskings=[],
+    primary_purposes=[],
+    has_results=[],
+    intervention_models=[],
     evidence=[],
     date_field=None,
     year_from=None,
@@ -40,13 +48,16 @@ def plan_from_fields(request: QueryRequest) -> QueryPlan:
         if (kind, tokens(value)) not in taken
     ]
     entities += compared
+    if request.exclude is not None:
+        entities += [
+            Entity(kind=kind, value=value, role="exclude")
+            for name, kind in ENTITY_FIELDS.items()
+            for value in getattr(request.exclude, name) or []
+        ]
     filters = NO_FILTERS.model_copy(
         update={
-            "phases": request.trial_phase or [],
-            "statuses": request.status or [],
-            "study_types": request.study_type or [],
-            "sponsor_classes": request.sponsor_class or [],
-            "intervention_types": request.intervention_type or [],
+            **{family: getattr(request, name) or [] for family, name in FAMILY_FIELDS.items()},
+            "exclude_statuses": (request.exclude.status if request.exclude is not None else None) or [],
             "date_field": request.date_field,
             "year_from": request.start_year,
             "year_to": request.end_year,
@@ -63,6 +74,8 @@ def plan_from_fields(request: QueryRequest) -> QueryPlan:
             series=series,
             time_unit=request.time_unit,
             top_n=request.top_n,
+            statistic=None,
+            of=None,
         ),
         chart_preference=request.chart_type,
     )

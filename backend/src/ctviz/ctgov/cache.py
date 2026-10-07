@@ -7,6 +7,10 @@ import anyio
 from cachetools import TTLCache
 
 
+def _keep_all(_value: object) -> bool:
+    return True
+
+
 @dataclass
 class _Flight[V]:
     """A fetch under way; callers that ask for the same key meanwhile wait on `done`."""
@@ -23,18 +27,21 @@ class SingleFlightCache[V]:
         self._values: TTLCache[Hashable, V] = TTLCache(maxsize=maxsize, ttl=ttl_s, timer=clock)
         self._flights: dict[Hashable, _Flight[V]] = {}
 
-    async def get(self, key: Hashable, fetch: Callable[[], Awaitable[V]]) -> tuple[V, bool]:
+    async def get(
+        self, key: Hashable, fetch: Callable[[], Awaitable[V]], *, keep: Callable[[V], bool] = _keep_all
+    ) -> tuple[V, bool]:
         """The value for `key`, and whether it was cached or shared instead of fetched by this call.
 
         A fetch that fails fails for every caller that was waiting for it, so one broken request is not
-        retried once per caller.
+        retried once per caller. `keep` decides whether a fetched value is stored for later callers;
+        the callers already waiting for this fetch get the value either way, as it answers them too.
         """
         while True:
             if (cached := self._values.get(key)) is not None:
                 return cached, True
             flight = self._flights.get(key)
             if flight is None:
-                return await self._lead(key, fetch), False
+                return await self._lead(key, fetch, keep), False
             await flight.done.wait()
             if flight.error is not None:
                 raise flight.error
@@ -42,11 +49,12 @@ class SingleFlightCache[V]:
                 return flight.value, True
             # The fetch was cancelled, for instance by its own request's deadline: lead, or follow the next.
 
-    async def _lead(self, key: Hashable, fetch: Callable[[], Awaitable[V]]) -> V:
+    async def _lead(self, key: Hashable, fetch: Callable[[], Awaitable[V]], keep: Callable[[V], bool]) -> V:
         flight = self._flights[key] = _Flight[V]()
         try:
             value = await fetch()
-            self._values[key] = value
+            if keep(value):
+                self._values[key] = value
             flight.value = value
             return value
         except Exception as error:

@@ -27,6 +27,12 @@ NUMBER_FORMATS: Final[dict[str, NumberFormat]] = {
     "duration_months": ".1f",
     "site_count": ",d",
 }
+STATISTIC_WORDS: Final = {"median": "Median", "mean": "Mean", "sum": "Total"}
+MEASURE_PHRASES: Final = {
+    "enrollment": "enrollment (participants)",
+    "duration_months": "duration (months)",
+    "site_count": "number of sites per trial",
+}
 KIND_PLURALS: Final = {
     "sponsor": "Sponsors",
     "drug": "Drugs",
@@ -47,6 +53,13 @@ FILTER_TITLES: Final = {
     "study_type": "Study type",
     "sponsor_class": "Sponsor class",
     "intervention_type": "Intervention type",
+    "sex": "Sex",
+    "age_group": "Age group",
+    "allocation": "Allocation",
+    "masking": "Masking",
+    "primary_purpose": "Primary purpose",
+    "has_results": "Results",
+    "intervention_model": "Intervention model",
 }
 DATE_PIECE_VERBS: Final = {
     "StartDate": "started",
@@ -134,6 +147,13 @@ def _filter_labels(key: str) -> Mapping[str, str]:
         "study_type": vocab.study_type().labels,
         "sponsor_class": vocab.sponsor_class().labels,
         "intervention_type": vocab.intervention_type().labels,
+        "sex": vocab.sex().labels,
+        "age_group": vocab.age_group().labels,
+        "allocation": vocab.allocation().labels,
+        "masking": vocab.masking().labels,
+        "primary_purpose": vocab.primary_purpose().labels,
+        "has_results": vocab.has_results().labels,
+        "intervention_model": vocab.intervention_model().labels,
     }[key]
 
 
@@ -163,15 +183,62 @@ def scope_filters(scope: Scope, *, skip_date_piece: str | None = None) -> list[s
     date_range = scope.date_range
     if date_range is not None and date_range.piece != skip_date_piece:
         phrases.append(date_range_phrase(date_range))
+    if scope.excluded:
+        phrases.append("excluding " + ", ".join(term.text for term in scope.excluded))
+    if scope.excluded_statuses:
+        labels = vocab.overall_status().labels
+        phrases.append(
+            "Status: not " + " or ".join(labels.get(token, token) for token in scope.excluded_statuses)
+        )
     return phrases
+
+
+def measure_label(statistic: str, of: str) -> str:
+    """`Median duration (months)`: the statistic and the field, with the unit in the words."""
+    phrase = MEASURE_PHRASES[of]
+    if statistic == "sum":
+        phrase = phrase.replace(" per trial", "")
+    return f"{STATISTIC_WORDS[statistic]} {phrase}"
+
+
+def measure_value(value: float | int | None, statistic: str) -> str:
+    if value is None:
+        return "no value"
+    return f"{value:,.0f}" if statistic == "sum" else f"{value:,.1f}"
+
+
+def measure_bar_title(
+    label: str, x_title: str, series_title: str | None, labels: Sequence[str | None]
+) -> str:
+    by = x_title.lower() if series_title is None else f"{x_title.lower()} and {series_title.lower()}"
+    return f"{label} by {by}{scope_suffix(labels)}"
+
+
+def measure_time_title(
+    label: str, date_title: str, unit: str, labels: Sequence[str | None], split: str | None = None
+) -> str:
+    by = f", by {split.lower()}" if split else ""
+    return f"{label} by {date_axis_title(date_title, unit)}{by}{scope_suffix(labels)}"
+
+
+def measure_compared_title(label: str, labels: Sequence[str | None]) -> str:
+    return f"{label}{scope_suffix(labels)}"
 
 
 def count_title(date_key: str | None) -> str:
     return f"Trials {DATE_VERBS[date_key]}" if date_key in DATE_VERBS else "Trials"
 
 
-def time_series_title(date_key: str, unit: str, labels: Sequence[str | None]) -> str:
-    return f"{count_title(date_key)} per {unit}{scope_suffix(labels)}"
+def time_series_title(
+    date_key: str, unit: str, labels: Sequence[str | None], split: str | None = None
+) -> str:
+    by = f", by {split.lower()}" if split else ""
+    return f"{count_title(date_key)} per {unit}{by}{scope_suffix(labels)}"
+
+
+def split_series_title(compare_kind: str | None, split_title: str) -> str:
+    """The legend title of a comparison that is also split: one line or bar per pair."""
+    return f"{KIND_TITLES.get(compare_kind or '', 'Group')} and {split_title.lower()}"
 
 
 def bar_title(x_title: str, series_title: str | None, labels: Sequence[str | None]) -> str:
@@ -276,6 +343,16 @@ def metric_message(trials: int, labels: Sequence[str | None], filters: Sequence[
     return f"{count(trials)} {verb}: {detail}." if detail else f"{count(trials)} {verb}."
 
 
+def measure_top_message(label: str, where: str, value: str, trials: int) -> str:
+    return f"{where} has the highest {label.lower()}: {value} ({count(trials)} trials measured)."
+
+
+def measure_metric_message(label: str, value: str, trials: int, labels: Sequence[str | None]) -> str:
+    named = [name for name in labels if name]
+    scope = f" for {' vs '.join(named)}" if named else ""
+    return f"{label}{scope}: {value}, over {count(trials)} trials."
+
+
 def histogram_message(label: str, trials: int) -> str:
     return f"The most common size range is {label}, with {count(trials)} trials."
 
@@ -301,9 +378,13 @@ def interpretation_summary(
     labels: Sequence[str | None],
     unit: str | None,
     filters: Sequence[str] = (),
+    measure: str | None = None,
 ) -> str:
     named = scope_suffix(labels)[2:] or "all trials"
     scope = f"{named} ({'; '.join(filters)})" if filters else named
+    if measure is not None and analysis in ("aggregate", "total"):
+        by = f" by {', then '.join(groups)}{f' (per {unit})' if unit else ''}" if groups else ""
+        return f"Computing the {measure.lower()}{by} for {scope}."
     match analysis:
         case "total":
             return f"Counting trials for {scope}."
@@ -350,6 +431,14 @@ def counts_not_reconciled(label: str | None, expected: int, counted: int) -> Not
     )
 
 
+def upstream_throttled() -> Note:
+    return Note(
+        code="upstream_throttled",
+        message="ClinicalTrials.gov limited the request rate recently, so this answer was fetched more "
+        "slowly and, where it could, by reading whole pages of trials instead of counting groups one by one.",
+    )
+
+
 def insufficient_cooccurrence() -> Note:
     return Note(
         code="insufficient_cooccurrence",
@@ -383,6 +472,27 @@ NUMBER_NOTES: Final = {
     "first day.",
     "site_count": "Sites are the locations listed in each record.",
 }
+
+
+MEASURE_NOTES: Final = {
+    "enrollment": "Enrollment counts, estimated and actual, are both used; a trial with no enrollment count "
+    "is left out.",
+    "duration_months": "Duration runs from the start date to the completion date, a month counting as its "
+    "first day; a trial without both dates, or one that completes before it starts, is left out.",
+    "site_count": "Sites are the locations listed in each record; a trial that lists no site is left out.",
+}
+
+
+def statistic_note(statistic: str, label: str) -> str:
+    how = {
+        "median": "The median is the middle value of the trials measured",
+        "mean": "The mean is the sum of the values divided by the number of trials measured",
+        "sum": "The total adds up the values of the trials measured",
+    }[statistic]
+    return (
+        f"{label}: {how}. The number is computed here from the trial records that were read, not by the "
+        "registry."
+    )
 
 
 def no_end_period(last: str) -> str:

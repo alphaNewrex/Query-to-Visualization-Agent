@@ -14,7 +14,10 @@ PATH = "protocolSection.statusModule.startDateStruct.date"
 FILTERS: dict[str, Any] = {
     "drug_name": ["pembrolizumab"], "condition": [], "sponsor": [], "country": [], "term": [],
     "trial_phase": [], "status": [], "study_type": [], "sponsor_class": [], "intervention_type": [],
+    "sex": [], "age_group": [], "allocation": [], "masking": [], "primary_purpose": [], "has_results": [],
+    "intervention_model": [],
     "start_year": 2015, "end_year": None, "date_field": "start_date", "compare": None,
+    "exclude": {"drug_name": [], "condition": [], "sponsor": [], "country": [], "term": [], "status": []},
 }  # fmt: skip
 
 PLAN: dict[str, Any] = {
@@ -22,10 +25,12 @@ PLAN: dict[str, Any] = {
     "entities": [{"kind": "drug", "value": "pembrolizumab", "role": "filter"}],
     "filters": {
         "phases": [], "statuses": [], "study_types": [], "sponsor_classes": [], "intervention_types": [],
+        "exclude_statuses": [], "sexes": [], "age_groups": [], "allocations": [], "maskings": [],
+        "primary_purposes": [], "has_results": [], "intervention_models": [],
         "evidence": [], "date_field": None, "year_from": 2015, "year_to": None,
     },
     "analysis": {"kind": "aggregate", "dimension": "start_date", "series": None, "time_unit": "year",
-                 "top_n": None},
+                 "top_n": None, "statistic": None, "of": None},
     "chart_preference": None,
 }  # fmt: skip
 

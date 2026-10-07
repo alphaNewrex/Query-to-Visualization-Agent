@@ -9,7 +9,7 @@ import dataclasses
 from collections.abc import Awaitable, Callable, Mapping
 from typing import Final, Literal, Protocol, cast
 
-from ctviz.contract.plan import Aggregate, DateField, Entity, EntityKind, QueryPlan
+from ctviz.contract.plan import FAMILY_DIMENSIONS, Aggregate, DateField, Entity, EntityKind, QueryPlan
 from ctviz.contract.request import QueryRequest
 from ctviz.contract.response import (
     Clarification,
@@ -37,19 +37,20 @@ _REQUEST_FIELD_OF: Final[Mapping[EntityKind, str]] = {
     "country": "country",
     "term": "term",
 }
-_FILTER_KEY_OF: Final = {
-    "phases": "phase",
-    "statuses": "overall_status",
-    "study_types": "study_type",
-    "sponsor_classes": "sponsor_class",
-    "intervention_types": "intervention_type",
-}
+_FILTER_KEY_OF: Final = FAMILY_DIMENSIONS
 _FILTER_NAME_OF: Final = {
     "phase": "the phase filter",
     "overall_status": "the status filter",
     "study_type": "the study type filter",
     "sponsor_class": "the sponsor class filter",
     "intervention_type": "the intervention type filter",
+    "sex": "the sex filter",
+    "age_group": "the age group filter",
+    "allocation": "the allocation filter",
+    "masking": "the masking filter",
+    "primary_purpose": "the primary purpose filter",
+    "has_results": "the results filter",
+    "intervention_model": "the intervention model filter",
 }
 _DATE_PIECE_OF: Final = {
     "start_date": "StartDate",
@@ -170,6 +171,34 @@ class EntityResolver:
         return "ok"
 
 
+_SEARCH_AREA: Final[Mapping[MatchDefinition, str]] = {
+    "intervention_search": "InterventionSearch",
+    "condition_search": "ConditionSearch",
+    "lead_sponsor_search": "LeadSponsorName",
+    "term_search": "BasicSearch",
+}
+
+
+def bind_excluded(resolution: EntityResolution) -> BoundTerm:
+    """The entity as an expression that selects the trials to leave out, searched as `bind_term` would."""
+    definition, text = resolution.definition, resolution.text
+    if definition == "country_exact":
+        inner = essie.area("LocationCountry", resolution.term_searched)
+    elif definition == "intervention_name":
+        inner = essie.area("InterventionName", text)
+    else:
+        inner = essie.search(_SEARCH_AREA[definition], resolution.term_searched)
+    return BoundTerm(
+        kind=resolution.kind,
+        text=text,
+        term=resolution.term_searched,
+        parameter=None,
+        expr=essie.not_(inner),
+        definition=definition,
+        note=f"Trials that match '{text}' as a {resolution.kind} (same search as for a filter) are left out.",
+    )
+
+
 def bind_term(resolution: EntityResolution) -> BoundTerm:
     """The entity as the registry will be asked for it: a search parameter, or an expression."""
     definition = resolution.definition
@@ -215,7 +244,10 @@ async def resolve_entities(planned: PlannedLike, deps: ResolveDeps, ctx: Request
         if outcome := _entity_outcome(entity, resolution):
             return outcome
 
-    terms = [bind_term(resolution) for resolution in resolutions]
+    terms = [
+        bind_excluded(resolution) if entity.role == "exclude" else bind_term(resolution)
+        for entity, resolution in zip(plan.entities, resolutions, strict=True)
+    ]
     scopes = _scopes(plan, plan.entities, terms)
     counts = await gather([_probe_call(deps, scope, ctx) for scope in scopes])
     matched = {scope.id: count for scope, count in zip(scopes, counts, strict=True)}
@@ -273,6 +305,8 @@ def _source(request: QueryRequest | None, entity: Entity) -> str:
     given: list[str] = list(getattr(request, _REQUEST_FIELD_OF[entity.kind]) or [])
     if request.compare is not None:
         given.extend(request.compare.values)
+    if request.exclude is not None:
+        given.extend(getattr(request.exclude, _REQUEST_FIELD_OF[entity.kind]) or [])
     return "request_field" if entity.value.casefold() in {value.casefold() for value in given} else "question"
 
 
@@ -332,6 +366,7 @@ def _warnings(resolutions: list[EntityResolution]) -> list[Note]:
 def _scopes(plan: QueryPlan, entities: list[Entity], terms: list[BoundTerm]) -> tuple[Scope, ...]:
     shared = [term for entity, term in zip(entities, terms, strict=True) if entity.role == "filter"]
     compared = [term for entity, term in zip(entities, terms, strict=True) if entity.role == "compare"]
+    excluded = tuple(term for entity, term in zip(entities, terms, strict=True) if entity.role == "exclude")
     enum_filters = {
         key: tuple(values)
         for family, key in _FILTER_KEY_OF.items()
@@ -342,7 +377,15 @@ def _scopes(plan: QueryPlan, entities: list[Entity], terms: list[BoundTerm]) -> 
         [(term.text, (*shared, term)) for term in compared] if compared else [(None, tuple(shared))]
     )
     return tuple(
-        Scope(id=f"s{position}", label=label, terms=group, enum_filters=enum_filters, date_range=date_range)
+        Scope(
+            id=f"s{position}",
+            label=label,
+            terms=group,
+            enum_filters=enum_filters,
+            date_range=date_range,
+            excluded=excluded,
+            excluded_statuses=tuple(plan.filters.exclude_statuses),
+        )
         for position, (label, group) in enumerate(groups)
     )
 
@@ -397,6 +440,15 @@ def _relaxations(scope: Scope) -> list[tuple[str, Scope]]:
         (f"'{term.text}'", dataclasses.replace(scope, terms=tuple(t for t in scope.terms if t is not term)))
         for term in scope.terms
     ]
+    relaxed.extend(
+        (
+            f"leaving out '{term.text}'",
+            dataclasses.replace(scope, excluded=tuple(t for t in scope.excluded if t is not term)),
+        )
+        for term in scope.excluded
+    )
+    if scope.excluded_statuses:
+        relaxed.append(("the excluded statuses", dataclasses.replace(scope, excluded_statuses=())))
     for key in scope.enum_filters:
         remaining = {k: v for k, v in scope.enum_filters.items() if k != key}
         relaxed.append((_FILTER_NAME_OF[key], dataclasses.replace(scope, enum_filters=remaining)))

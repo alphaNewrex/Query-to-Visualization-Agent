@@ -14,7 +14,7 @@ model receives, and the schema is measured and kept as small as it is.
 """
 
 from dataclasses import dataclass
-from typing import Literal
+from typing import Final, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -56,6 +56,24 @@ InterventionType = Literal[
     "RADIATION",
     "OTHER",
 ]
+Sex = Literal["FEMALE", "MALE", "ALL"]
+AgeGroup = Literal["CHILD", "ADULT", "OLDER_ADULT"]
+Allocation = Literal["RANDOMIZED", "NON_RANDOMIZED", "NA"]
+Masking = Literal["NONE", "SINGLE", "DOUBLE", "TRIPLE", "QUADRUPLE"]
+PrimaryPurpose = Literal[
+    "TREATMENT",
+    "PREVENTION",
+    "DIAGNOSTIC",
+    "ECT",
+    "SUPPORTIVE_CARE",
+    "SCREENING",
+    "HEALTH_SERVICES_RESEARCH",
+    "BASIC_SCIENCE",
+    "DEVICE_FEASIBILITY",
+    "OTHER",
+]
+ResultsPosted = Literal["true", "false"]
+InterventionModel = Literal["PARALLEL", "CROSSOVER", "FACTORIAL", "SEQUENTIAL", "SINGLE_GROUP"]
 DateField = Literal["start_date", "primary_completion_date", "completion_date", "first_posted_date"]
 ClosedDimension = Literal[
     "phase",
@@ -69,6 +87,7 @@ ClosedDimension = Literal[
     "masking",
     "primary_purpose",
     "has_results",
+    "intervention_model",
 ]
 DimensionKey = Literal[
     "phase",
@@ -81,7 +100,8 @@ DimensionKey = Literal[
     "allocation",
     "masking",
     "primary_purpose",
-    "has_results",  # closed
+    "has_results",
+    "intervention_model",  # closed
     "country",
     "sponsor",
     "drug",
@@ -95,7 +115,51 @@ DimensionKey = Literal[
 NumericField = Literal["enrollment", "duration_months", "site_count"]
 NodeKind = Literal["sponsor", "drug", "condition", "country"]
 SortField = Literal["enrollment", "start_date", "completion_date", "first_posted_date"]
-FilterFamily = Literal["phases", "statuses", "study_types", "sponsor_classes", "intervention_types"]
+FilterFamily = Literal[
+    "phases",
+    "statuses",
+    "exclude_statuses",
+    "study_types",
+    "sponsor_classes",
+    "intervention_types",
+    "sexes",
+    "age_groups",
+    "allocations",
+    "maskings",
+    "primary_purposes",
+    "has_results",
+    "intervention_models",
+]
+Statistic = Literal["median", "mean", "sum"]
+# The request field and the catalogue dimension of every filter family that includes values.
+FAMILY_FIELDS: Final[dict[FilterFamily, str]] = {
+    "phases": "trial_phase",
+    "statuses": "status",
+    "study_types": "study_type",
+    "sponsor_classes": "sponsor_class",
+    "intervention_types": "intervention_type",
+    "sexes": "sex",
+    "age_groups": "age_group",
+    "allocations": "allocation",
+    "maskings": "masking",
+    "primary_purposes": "primary_purpose",
+    "has_results": "has_results",
+    "intervention_models": "intervention_model",
+}
+FAMILY_DIMENSIONS: Final[dict[FilterFamily, str]] = {
+    "phases": "phase",
+    "statuses": "overall_status",
+    "study_types": "study_type",
+    "sponsor_classes": "sponsor_class",
+    "intervention_types": "intervention_type",
+    "sexes": "sex",
+    "age_groups": "age_group",
+    "allocations": "allocation",
+    "maskings": "masking",
+    "primary_purposes": "primary_purpose",
+    "has_results": "has_results",
+    "intervention_models": "intervention_model",
+}
 ChartType = Literal[
     "bar_chart", "time_series", "histogram", "scatter_plot", "network_graph", "table", "metric"
 ]
@@ -112,8 +176,10 @@ class Entity(PlanModel):
         description="The words exactly as they appear in the question or in a structured field. "
         "Never translate, expand, correct or add a name."
     )
-    role: Literal["filter", "compare"] = Field(
-        description="'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison."
+    role: Literal["filter", "compare", "exclude"] = Field(
+        description="'filter': every counted trial must match. "
+        "'compare': one side of an 'A vs B' comparison. "
+        "'exclude': no counted trial may match ('excluding', 'without', 'not involving')."
     )
 
 
@@ -127,12 +193,32 @@ class PlanFilters(PlanModel):
     statuses: list[Status] = Field(
         description="Empty unless the question restricts status. 'recruiting' means RECRUITING only."
     )
+    exclude_statuses: list[Status] = Field(
+        description="Empty unless the question leaves statuses out, e.g. 'exclude terminated studies'."
+    )
     study_types: list[StudyType] = Field(description="Empty unless the question restricts study type.")
     sponsor_classes: list[SponsorClass] = Field(
         description="Empty unless the question restricts the kind of sponsor, e.g. industry."
     )
     intervention_types: list[InterventionType] = Field(
         description="Empty unless the question restricts the kind of intervention."
+    )
+    sexes: list[Sex] = Field(description="Empty unless the question restricts the sexes eligible.")
+    age_groups: list[AgeGroup] = Field(description="Empty unless the question restricts the age group.")
+    allocations: list[Allocation] = Field(
+        description="Empty unless the question restricts allocation: 'randomized' is RANDOMIZED."
+    )
+    maskings: list[Masking] = Field(
+        description="Empty unless the question restricts masking, e.g. 'double-blind' is DOUBLE."
+    )
+    primary_purposes: list[PrimaryPurpose] = Field(
+        description="Empty unless the question restricts the primary purpose, e.g. 'prevention trials'."
+    )
+    has_results: list[ResultsPosted] = Field(
+        description="Empty unless the question restricts whether results are posted: ['true'] or ['false']."
+    )
+    intervention_models: list[InterventionModel] = Field(
+        description="Empty unless the question restricts the assignment model, e.g. 'crossover'."
     )
     evidence: list[FilterEvidence] = Field(description="One item for every non-empty list above.")
     date_field: DateField | None = Field(
@@ -161,11 +247,19 @@ class Aggregate(PlanModel):
     top_n: int | None = Field(
         ge=1, le=500, description="Only when the user asks for a number of items; otherwise null."
     )
+    statistic: Statistic | None = Field(
+        description="Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead."
+    )
+    of: NumericField | None = Field(description="The numeric field of a statistic; null when counting.")
 
 
 # One number.
 class Total(PlanModel):
     kind: Literal["total"]
+    statistic: Statistic | None = Field(
+        description="Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead."
+    )
+    of: NumericField | None = Field(description="The numeric field of a statistic; null when counting.")
 
 
 # One point per trial.

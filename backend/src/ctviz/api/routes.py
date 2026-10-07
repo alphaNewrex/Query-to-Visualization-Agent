@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 
+from ctviz.api.readiness import Readiness, check_readiness
 from ctviz.contract.request import AnalysisRequest, QueryRequest
 from ctviz.contract.response import QueryResponse
 from ctviz.ctgov.context import RequestContext
@@ -26,6 +27,21 @@ def get_context(request: Request) -> RequestContext:
 async def healthz() -> dict[str, str]:
     """Answer without touching ClinicalTrials.gov or the planner, so it stays true when they are down."""
     return {"status": "ok"}
+
+
+@router.get(
+    "/readyz",
+    summary="Readiness: the registry answers, and the configured models are listed by the key",
+    response_model=Readiness,
+    responses={503: {"model": Readiness, "description": "ClinicalTrials.gov does not answer."}},
+)
+async def readyz(deps: Annotated[Deps, Depends(get_deps)]) -> JSONResponse:
+    """Ask the registry for its version and the model provider for its list, each within a few seconds.
+
+    503 only when the registry is unreachable. The model list is reported and never decides the status.
+    """
+    report = await check_readiness(deps)
+    return JSONResponse(report.model_dump(mode="json"), status_code=200 if report.status == "ready" else 503)
 
 
 @router.post(

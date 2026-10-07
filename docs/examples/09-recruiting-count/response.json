@@ -80,8 +80,8 @@
     }
   },
   "meta": {
-    "request_id": "58e4e55f-d546-4e6d-8eed-7656a1795d10",
-    "generated_at": "2026-10-07T00:59:45.492495Z",
+    "request_id": "3f1e36ed-ac93-4e4e-bb30-f7b9d2cba701",
+    "generated_at": "2026-10-07T02:20:17.535217Z",
     "query": "How many recruiting trials are there for Duchenne muscular dystrophy?",
     "filters": {
       "drug_name": [],
@@ -98,17 +98,33 @@
       "study_type": [],
       "sponsor_class": [],
       "intervention_type": [],
+      "sex": [],
+      "age_group": [],
+      "allocation": [],
+      "masking": [],
+      "primary_purpose": [],
+      "has_results": [],
+      "intervention_model": [],
       "start_year": null,
       "end_year": null,
       "date_field": "start_date",
-      "compare": null
+      "compare": null,
+      "exclude": {
+        "drug_name": [],
+        "condition": [],
+        "sponsor": [],
+        "country": [],
+        "term": [],
+        "status": []
+      }
     },
     "interpretation": {
       "summary": "Counting trials for Duchenne muscular dystrophy (Status: Recruiting).",
       "analysis": "total",
       "measure": {
         "aggregate": "count",
-        "of": "trials"
+        "of": "trials",
+        "unit": "trials"
       },
       "group_by": [],
       "compare": null,
@@ -158,9 +174,17 @@
         "statuses": [
           "RECRUITING"
         ],
+        "exclude_statuses": [],
         "study_types": [],
         "sponsor_classes": [],
         "intervention_types": [],
+        "sexes": [],
+        "age_groups": [],
+        "allocations": [],
+        "maskings": [],
+        "primary_purposes": [],
+        "has_results": [],
+        "intervention_models": [],
         "evidence": [
           {
             "family": "statuses",
@@ -172,7 +196,9 @@
         "year_to": null
       },
       "analysis": {
-        "kind": "total"
+        "kind": "total",
+        "statistic": null,
+        "of": null
       },
       "chart_preference": null
     },
@@ -187,15 +213,15 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v1",
+      "prompt_version": "plan-v2",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 4148,
-        "output_tokens": 129,
-        "reasoning_tokens": 14,
-        "cached_tokens": 3840
+        "input_tokens": 7109,
+        "output_tokens": 171,
+        "reasoning_tokens": 12,
+        "cached_tokens": 6912
       }
     },
     "assumptions": [
@@ -207,7 +233,7 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T00:59:45.492495Z",
+      "retrieved_at": "2026-10-07T02:20:17.535217Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
@@ -236,7 +262,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&filter.overallStatus=RECRUITING&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 470,
+          "duration_ms": 136,
           "total_count": 61,
           "records_returned": 1,
           "is_cached": false,
@@ -246,7 +272,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&filter.overallStatus=RECRUITING&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,OverallStatus,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 114,
+          "duration_ms": 70,
           "total_count": 61,
           "records_returned": 5,
           "is_cached": false,
@@ -283,10 +309,10 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 1788,
-      "plan_ms": 1201,
-      "resolve_ms": 471,
-      "fetch_ms": 115,
+      "total_ms": 1536,
+      "plan_ms": 1326,
+      "resolve_ms": 137,
+      "fetch_ms": 72,
       "build_ms": 0
     },
     "debug": {
@@ -295,7 +321,7 @@
           "index": 0,
           "type": "plan",
           "summary": "Count recruiting Duchenne muscular dystrophy trials.",
-          "duration_ms": 1201,
+          "duration_ms": 1326,
           "request_indexes": [],
           "detail": {}
         },
@@ -303,7 +329,7 @@
           "index": 1,
           "type": "resolve_entity",
           "summary": "1 entities",
-          "duration_ms": 471,
+          "duration_ms": 137,
           "request_indexes": [
             0,
             1,
@@ -315,7 +341,7 @@
           "index": 2,
           "type": "execute",
           "summary": "1 requests",
-          "duration_ms": 115,
+          "duration_ms": 72,
           "request_indexes": [
             3
           ],

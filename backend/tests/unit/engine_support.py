@@ -16,7 +16,7 @@ from ctviz.ctgov import essie
 from ctviz.ctgov.client import Page, RequestLog, WalkResult
 from ctviz.ctgov.params import BoundTerm, Params, Scope, canonical_url
 from ctviz.ctgov.study import Study, parse_study
-from ctviz.engine.lower import EnginePlan, RowSpec
+from ctviz.engine.lower import EnginePlan, MeasureSpec, RowSpec
 
 BASE = "https://registry.test/api/v2"
 _DESIGN = "protocolSection.designModule"
@@ -35,11 +35,14 @@ def study(
     countries: Sequence[str] = (),
     drugs: Sequence[tuple[str, Sequence[str]]] = (),
     enrollment: int | None = None,
+    completion: str | None = None,
 ) -> Study:
     """A trial record with only the fields the tests read."""
     status: dict[str, object] = {"studyFirstPostDateStruct": {"date": posted}}
     if start is not None:
         status["startDateStruct"] = {"date": start}
+    if completion is not None:
+        status["completionDateStruct"] = {"date": completion}
     interventions = [{"type": "DRUG", "name": name, "armGroupLabels": list(arms)} for name, arms in drugs]
     design: dict[str, object] = {"phases": list(phases)}
     if enrollment is not None:
@@ -173,10 +176,13 @@ PUBLIC_PLAN = QueryPlan(
     interpretation="A test question.",
     entities=[],
     filters=PlanFilters(
-        phases=[], statuses=[], study_types=[], sponsor_classes=[], intervention_types=[], evidence=[],
+        phases=[], statuses=[], exclude_statuses=[], study_types=[], sponsor_classes=[],
+        intervention_types=[],
+        sexes=[], age_groups=[], allocations=[], maskings=[], primary_purposes=[], has_results=[],
+        intervention_models=[], evidence=[],
         date_field=None, year_from=None, year_to=None,
     ),
-    analysis=Total(kind="total"),
+    analysis=Total(kind="total", statistic=None, of=None),
     chart_preference=None,
 )  # fmt: skip
 
@@ -202,6 +208,7 @@ def engine_plan(
     top_n: int = 15,
     citations: int = 2,
     rows: RowSpec | None = None,
+    measure: MeasureSpec | None = None,
 ) -> EnginePlan:
     return EnginePlan(
         scopes=scopes or (scope(),),
@@ -218,6 +225,7 @@ def engine_plan(
         chart_preference=None,
         citations_per_datum=citations,
         public=PUBLIC_PLAN,
+        measure=measure,
     )
 
 

@@ -55,6 +55,7 @@
             "masking",
             "primary_purpose",
             "has_results",
+            "intervention_model",
             "country",
             "sponsor",
             "drug",
@@ -81,7 +82,8 @@
                 "allocation",
                 "masking",
                 "primary_purpose",
-                "has_results"
+                "has_results",
+                "intervention_model"
               ],
               "type": "string"
             },
@@ -119,6 +121,38 @@
             }
           ],
           "description": "Only when the user asks for a number of items; otherwise null."
+        },
+        "statistic": {
+          "anyOf": [
+            {
+              "enum": [
+                "median",
+                "mean",
+                "sum"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead."
+        },
+        "of": {
+          "anyOf": [
+            {
+              "enum": [
+                "enrollment",
+                "duration_months",
+                "site_count"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The numeric field of a statistic; null when counting."
         }
       },
       "required": [
@@ -126,7 +160,9 @@
         "dimension",
         "series",
         "time_unit",
-        "top_n"
+        "top_n",
+        "statistic",
+        "of"
       ],
       "title": "Aggregate",
       "type": "object"
@@ -146,6 +182,74 @@
         "plan"
       ],
       "title": "AnalysisRequest",
+      "type": "object"
+    },
+    "AppliedExclusions": {
+      "additionalProperties": false,
+      "description": "What the answer leaves out, in request field names (`exclude` of the request).",
+      "properties": {
+        "drug_name": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "condition": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "sponsor": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "country": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "term": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "status": {
+          "items": {
+            "enum": [
+              "NOT_YET_RECRUITING",
+              "RECRUITING",
+              "ENROLLING_BY_INVITATION",
+              "ACTIVE_NOT_RECRUITING",
+              "COMPLETED",
+              "SUSPENDED",
+              "TERMINATED",
+              "WITHDRAWN",
+              "AVAILABLE",
+              "NO_LONGER_AVAILABLE",
+              "TEMPORARILY_NOT_AVAILABLE",
+              "APPROVED_FOR_MARKETING",
+              "WITHHELD",
+              "UNKNOWN"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "drug_name",
+        "condition",
+        "sponsor",
+        "country",
+        "term",
+        "status"
+      ],
+      "title": "AppliedExclusions",
       "type": "object"
     },
     "AppliedFilters": {
@@ -265,6 +369,93 @@
           },
           "type": "array"
         },
+        "sex": {
+          "items": {
+            "enum": [
+              "FEMALE",
+              "MALE",
+              "ALL"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "age_group": {
+          "items": {
+            "enum": [
+              "CHILD",
+              "ADULT",
+              "OLDER_ADULT"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "allocation": {
+          "items": {
+            "enum": [
+              "RANDOMIZED",
+              "NON_RANDOMIZED",
+              "NA"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "masking": {
+          "items": {
+            "enum": [
+              "NONE",
+              "SINGLE",
+              "DOUBLE",
+              "TRIPLE",
+              "QUADRUPLE"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "primary_purpose": {
+          "items": {
+            "enum": [
+              "TREATMENT",
+              "PREVENTION",
+              "DIAGNOSTIC",
+              "ECT",
+              "SUPPORTIVE_CARE",
+              "SCREENING",
+              "HEALTH_SERVICES_RESEARCH",
+              "BASIC_SCIENCE",
+              "DEVICE_FEASIBILITY",
+              "OTHER"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "has_results": {
+          "items": {
+            "enum": [
+              "true",
+              "false"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "intervention_model": {
+          "items": {
+            "enum": [
+              "PARALLEL",
+              "CROSSOVER",
+              "FACTORIAL",
+              "SEQUENTIAL",
+              "SINGLE_GROUP"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
         "start_year": {
           "anyOf": [
             {
@@ -310,6 +501,9 @@
               "type": "null"
             }
           ]
+        },
+        "exclude": {
+          "$ref": "#/$defs/AppliedExclusions"
         }
       },
       "required": [
@@ -323,10 +517,18 @@
         "study_type",
         "sponsor_class",
         "intervention_type",
+        "sex",
+        "age_group",
+        "allocation",
+        "masking",
+        "primary_purpose",
+        "has_results",
+        "intervention_model",
         "start_year",
         "end_year",
         "date_field",
-        "compare"
+        "compare",
+        "exclude"
       ],
       "title": "AppliedFilters",
       "type": "object"
@@ -731,7 +933,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "maxItems": 4,
+          "maxItems": 5,
           "minItems": 2,
           "type": "array"
         }
@@ -932,10 +1134,11 @@
           "type": "string"
         },
         "role": {
-          "description": "'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison.",
+          "description": "'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison. 'exclude': no counted trial may match ('excluding', 'without', 'not involving').",
           "enum": [
             "filter",
-            "compare"
+            "compare",
+            "exclude"
           ],
           "type": "string"
         }
@@ -1099,6 +1302,135 @@
       "title": "ErrorResponse",
       "type": "object"
     },
+    "ExcludeSpec": {
+      "additionalProperties": false,
+      "description": "Trials to leave out: those that match any of these entities or have any of these statuses.",
+      "properties": {
+        "drug_name": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Drugs to leave out; same searches as the filter fields."
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Conditions to leave out."
+        },
+        "sponsor": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Lead sponsors to leave out."
+        },
+        "country": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Countries to leave out (any site there)."
+        },
+        "term": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Other search words to leave out."
+        },
+        "status": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "NOT_YET_RECRUITING",
+                  "RECRUITING",
+                  "ENROLLING_BY_INVITATION",
+                  "ACTIVE_NOT_RECRUITING",
+                  "COMPLETED",
+                  "SUSPENDED",
+                  "TERMINATED",
+                  "WITHDRAWN",
+                  "AVAILABLE",
+                  "NO_LONGER_AVAILABLE",
+                  "TEMPORARILY_NOT_AVAILABLE",
+                  "APPROVED_FOR_MARKETING",
+                  "WITHHELD",
+                  "UNKNOWN"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Overall statuses to leave out."
+        }
+      },
+      "title": "ExcludeSpec",
+      "type": "object"
+    },
     "ExclusionCount": {
       "additionalProperties": false,
       "description": "Trials of a series that were not drawn, and why.",
@@ -1209,9 +1541,17 @@
           "enum": [
             "phases",
             "statuses",
+            "exclude_statuses",
             "study_types",
             "sponsor_classes",
-            "intervention_types"
+            "intervention_types",
+            "sexes",
+            "age_groups",
+            "allocations",
+            "maskings",
+            "primary_purposes",
+            "has_results",
+            "intervention_models"
           ],
           "type": "string"
         },
@@ -1428,17 +1768,32 @@
       "additionalProperties": false,
       "properties": {
         "aggregate": {
-          "const": "count",
+          "enum": [
+            "count",
+            "median",
+            "mean",
+            "sum"
+          ],
           "type": "string"
         },
         "of": {
-          "const": "trials",
+          "enum": [
+            "trials",
+            "enrollment",
+            "duration_months",
+            "site_count"
+          ],
+          "type": "string"
+        },
+        "unit": {
+          "description": "What `of` is counted in: trials, participants, months or sites.",
           "type": "string"
         }
       },
       "required": [
         "aggregate",
-        "of"
+        "of",
+        "unit"
       ],
       "title": "Measure",
       "type": "object"
@@ -2047,6 +2402,29 @@
           },
           "type": "array"
         },
+        "exclude_statuses": {
+          "description": "Empty unless the question leaves statuses out, e.g. 'exclude terminated studies'.",
+          "items": {
+            "enum": [
+              "NOT_YET_RECRUITING",
+              "RECRUITING",
+              "ENROLLING_BY_INVITATION",
+              "ACTIVE_NOT_RECRUITING",
+              "COMPLETED",
+              "SUSPENDED",
+              "TERMINATED",
+              "WITHDRAWN",
+              "AVAILABLE",
+              "NO_LONGER_AVAILABLE",
+              "TEMPORARILY_NOT_AVAILABLE",
+              "APPROVED_FOR_MARKETING",
+              "WITHHELD",
+              "UNKNOWN"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
         "study_types": {
           "description": "Empty unless the question restricts study type.",
           "items": {
@@ -2092,6 +2470,100 @@
               "PROCEDURE",
               "RADIATION",
               "OTHER"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "sexes": {
+          "description": "Empty unless the question restricts the sexes eligible.",
+          "items": {
+            "enum": [
+              "FEMALE",
+              "MALE",
+              "ALL"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "age_groups": {
+          "description": "Empty unless the question restricts the age group.",
+          "items": {
+            "enum": [
+              "CHILD",
+              "ADULT",
+              "OLDER_ADULT"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "allocations": {
+          "description": "Empty unless the question restricts allocation: 'randomized' is RANDOMIZED.",
+          "items": {
+            "enum": [
+              "RANDOMIZED",
+              "NON_RANDOMIZED",
+              "NA"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "maskings": {
+          "description": "Empty unless the question restricts masking, e.g. 'double-blind' is DOUBLE.",
+          "items": {
+            "enum": [
+              "NONE",
+              "SINGLE",
+              "DOUBLE",
+              "TRIPLE",
+              "QUADRUPLE"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "primary_purposes": {
+          "description": "Empty unless the question restricts the primary purpose, e.g. 'prevention trials'.",
+          "items": {
+            "enum": [
+              "TREATMENT",
+              "PREVENTION",
+              "DIAGNOSTIC",
+              "ECT",
+              "SUPPORTIVE_CARE",
+              "SCREENING",
+              "HEALTH_SERVICES_RESEARCH",
+              "BASIC_SCIENCE",
+              "DEVICE_FEASIBILITY",
+              "OTHER"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "has_results": {
+          "description": "Empty unless the question restricts whether results are posted: ['true'] or ['false'].",
+          "items": {
+            "enum": [
+              "true",
+              "false"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "intervention_models": {
+          "description": "Empty unless the question restricts the assignment model, e.g. 'crossover'.",
+          "items": {
+            "enum": [
+              "PARALLEL",
+              "CROSSOVER",
+              "FACTORIAL",
+              "SEQUENTIAL",
+              "SINGLE_GROUP"
             ],
             "type": "string"
           },
@@ -2151,9 +2623,17 @@
       "required": [
         "phases",
         "statuses",
+        "exclude_statuses",
         "study_types",
         "sponsor_classes",
         "intervention_types",
+        "sexes",
+        "age_groups",
+        "allocations",
+        "maskings",
+        "primary_purposes",
+        "has_results",
+        "intervention_models",
         "evidence",
         "date_field",
         "year_from",
@@ -2607,6 +3087,156 @@
           "default": null,
           "description": "Trials with at least one intervention of these types, any of."
         },
+        "sex": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "FEMALE",
+                  "MALE",
+                  "ALL"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Sexes the trials accept, any of."
+        },
+        "age_group": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "CHILD",
+                  "ADULT",
+                  "OLDER_ADULT"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Age groups the trials include, any of."
+        },
+        "allocation": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "RANDOMIZED",
+                  "NON_RANDOMIZED",
+                  "NA"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Allocation of interventional trials, any of (RANDOMIZED, NON_RANDOMIZED, NA)."
+        },
+        "masking": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "NONE",
+                  "SINGLE",
+                  "DOUBLE",
+                  "TRIPLE",
+                  "QUADRUPLE"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Masking of interventional trials, any of."
+        },
+        "primary_purpose": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "TREATMENT",
+                  "PREVENTION",
+                  "DIAGNOSTIC",
+                  "ECT",
+                  "SUPPORTIVE_CARE",
+                  "SCREENING",
+                  "HEALTH_SERVICES_RESEARCH",
+                  "BASIC_SCIENCE",
+                  "DEVICE_FEASIBILITY",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Primary purposes, any of."
+        },
+        "has_results": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "true",
+                  "false"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "'true': results posted; 'false': none posted."
+        },
+        "intervention_model": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "PARALLEL",
+                  "CROSSOVER",
+                  "FACTORIAL",
+                  "SEQUENTIAL",
+                  "SINGLE_GROUP"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Assignment models of interventional trials, any of."
+        },
         "start_year": {
           "anyOf": [
             {
@@ -2665,6 +3295,18 @@
           "default": null,
           "description": "Compare these as series. Replaces any comparison found in the question."
         },
+        "exclude": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExcludeSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Leave out trials that match any listed entity or have any listed status ('excluding diabetes', 'without terminated studies'). Replaces what the planner read for the same entity kind or for statuses; an empty object is no exclusion."
+        },
         "group_by": {
           "anyOf": [
             {
@@ -2681,6 +3323,7 @@
                   "masking",
                   "primary_purpose",
                   "has_results",
+                  "intervention_model",
                   "country",
                   "sponsor",
                   "drug",
@@ -2702,7 +3345,7 @@
             }
           ],
           "default": null,
-          "description": "Analysis hint: the first key is the axis, the second the series. The second key must be one of the closed dimensions (phase, overall_status, study_type, sponsor_class, intervention_type, sex, age_group, allocation, masking, primary_purpose, has_results). Overrides what the planner chose. Required when `options.planner` is 'structured'."
+          "description": "Analysis hint: the first key is the axis, the second the series. The second key must be one of the closed dimensions (phase, overall_status, study_type, sponsor_class, intervention_type, sex, age_group, allocation, masking, primary_purpose, has_results, intervention_model). Overrides what the planner chose. Required when `options.planner` is 'structured'."
         },
         "time_unit": {
           "anyOf": [
@@ -2825,7 +3468,8 @@
                 "allocation",
                 "masking",
                 "primary_purpose",
-                "has_results"
+                "has_results",
+                "intervention_model"
               ],
               "type": "string"
             },
@@ -3412,10 +4056,44 @@
         "kind": {
           "const": "total",
           "type": "string"
+        },
+        "statistic": {
+          "anyOf": [
+            {
+              "enum": [
+                "median",
+                "mean",
+                "sum"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead."
+        },
+        "of": {
+          "anyOf": [
+            {
+              "enum": [
+                "enrollment",
+                "duration_months",
+                "site_count"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The numeric field of a statistic; null when counting."
         }
       },
       "required": [
-        "kind"
+        "kind",
+        "statistic",
+        "of"
       ],
       "title": "Total",
       "type": "object"

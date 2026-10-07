@@ -76,6 +76,7 @@ class Study:
     has_results: bool | None
     # The record as the API sent it, which a citation's path is resolved against.
     raw: JsonObject = field(repr=False, compare=False)
+    intervention_model: str | None = None  # `designInfo.interventionModel`
 
     def value_at(self, path: str) -> object | None:
         """The JSON value at a path in the API's own notation, `protocolSection.designModule.phases[0]`.
@@ -150,6 +151,7 @@ def parse_study(record: JsonObject) -> Study:
         primary_purpose=_text(_dig(design, "designInfo", "primaryPurpose")),
         has_results=_flag(record.get("hasResults")),
         raw=record,
+        intervention_model=_text(_dig(design, "designInfo", "interventionModel")),
     )
 
 

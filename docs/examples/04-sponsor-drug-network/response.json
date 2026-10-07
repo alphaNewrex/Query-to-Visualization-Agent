@@ -2047,8 +2047,8 @@
     }
   },
   "meta": {
-    "request_id": "2c1f6344-9d09-40d8-8cf4-de46335ea525",
-    "generated_at": "2026-10-07T00:59:33.949866Z",
+    "request_id": "a64a8034-1020-40fc-aa71-66421abf02c3",
+    "generated_at": "2026-10-07T02:20:05.304680Z",
     "query": "Show a network of sponsors and drugs for Duchenne muscular dystrophy trials.",
     "filters": {
       "drug_name": [],
@@ -2063,17 +2063,33 @@
       "study_type": [],
       "sponsor_class": [],
       "intervention_type": [],
+      "sex": [],
+      "age_group": [],
+      "allocation": [],
+      "masking": [],
+      "primary_purpose": [],
+      "has_results": [],
+      "intervention_model": [],
       "start_year": null,
       "end_year": null,
       "date_field": "start_date",
-      "compare": null
+      "compare": null,
+      "exclude": {
+        "drug_name": [],
+        "condition": [],
+        "sponsor": [],
+        "country": [],
+        "term": [],
+        "status": []
+      }
     },
     "interpretation": {
       "summary": "Counting trials in which sponsor and drug occur together, for Duchenne muscular dystrophy.",
       "analysis": "network",
       "measure": {
         "aggregate": "count",
-        "of": "trials"
+        "of": "trials",
+        "unit": "trials"
       },
       "group_by": [
         "sponsor",
@@ -2124,9 +2140,17 @@
       "filters": {
         "phases": [],
         "statuses": [],
+        "exclude_statuses": [],
         "study_types": [],
         "sponsor_classes": [],
         "intervention_types": [],
+        "sexes": [],
+        "age_groups": [],
+        "allocations": [],
+        "maskings": [],
+        "primary_purposes": [],
+        "has_results": [],
+        "intervention_models": [],
         "evidence": [],
         "date_field": "start_date",
         "year_from": null,
@@ -2151,15 +2175,15 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v1",
+      "prompt_version": "plan-v2",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 4150,
-        "output_tokens": 171,
-        "reasoning_tokens": 56,
-        "cached_tokens": 3840
+        "input_tokens": 7111,
+        "output_tokens": 172,
+        "reasoning_tokens": 21,
+        "cached_tokens": 6912
       }
     },
     "assumptions": [
@@ -2179,7 +2203,7 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T00:59:33.949866Z",
+      "retrieved_at": "2026-10-07T02:20:05.304680Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
@@ -2188,7 +2212,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 63,
+          "duration_ms": 79,
           "total_count": 499,
           "records_returned": 1,
           "is_cached": false,
@@ -2198,7 +2222,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 73,
+          "duration_ms": 83,
           "total_count": 462,
           "records_returned": 1,
           "is_cached": false,
@@ -2218,7 +2242,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,Condition,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,LeadSponsorClass,LeadSponsorName,StudyFirstPostDate",
           "status": 200,
-          "duration_ms": 407,
+          "duration_ms": 325,
           "total_count": 499,
           "records_returned": 499,
           "is_cached": false,
@@ -2274,11 +2298,11 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 2013,
+      "total_ms": 1942,
       "plan_ms": 1516,
-      "resolve_ms": 74,
-      "fetch_ms": 420,
-      "build_ms": 1
+      "resolve_ms": 84,
+      "fetch_ms": 337,
+      "build_ms": 3
     },
     "debug": {
       "trace": [
@@ -2294,7 +2318,7 @@
           "index": 1,
           "type": "resolve_entity",
           "summary": "1 entities",
-          "duration_ms": 74,
+          "duration_ms": 84,
           "request_indexes": [
             0,
             1,
@@ -2306,7 +2330,7 @@
           "index": 2,
           "type": "execute",
           "summary": "1 requests",
-          "duration_ms": 420,
+          "duration_ms": 337,
           "request_indexes": [
             3
           ],

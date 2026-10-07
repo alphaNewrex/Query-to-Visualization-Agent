@@ -35,10 +35,13 @@ class Cell:
     sample: list[TrialEvidence] = field(default_factory=list)  # at most the frame's sample_size, best first
     expr: Expr | None = None  # Essie selecting exactly these trials, when every bucket has one
     source_url: str | None = None  # the URL that was called (fan-out) or that can be composed (walk)
+    values: list[float] = field(default_factory=list)  # a measure: the value of each of the `trials`
 
-    def add(self, trial: TrialEvidence, sample_size: int) -> None:
+    def add(self, trial: TrialEvidence, sample_size: int, value: float | None = None) -> None:
         """Count one trial and offer it to the sample, which keeps the best-ranked `sample_size`."""
         self.trials += 1
+        if value is not None:
+            self.values.append(value)
         if sample_size == 0 or (len(self.sample) == sample_size and trial.rank <= self.sample[-1].rank):
             return
         self.sample.append(trial)

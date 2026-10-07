@@ -19,7 +19,7 @@ from ctviz.catalog.fields import CATALOG
 from ctviz.ctgov.client import CtGovClient
 from ctviz.engine.resolve import EntityResolver
 from ctviz.log import configure_logging
-from ctviz.pipeline import Deps
+from ctviz.pipeline import Deps, new_response_cache
 from ctviz.planning.planner import Planner, build_planners
 from ctviz.planning.service import PlanService
 from ctviz.settings import Settings, load_settings, log_configuration_sources
@@ -56,6 +56,7 @@ def create_app(
             catalog=CATALOG,
             countries=countries,
             clock=lambda: datetime.now(UTC),
+            responses=new_response_cache(settings.response_cache_size),
         )
         try:
             yield

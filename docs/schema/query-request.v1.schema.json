@@ -19,7 +19,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "maxItems": 4,
+          "maxItems": 5,
           "minItems": 2,
           "type": "array"
         }
@@ -29,6 +29,135 @@
         "values"
       ],
       "title": "CompareSpec",
+      "type": "object"
+    },
+    "ExcludeSpec": {
+      "additionalProperties": false,
+      "description": "Trials to leave out: those that match any of these entities or have any of these statuses.",
+      "properties": {
+        "drug_name": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Drugs to leave out; same searches as the filter fields."
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Conditions to leave out."
+        },
+        "sponsor": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Lead sponsors to leave out."
+        },
+        "country": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Countries to leave out (any site there)."
+        },
+        "term": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Other search words to leave out."
+        },
+        "status": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "NOT_YET_RECRUITING",
+                  "RECRUITING",
+                  "ENROLLING_BY_INVITATION",
+                  "ACTIVE_NOT_RECRUITING",
+                  "COMPLETED",
+                  "SUSPENDED",
+                  "TERMINATED",
+                  "WITHDRAWN",
+                  "AVAILABLE",
+                  "NO_LONGER_AVAILABLE",
+                  "TEMPORARILY_NOT_AVAILABLE",
+                  "APPROVED_FOR_MARKETING",
+                  "WITHHELD",
+                  "UNKNOWN"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Overall statuses to leave out."
+        }
+      },
+      "title": "ExcludeSpec",
       "type": "object"
     },
     "RequestOptions": {
@@ -308,6 +437,156 @@
       "default": null,
       "description": "Trials with at least one intervention of these types, any of."
     },
+    "sex": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "FEMALE",
+              "MALE",
+              "ALL"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Sexes the trials accept, any of."
+    },
+    "age_group": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "CHILD",
+              "ADULT",
+              "OLDER_ADULT"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Age groups the trials include, any of."
+    },
+    "allocation": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "RANDOMIZED",
+              "NON_RANDOMIZED",
+              "NA"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Allocation of interventional trials, any of (RANDOMIZED, NON_RANDOMIZED, NA)."
+    },
+    "masking": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "NONE",
+              "SINGLE",
+              "DOUBLE",
+              "TRIPLE",
+              "QUADRUPLE"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Masking of interventional trials, any of."
+    },
+    "primary_purpose": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "TREATMENT",
+              "PREVENTION",
+              "DIAGNOSTIC",
+              "ECT",
+              "SUPPORTIVE_CARE",
+              "SCREENING",
+              "HEALTH_SERVICES_RESEARCH",
+              "BASIC_SCIENCE",
+              "DEVICE_FEASIBILITY",
+              "OTHER"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Primary purposes, any of."
+    },
+    "has_results": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "true",
+              "false"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "'true': results posted; 'false': none posted."
+    },
+    "intervention_model": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "PARALLEL",
+              "CROSSOVER",
+              "FACTORIAL",
+              "SEQUENTIAL",
+              "SINGLE_GROUP"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Assignment models of interventional trials, any of."
+    },
     "start_year": {
       "anyOf": [
         {
@@ -366,6 +645,18 @@
       "default": null,
       "description": "Compare these as series. Replaces any comparison found in the question."
     },
+    "exclude": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ExcludeSpec"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Leave out trials that match any listed entity or have any listed status ('excluding diabetes', 'without terminated studies'). Replaces what the planner read for the same entity kind or for statuses; an empty object is no exclusion."
+    },
     "group_by": {
       "anyOf": [
         {
@@ -382,6 +673,7 @@
               "masking",
               "primary_purpose",
               "has_results",
+              "intervention_model",
               "country",
               "sponsor",
               "drug",
@@ -403,7 +695,7 @@
         }
       ],
       "default": null,
-      "description": "Analysis hint: the first key is the axis, the second the series. The second key must be one of the closed dimensions (phase, overall_status, study_type, sponsor_class, intervention_type, sex, age_group, allocation, masking, primary_purpose, has_results). Overrides what the planner chose. Required when `options.planner` is 'structured'."
+      "description": "Analysis hint: the first key is the axis, the second the series. The second key must be one of the closed dimensions (phase, overall_status, study_type, sponsor_class, intervention_type, sex, age_group, allocation, masking, primary_purpose, has_results, intervention_model). Overrides what the planner chose. Required when `options.planner` is 'structured'."
     },
     "time_unit": {
       "anyOf": [

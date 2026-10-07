@@ -13,6 +13,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Final, Literal
 
+from ctviz.catalog import vocab
 from ctviz.catalog.fields import BoundDimension, Bucket, Window
 from ctviz.contract.response import Note, Outcome, StrategyStep, TruncationItem
 from ctviz.ctgov import essie
@@ -26,6 +27,8 @@ from ctviz.engine.rows import RowsResult
 
 OTHER_KEY: Final = "other"  # the key of the cell that sums the categories a top-N left out
 MAX_POINTS: Final = 500
+# Compared groups times split values is the number of lines or bars per x; keep it drawable.
+MAX_COMBINED_SERIES: Final = 16
 
 
 @dataclass(frozen=True)
@@ -155,7 +158,8 @@ class _Axis:
 def _shape_grids(result: EngineResult, plan: EnginePlan) -> ShapedResult:
     if not plan.dimensions:
         frames = tuple(ShapedFrame(frame, (_only_cell(frame),)) for frame in result.frames)
-        return ShapedResult(frames, (), result.window, result.warnings, (), (), result.steps, None)
+        capped = tuple(_subset_truncation(result.frames, plan))
+        return ShapedResult(frames, (), result.window, result.warnings, (), capped, result.steps, None)
 
     truncation: list[TruncationItem] = []
     window = result.window
@@ -164,11 +168,33 @@ def _shape_grids(result: EngineResult, plan: EnginePlan) -> ShapedResult:
         axis, window = _trim_leading_empty(axis, result, window)
     series = None
     if plan.relation == "series":
-        series = _axis(plan.dimensions[1], result, plan, 1, window, plan.max_series, truncation, "series")
+        series_limit = plan.max_series
+        if len(result.frames) > 1:
+            series_limit = max(2, min(series_limit, MAX_COMBINED_SERIES // len(result.frames)))
+        series = _axis(plan.dimensions[1], result, plan, 1, window, series_limit, truncation, "series")
     frames = tuple(
         ShapedFrame(frame, _grid(frame, axis, series, plan.citations_per_datum)) for frame in result.frames
     )
+    truncation.extend(_subset_truncation(result.frames, plan))
     return ShapedResult(frames, (), window, result.warnings, (), tuple(truncation), result.steps, None)
+
+
+def _subset_truncation(frames: Sequence[Frame], plan: EnginePlan) -> list[TruncationItem]:
+    """A statistic read from a capped walk covers only the recent trials: say how many of how many."""
+    if plan.measure is None:
+        return []
+    return [
+        TruncationItem(
+            scope="trials",
+            shown=frame.subset.size,
+            total=frame.matched,
+            rule=f"The {frame.subset.size:,} most recently first-posted trials"
+            + (f" of {frame.scope.label}" if frame.scope.label else "")
+            + "; older trials are not in the statistic.",
+        )
+        for frame in frames
+        if frame.subset is not None
+    ]
 
 
 def _axis(
@@ -196,6 +222,10 @@ def _axis(
     if is_natural:
         listed = [bucket.key for bucket in buckets]
         keys = [*listed, *sorted(key for key in totals if key not in listed)]
+        if spec.key == "phase" and plan.public.filters.phases:
+            keys = [key for key in keys if _phase_can_match(key, plan.public.filters.phases)]
+        if scope == "series" and len(result.frames) > 1:
+            keys = [key for key in keys if totals[key] > 0]  # a group times a value nobody has is no line
     else:
         keys = sorted(
             (key for key, total in totals.items() if total > 0), key=lambda key: (-totals[key], key)
@@ -223,6 +253,14 @@ def _axis(
             keys.append(OTHER_KEY)
             labels[OTHER_KEY] = f"Other ({len(dropped)} more)"
     return _Axis(dimension, tuple(keys), merged, labels, exprs)
+
+
+def _phase_can_match(key: str, filter_phases: Sequence[str]) -> bool:
+    """Whether a phase bucket can hold a trial that lists one of the filtered phases."""
+    if key == vocab.NO_PHASE_KEY:
+        return False
+    tokens = vocab.PHASE_TOKENS_OF.get(key)
+    return tokens is None or not tokens.isdisjoint(filter_phases)
 
 
 def _trim_leading_empty(axis: _Axis, result: EngineResult, window: Window) -> tuple[_Axis, Window]:
@@ -265,6 +303,7 @@ def _cell(frame: Frame, axes: Sequence[tuple[_Axis, str]], sample_size: int) -> 
         trials=sum(part.trials for part in parts),
         sample=sample[:sample_size],
         expr=expr,
+        values=[value for part in parts for value in part.values],
     )
 
 

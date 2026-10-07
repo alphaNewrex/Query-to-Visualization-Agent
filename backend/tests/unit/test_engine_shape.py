@@ -215,3 +215,15 @@ def test_scatter_points_are_capped_to_the_most_recently_first_posted() -> None:
     assert len(kept.rows) == MAX_POINTS and kept.excluded["beyond_plotted_points"].count == 1
     assert [(item.scope, item.shown, item.total) for item in shaped.truncation] == [("points", 500, 501)]
     assert [note.code for note in shaped.warnings] == ["recent_subset"]
+
+
+def test_compared_groups_share_a_split_that_drops_the_values_nobody_has() -> None:
+    plan = engine_plan(bound(COUNTRY), bound(PHASE, "series"), relation="series")
+    a = [study(1, countries=["A"], phases=("PHASE2",)), study(2, countries=["A"], phases=("PHASE2",))]
+    b = [study(3, countries=["A"], phases=())]
+
+    shaped = shape(result_of(plan, a, b), plan)
+
+    assert [cell.key for cell in shaped.frames[0].cells] == [("A", "PHASE2"), ("A", "NONE")]
+    assert [cell.key for cell in shaped.frames[1].cells] == [("A", "PHASE2"), ("A", "NONE")]
+    assert [cell.trials for cell in shaped.frames[1].cells] == [0, 1]

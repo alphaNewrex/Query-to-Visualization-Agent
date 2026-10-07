@@ -150,10 +150,25 @@ def context(**changes: Any) -> MetaContext:
                 "study_type": [],
                 "sponsor_class": [],
                 "intervention_type": [],
+                "sex": [],
+                "age_group": [],
+                "allocation": [],
+                "masking": [],
+                "primary_purpose": [],
+                "has_results": [],
+                "intervention_model": [],
                 "start_year": None,
                 "end_year": None,
                 "date_field": None,
                 "compare": None,
+                "exclude": {
+                    "drug_name": [],
+                    "condition": [],
+                    "sponsor": [],
+                    "country": [],
+                    "term": [],
+                    "status": [],
+                },
             }
         ),
         "plan": QueryPlan.model_validate(PLAN),
@@ -262,6 +277,42 @@ def test_comparison_is_grouped_and_never_stacked() -> None:
         ("China", "pembrolizumab"),
         ("China", "nivolumab"),
     ]
+
+
+def test_a_comparison_with_a_split_draws_one_series_per_pair_that_has_trials() -> None:
+    ph = BoundDimension(PHASE.spec, None, "series")
+    drug_a = frame(
+        "pembrolizumab",
+        (COUNTRY, ph),
+        [cell(("China", "PHASE2"), 4, trial(1)), cell(("China", "PHASE3"), 2, trial(2))],
+    )
+    drug_b = frame("nivolumab", (COUNTRY, ph), [cell(("China", "PHASE2"), 1, trial(3))])
+    plan = plan_of(
+        scopes=(scope(0, "pembrolizumab"), scope(1, "nivolumab")),
+        compare_kind="drug",
+        dimensions=(COUNTRY, ph),
+        relation="series",
+    )
+
+    response = respond(plan, ShapedResult(frames=(drug_a, drug_b)))
+
+    viz = response.visualization
+    assert viz.type == "bar_chart" and viz.stack == "none"
+    assert viz.encoding.series is not None and viz.encoding.series.field == "group_split"
+    assert viz.encoding.series.title == "Drug and phase"
+    assert viz.encoding.series.domain == [
+        "pembrolizumab · PHASE2",
+        "pembrolizumab · PHASE3",
+        "nivolumab · PHASE2",
+    ]
+    assert viz.title == "Trials by country and phase: pembrolizumab vs nivolumab"
+    first = rows(response)[0]
+    assert (first["country"], first["group"], first["phase"], first["trial_count"]) == (
+        "China",
+        "pembrolizumab",
+        "PHASE2",
+        4,
+    )
 
 
 def test_compared_totals_and_metric() -> None:

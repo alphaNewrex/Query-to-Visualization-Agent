@@ -25,6 +25,13 @@ _FILTER_AREAS: Final = {
     "study_type": "StudyType",
     "sponsor_class": "LeadSponsorClass",
     "intervention_type": "InterventionType",
+    "sex": "Sex",
+    "age_group": "StdAge",
+    "allocation": "DesignAllocation",
+    "masking": "DesignMasking",
+    "primary_purpose": "DesignPrimaryPurpose",
+    "has_results": "HasResults",
+    "intervention_model": "DesignInterventionModel",
 }
 # Commas and colons are legal in a query string and keep `fields` and `sort` readable. Everything else
 # that is not plain is encoded, brackets included: `curl` reads a raw `[` as the start of a range.
@@ -96,6 +103,8 @@ class Scope:
     enum_filters: Mapping[str, tuple[str, ...]]  # {"phase": ("PHASE3",), "overall_status": ("RECRUITING",)}
     date_range: DateRange | None
     extra: tuple[Expr, ...] = ()  # a presence push-down added by the strategy
+    excluded: tuple[BoundTerm, ...] = ()  # entities whose trials are left out; each `expr` is negated
+    excluded_statuses: tuple[str, ...] = ()  # overall statuses whose trials are left out
 
     def params(self) -> Params:
         """The search that selects exactly this scope, in canonical form.
@@ -124,6 +133,9 @@ class Scope:
                 raise ValueError(f"No filter is defined for {key!r}.")
         if self.date_range is not None:
             clauses.append(self.date_range.expr())
+        clauses.extend(term.expr for term in self.excluded if term.expr is not None)
+        if self.excluded_statuses:
+            clauses.append(essie.not_(essie.any_of("OverallStatus", self.excluded_statuses)))
         clauses.extend(self.extra)
         return Params(tuple(texts), essie.and_(*clauses) if clauses else None)
 

@@ -148,7 +148,13 @@ async def test_a_date_range_applies_to_the_date_on_the_axis_when_the_plan_names_
     plan = plan_of(drug("pembrolizumab"), year_from=2015).model_copy(
         update={
             "analysis": Aggregate(
-                kind="aggregate", dimension="completion_date", series=None, time_unit="year", top_n=None
+                kind="aggregate",
+                dimension="completion_date",
+                series=None,
+                time_unit="year",
+                top_n=None,
+                statistic=None,
+                of=None,
             )
         }
     )

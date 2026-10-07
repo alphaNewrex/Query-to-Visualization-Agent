@@ -24,7 +24,7 @@ def test_every_error_code_of_the_service_is_in_the_error_contract() -> None:
 
 def test_a_series_is_always_a_dimension_a_question_can_group_by() -> None:
     assert set(get_args(ClosedDimension)) < set(get_args(DimensionKey))
-    assert len(set(get_args(DimensionKey))) == len(get_args(DimensionKey)) == 20
+    assert len(set(get_args(DimensionKey))) == len(get_args(DimensionKey)) == 21
 
 
 def test_a_filter_family_names_a_list_of_the_plan_filters() -> None:

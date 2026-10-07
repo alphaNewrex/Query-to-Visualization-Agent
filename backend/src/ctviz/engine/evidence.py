@@ -52,6 +52,8 @@ def projection(plan: EnginePlan, scope: Scope) -> tuple[str, ...]:
         pieces.update(_TERM_PIECES[term.kind])
     for dimension in plan.dimensions:
         pieces.update(dimension.spec.pieces)
+    if plan.measure is not None:
+        pieces.update(_NUMERIC_PIECES[plan.measure.field])
     match plan.rows:
         case PointRows(x=x, y=y, color=color):
             pieces.update(_NUMERIC_PIECES[x], _NUMERIC_PIECES[y])

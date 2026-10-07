@@ -10,6 +10,7 @@ from dataclasses import dataclass, replace
 from datetime import date, datetime
 from typing import Final, Literal
 
+from ctviz.applied import MAX_COMPARED
 from ctviz.contract.plan import Clarify, QueryPlan, Unsupported
 from ctviz.contract.request import CompareSpec, QueryRequest, RequestOptions
 from ctviz.contract.response import (
@@ -293,10 +294,18 @@ def _interpretation(context: MetaContext, plan: EnginePlan, choice: ChartChoice 
     labels = [text.scope_name(scope) for scope in plan.scopes]
     counts_trials = analysis.kind in ("aggregate", "total", "network")
     filters = scope_filters(plan, plan.scopes[0])
+    measure = plan.measure
     return Interpretation(
-        summary=text.interpretation_summary(analysis.kind, groups, labels, unit, filters),
+        summary=text.interpretation_summary(
+            analysis.kind,
+            groups,
+            labels,
+            unit,
+            filters,
+            None if measure is None else text.measure_label(measure.statistic, measure.field),
+        ),
         analysis=analysis.kind,
-        measure=Measure(aggregate="count", of="trials") if counts_trials else None,
+        measure=_measure(plan) if counts_trials else None,
         group_by=groups,
         compare=_compare(plan),
         time_granularity=unit,
@@ -308,10 +317,17 @@ def _interpretation(context: MetaContext, plan: EnginePlan, choice: ChartChoice 
     )
 
 
+def _measure(plan: EnginePlan) -> Measure:
+    measure = plan.measure
+    if measure is None:
+        return Measure(aggregate="count", of="trials", unit="trials")
+    return Measure(aggregate=measure.statistic, of=measure.field, unit=text.NUMBER_UNITS[measure.field])
+
+
 def _compare(plan: EnginePlan) -> CompareSpec | None:
     field = _COMPARE_FIELDS.get(plan.compare_kind or "")
     values = [entity.value for entity in plan.public.entities if entity.role == "compare"]
-    if field is None or not 2 <= len(values) <= 4:
+    if field is None or not 2 <= len(values) <= MAX_COMPARED:
         return None
     return CompareSpec(field=field, values=values)
 
@@ -339,6 +355,10 @@ def _assumptions(plan: EnginePlan, shaped: ShapedResult | None) -> list[str]:
     if plan.relation == "network":
         first, second = plan.dimensions[0].spec.key, plan.dimensions[1].spec.key
         notes.append(text.link_note(first, second, plan.pairing))
+    if plan.measure is not None:
+        label = text.measure_label(plan.measure.statistic, plan.measure.field)
+        notes.append(text.statistic_note(plan.measure.statistic, label))
+        notes.append(text.MEASURE_NOTES[plan.measure.field])
     if isinstance(plan.rows, PointRows):
         notes.extend(text.NUMBER_NOTES[field] for field in dict.fromkeys((plan.rows.x, plan.rows.y)))
     if shaped is not None and shaped.trials_in_several_series:

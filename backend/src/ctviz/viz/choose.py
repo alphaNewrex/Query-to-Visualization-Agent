@@ -67,7 +67,7 @@ def _by_shape(plan: EnginePlan, shaped: ShapedResult) -> ChartChoice:
     if axis.spec.kind == "date":
         return ChartChoice("time_series", text.CHART_RATIONALE[5], ChartOptions(mark="line"))
     if axis.spec.kind == "number":
-        if not several_scopes and series is None:
+        if not several_scopes and series is None and plan.measure is None:
             return ChartChoice("histogram", text.CHART_RATIONALE[6])
         return ChartChoice("bar_chart", text.CHART_RATIONALE[7], ChartOptions(over_bins=True))
     return _bars(axis.spec.is_ordinal, several_scopes, series.spec.is_exclusive if series else None)

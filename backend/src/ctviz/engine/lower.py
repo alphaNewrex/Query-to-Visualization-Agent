@@ -23,6 +23,7 @@ from ctviz.contract.plan import (
     Relate,
     SortField,
     SortOrder,
+    Statistic,
     TimeUnit,
     Total,
     TrialList,
@@ -39,6 +40,7 @@ __all__ = [
     "DateRange",
     "EnginePlan",
     "ListRows",
+    "MeasureSpec",
     "PointRows",
     "Resolved",
     "RowSpec",
@@ -78,6 +80,14 @@ RowSpec = PointRows | ListRows
 
 
 @dataclass(frozen=True)
+class MeasureSpec:
+    """`aggregate` and `total` with a statistic: the median, mean or sum of a numeric field per cell."""
+
+    statistic: Statistic
+    field: NumericField
+
+
+@dataclass(frozen=True)
 class EnginePlan:
     """Everything the stages after resolution need to know, with every default already applied."""
 
@@ -95,6 +105,7 @@ class EnginePlan:
     chart_preference: ChartType | None
     citations_per_datum: int
     public: QueryPlan  # the canonical plan echoed in meta.plan
+    measure: MeasureSpec | None = None  # None counts trials
 
 
 @dataclass(frozen=True)
@@ -139,6 +150,9 @@ def lower_plan(
     pairing: Pairing = "same_trial"
     rows: RowSpec | None = None
     top_n = DEFAULT_TOP_N
+    measure: MeasureSpec | None = None
+    if isinstance(analysis, Aggregate | Total) and analysis.statistic is not None and analysis.of is not None:
+        measure = MeasureSpec(analysis.statistic, analysis.of)
     match analysis:
         case Aggregate():
             dimensions = (_bind(catalog, analysis.dimension, analysis.time_unit, "axis"),)
@@ -185,6 +199,7 @@ def lower_plan(
         chart_preference=plan.chart_preference,
         citations_per_datum=planned.options.citations_per_datum,
         public=plan,
+        measure=measure,
     )
 
 

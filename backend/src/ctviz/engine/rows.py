@@ -110,6 +110,13 @@ def _number(study: Study, name: NumericField) -> tuple[float, tuple[Evidence, ..
     )
 
 
+def numeric_value(study: Study, name: NumericField) -> tuple[float, tuple[Evidence, ...]] | None:
+    """The value of a numeric field for a statistic; a trial that lists no site has no site count."""
+    if name == "site_count" and not study.locations:
+        return None
+    return _number(study, name)
+
+
 def _site_evidence(study: Study) -> tuple[Evidence, ...]:
     for location in study.locations:
         if location.country is not None:

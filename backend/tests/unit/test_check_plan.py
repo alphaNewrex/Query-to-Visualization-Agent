@@ -155,13 +155,22 @@ def test_rule_5_hints_replace_the_planners_choices() -> None:
         ),
     )
     assert result.plan.analysis == Aggregate(
-        kind="aggregate", dimension="start_date", series="phase", time_unit="quarter", top_n=7
+        kind="aggregate",
+        dimension="start_date",
+        series="phase",
+        time_unit="quarter",
+        top_n=7,
+        statistic=None,
+        of=None,
     )
     assert result.plan.chart_preference == "time_series" and "hint_override" in codes(result)
 
 
 def test_rule_5_a_total_becomes_an_aggregate_when_group_by_is_given() -> None:
-    result = check(plan(analysis={"kind": "total"}), request("pembrolizumab trials", group_by=["phase"]))
+    result = check(
+        plan(analysis={"kind": "total", "statistic": None, "of": None}),
+        request("pembrolizumab trials", group_by=["phase"]),
+    )
     assert isinstance(result.plan.analysis, Aggregate) and result.plan.analysis.dimension == "phase"
 
 
@@ -293,22 +302,50 @@ def test_rule_8_one_compared_entity_becomes_a_filter() -> None:
     assert [e.role for e in result.plan.entities] == ["filter"]
 
 
-def test_rule_9_only_four_compared_entities_are_kept() -> None:
-    names = ["pembrolizumab", "nivolumab", "atezolizumab", "durvalumab", "ipilimumab"]
+def test_rule_9_only_five_compared_entities_are_kept() -> None:
+    names = ["pembrolizumab", "nivolumab", "atezolizumab", "durvalumab", "ipilimumab", "cemiplimab"]
     model = plan(entities=[entity("drug", n, "compare") for n in names])
     result = check(model, request("Compare " + " vs ".join(names)))
-    assert [e.value for e in result.plan.entities] == names[:4]
+    assert [e.value for e in result.plan.entities] == names[:5]
     assert [w.code for w in result.warnings] == ["compare_truncated"]
 
 
-def test_rule_10_a_series_is_dropped_while_entities_are_compared() -> None:
+def test_rule_10_an_aggregate_keeps_its_split_while_entities_are_compared() -> None:
     model = plan(
         entities=[entity("drug", "pembrolizumab", "compare"), entity("drug", "nivolumab", "compare")],
-        analysis=aggregate("phase", series="sponsor_class"),
+        analysis=aggregate("start_date", series="phase"),
     )
-    result = check(model, request("Compare pembrolizumab vs nivolumab by phase and sponsor class"))
-    assert isinstance(result.plan.analysis, Aggregate) and result.plan.analysis.series is None
+    result = check(model, request("Compare pembrolizumab vs nivolumab per year, separate by phase"))
+    assert isinstance(result.plan.analysis, Aggregate) and result.plan.analysis.series == "phase"
+    assert result.blocking == () and "series_dropped" not in {w.code for w in result.warnings}
+
+
+def test_rule_10_a_scatter_colour_is_dropped_while_entities_are_compared() -> None:
+    relate = {"kind": "relate", "x": "enrollment", "y": "site_count", "color_by": "phase"}
+    model = plan(
+        entities=[entity("drug", "pembrolizumab", "compare"), entity("drug", "nivolumab", "compare")],
+        analysis=relate,
+    )
+    result = check(model, request("Compare pembrolizumab vs nivolumab enrollment against sites by phase"))
+    assert isinstance(result.plan.analysis, Relate) and result.plan.analysis.color_by is None
     assert "series_dropped" in {w.code for w in result.warnings}
+
+
+def test_rule_10b_the_split_replaces_a_dimension_of_the_compared_kind() -> None:
+    countries = [entity("country", "France", "compare"), entity("country", "United States", "compare")]
+    model = plan(entities=countries, analysis=aggregate("country", series="phase"))
+    result = check(model, request("Compare France and United States by phase"))
+    analysis = result.plan.analysis
+    assert isinstance(analysis, Aggregate) and (analysis.dimension, analysis.series) == ("phase", None)
+    assert "compare_dimension_same_kind" in codes(result)
+
+
+def test_rule_10b_a_dimension_of_the_compared_kind_without_a_split_goes_to_the_model() -> None:
+    countries = [entity("country", "France", "compare"), entity("country", "United States", "compare")]
+    result = check(
+        plan(entities=countries, analysis=aggregate("country")), request("Compare France and United States")
+    )
+    assert [issue.code for issue in result.blocking] == ["compare_dimension_same_kind"]
 
 
 def test_rule_11_a_series_equal_to_the_dimension_is_dropped() -> None:

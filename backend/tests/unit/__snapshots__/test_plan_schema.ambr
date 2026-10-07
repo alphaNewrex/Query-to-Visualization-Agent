@@ -19,6 +19,7 @@
               'masking',
               'primary_purpose',
               'has_results',
+              'intervention_model',
               'country',
               'sponsor',
               'drug',
@@ -37,6 +38,23 @@
             'title': 'Kind',
             'type': 'string',
           }),
+          'of': dict({
+            'anyOf': list([
+              dict({
+                'enum': list([
+                  'enrollment',
+                  'duration_months',
+                  'site_count',
+                ]),
+                'type': 'string',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': 'The numeric field of a statistic; null when counting.',
+            'title': 'Of',
+          }),
           'series': dict({
             'anyOf': list([
               dict({
@@ -52,6 +70,7 @@
                   'masking',
                   'primary_purpose',
                   'has_results',
+                  'intervention_model',
                 ]),
                 'type': 'string',
               }),
@@ -61,6 +80,23 @@
             ]),
             'description': 'A second, closed dimension that splits the first; null otherwise.',
             'title': 'Series',
+          }),
+          'statistic': dict({
+            'anyOf': list([
+              dict({
+                'enum': list([
+                  'median',
+                  'mean',
+                  'sum',
+                ]),
+                'type': 'string',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': "Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead.",
+            'title': 'Statistic',
           }),
           'time_unit': dict({
             'anyOf': list([
@@ -100,6 +136,8 @@
           'series',
           'time_unit',
           'top_n',
+          'statistic',
+          'of',
         ]),
         'title': 'Aggregate',
         'type': 'object',
@@ -159,10 +197,11 @@
             'type': 'string',
           }),
           'role': dict({
-            'description': "'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison.",
+            'description': "'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison. 'exclude': no counted trial may match ('excluding', 'without', 'not involving').",
             'enum': list([
               'filter',
               'compare',
+              'exclude',
             ]),
             'title': 'Role',
             'type': 'string',
@@ -188,9 +227,17 @@
             'enum': list([
               'phases',
               'statuses',
+              'exclude_statuses',
               'study_types',
               'sponsor_classes',
               'intervention_types',
+              'sexes',
+              'age_groups',
+              'allocations',
+              'maskings',
+              'primary_purposes',
+              'has_results',
+              'intervention_models',
             ]),
             'title': 'Family',
             'type': 'string',
@@ -266,6 +313,32 @@
       'PlanFilters': dict({
         'additionalProperties': False,
         'properties': dict({
+          'age_groups': dict({
+            'description': 'Empty unless the question restricts the age group.',
+            'items': dict({
+              'enum': list([
+                'CHILD',
+                'ADULT',
+                'OLDER_ADULT',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Age Groups',
+            'type': 'array',
+          }),
+          'allocations': dict({
+            'description': "Empty unless the question restricts allocation: 'randomized' is RANDOMIZED.",
+            'items': dict({
+              'enum': list([
+                'RANDOMIZED',
+                'NON_RANDOMIZED',
+                'NA',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Allocations',
+            'type': 'array',
+          }),
           'date_field': dict({
             'anyOf': list([
               dict({
@@ -292,6 +365,57 @@
             'title': 'Evidence',
             'type': 'array',
           }),
+          'exclude_statuses': dict({
+            'description': "Empty unless the question leaves statuses out, e.g. 'exclude terminated studies'.",
+            'items': dict({
+              'enum': list([
+                'NOT_YET_RECRUITING',
+                'RECRUITING',
+                'ENROLLING_BY_INVITATION',
+                'ACTIVE_NOT_RECRUITING',
+                'COMPLETED',
+                'SUSPENDED',
+                'TERMINATED',
+                'WITHDRAWN',
+                'AVAILABLE',
+                'NO_LONGER_AVAILABLE',
+                'TEMPORARILY_NOT_AVAILABLE',
+                'APPROVED_FOR_MARKETING',
+                'WITHHELD',
+                'UNKNOWN',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Exclude Statuses',
+            'type': 'array',
+          }),
+          'has_results': dict({
+            'description': "Empty unless the question restricts whether results are posted: ['true'] or ['false'].",
+            'items': dict({
+              'enum': list([
+                'true',
+                'false',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Has Results',
+            'type': 'array',
+          }),
+          'intervention_models': dict({
+            'description': "Empty unless the question restricts the assignment model, e.g. 'crossover'.",
+            'items': dict({
+              'enum': list([
+                'PARALLEL',
+                'CROSSOVER',
+                'FACTORIAL',
+                'SEQUENTIAL',
+                'SINGLE_GROUP',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Intervention Models',
+            'type': 'array',
+          }),
           'intervention_types': dict({
             'description': 'Empty unless the question restricts the kind of intervention.',
             'items': dict({
@@ -313,6 +437,21 @@
             'title': 'Intervention Types',
             'type': 'array',
           }),
+          'maskings': dict({
+            'description': "Empty unless the question restricts masking, e.g. 'double-blind' is DOUBLE.",
+            'items': dict({
+              'enum': list([
+                'NONE',
+                'SINGLE',
+                'DOUBLE',
+                'TRIPLE',
+                'QUADRUPLE',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Maskings',
+            'type': 'array',
+          }),
           'phases': dict({
             'description': 'Empty unless the question restricts phase.',
             'items': dict({
@@ -327,6 +466,39 @@
               'type': 'string',
             }),
             'title': 'Phases',
+            'type': 'array',
+          }),
+          'primary_purposes': dict({
+            'description': "Empty unless the question restricts the primary purpose, e.g. 'prevention trials'.",
+            'items': dict({
+              'enum': list([
+                'TREATMENT',
+                'PREVENTION',
+                'DIAGNOSTIC',
+                'ECT',
+                'SUPPORTIVE_CARE',
+                'SCREENING',
+                'HEALTH_SERVICES_RESEARCH',
+                'BASIC_SCIENCE',
+                'DEVICE_FEASIBILITY',
+                'OTHER',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Primary Purposes',
+            'type': 'array',
+          }),
+          'sexes': dict({
+            'description': 'Empty unless the question restricts the sexes eligible.',
+            'items': dict({
+              'enum': list([
+                'FEMALE',
+                'MALE',
+                'ALL',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Sexes',
             'type': 'array',
           }),
           'sponsor_classes': dict({
@@ -417,9 +589,17 @@
         'required': list([
           'phases',
           'statuses',
+          'exclude_statuses',
           'study_types',
           'sponsor_classes',
           'intervention_types',
+          'sexes',
+          'age_groups',
+          'allocations',
+          'maskings',
+          'primary_purposes',
+          'has_results',
+          'intervention_models',
           'evidence',
           'date_field',
           'year_from',
@@ -446,6 +626,7 @@
                   'masking',
                   'primary_purpose',
                   'has_results',
+                  'intervention_model',
                 ]),
                 'type': 'string',
               }),
@@ -496,9 +677,45 @@
             'title': 'Kind',
             'type': 'string',
           }),
+          'of': dict({
+            'anyOf': list([
+              dict({
+                'enum': list([
+                  'enrollment',
+                  'duration_months',
+                  'site_count',
+                ]),
+                'type': 'string',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': 'The numeric field of a statistic; null when counting.',
+            'title': 'Of',
+          }),
+          'statistic': dict({
+            'anyOf': list([
+              dict({
+                'enum': list([
+                  'median',
+                  'mean',
+                  'sum',
+                ]),
+                'type': 'string',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': "Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead.",
+            'title': 'Statistic',
+          }),
         }),
         'required': list([
           'kind',
+          'statistic',
+          'of',
         ]),
         'title': 'Total',
         'type': 'object',

@@ -79,6 +79,14 @@ def area(piece: str, value: str) -> Expr:
     return Expr(f"AREA[{_checked_piece(piece)}]{_term(value)}")
 
 
+def search(piece: str, term: str) -> Expr:
+    """`AREA[ConditionSearch](term)`: a search area read like the matching `query.*` parameter.
+
+    `term` must already have passed through `literal()`.
+    """
+    return Expr(f"AREA[{_checked_piece(piece)}]({term})")
+
+
 def any_of(piece: str, values: Sequence[str]) -> Expr:
     """`AREA[Phase](PHASE2 OR PHASE3)`: the area holds at least one of the enum tokens."""
     return _in_area(piece, _enum_tokens(values), joiner=" OR ")

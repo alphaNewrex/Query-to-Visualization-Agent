@@ -5311,8 +5311,8 @@
     }
   },
   "meta": {
-    "request_id": "f2665e71-a17f-4f1b-ba51-44e004a4243d",
-    "generated_at": "2026-10-07T00:59:38.273537Z",
+    "request_id": "10b95728-6890-43ab-acc2-05bb2445f3d2",
+    "generated_at": "2026-10-07T02:20:09.835764Z",
     "query": "Which drugs frequently co-occur in combination studies with pembrolizumab?",
     "filters": {
       "drug_name": [
@@ -5327,17 +5327,33 @@
       "study_type": [],
       "sponsor_class": [],
       "intervention_type": [],
+      "sex": [],
+      "age_group": [],
+      "allocation": [],
+      "masking": [],
+      "primary_purpose": [],
+      "has_results": [],
+      "intervention_model": [],
       "start_year": null,
       "end_year": null,
       "date_field": "start_date",
-      "compare": null
+      "compare": null,
+      "exclude": {
+        "drug_name": [],
+        "condition": [],
+        "sponsor": [],
+        "country": [],
+        "term": [],
+        "status": []
+      }
     },
     "interpretation": {
       "summary": "Counting trials in which drug and drug occur together, for pembrolizumab.",
       "analysis": "network",
       "measure": {
         "aggregate": "count",
-        "of": "trials"
+        "of": "trials",
+        "unit": "trials"
       },
       "group_by": [
         "drug",
@@ -5388,9 +5404,17 @@
       "filters": {
         "phases": [],
         "statuses": [],
+        "exclude_statuses": [],
         "study_types": [],
         "sponsor_classes": [],
         "intervention_types": [],
+        "sexes": [],
+        "age_groups": [],
+        "allocations": [],
+        "maskings": [],
+        "primary_purposes": [],
+        "has_results": [],
+        "intervention_models": [],
         "evidence": [],
         "date_field": "start_date",
         "year_from": null,
@@ -5415,15 +5439,15 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v1",
+      "prompt_version": "plan-v2",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 4150,
-        "output_tokens": 171,
-        "reasoning_tokens": 54,
-        "cached_tokens": 3840
+        "input_tokens": 7111,
+        "output_tokens": 182,
+        "reasoning_tokens": 29,
+        "cached_tokens": 6912
       }
     },
     "assumptions": [
@@ -5447,7 +5471,7 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T00:59:38.273537Z",
+      "retrieved_at": "2026-10-07T02:20:09.835764Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
@@ -5496,7 +5520,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate",
           "status": 200,
-          "duration_ms": 948,
+          "duration_ms": 757,
           "total_count": 2877,
           "records_returned": 1000,
           "is_cached": false,
@@ -5506,7 +5530,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate&pageToken=ZVNj7o2Elu8o3lpwS9785unumpOQJJxuYfag2vwakA",
           "status": 200,
-          "duration_ms": 858,
+          "duration_ms": 835,
           "total_count": null,
           "records_returned": 1000,
           "is_cached": false,
@@ -5516,7 +5540,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate&pageToken=ZVNj7o2Elu8o3lpwS9785unumpOQJJxtbPGj3P0TkA",
           "status": 200,
-          "duration_ms": 847,
+          "duration_ms": 991,
           "total_count": null,
           "records_returned": 877,
           "is_cached": false,
@@ -5572,10 +5596,10 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 4319,
-      "plan_ms": 1554,
+      "total_ms": 4521,
+      "plan_ms": 1821,
       "resolve_ms": 1,
-      "fetch_ms": 2759,
+      "fetch_ms": 2694,
       "build_ms": 1
     },
     "debug": {
@@ -5584,7 +5608,7 @@
           "index": 0,
           "type": "plan",
           "summary": "Link drugs that share an arm with pembrolizumab in combination studies.",
-          "duration_ms": 1554,
+          "duration_ms": 1821,
           "request_indexes": [],
           "detail": {}
         },
@@ -5605,7 +5629,7 @@
           "index": 2,
           "type": "execute",
           "summary": "3 requests",
-          "duration_ms": 2759,
+          "duration_ms": 2694,
           "request_indexes": [
             4,
             5,

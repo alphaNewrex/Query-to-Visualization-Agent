@@ -9,17 +9,25 @@ from collections.abc import Sequence
 from typing import Final, get_args
 
 from ctviz.contract.plan import (
+    AgeGroup,
     Aggregate,
+    Allocation,
     ChartType,
     FilterFamily,
+    InterventionModel,
     InterventionType,
+    Masking,
     Network,
     Phase,
+    PrimaryPurpose,
     QueryPlan,
     Relate,
+    ResultsPosted,
+    Sex,
     SponsorClass,
     Status,
     StudyType,
+    Total,
     TrialList,
 )
 from ctviz.ctgov import essie
@@ -34,10 +42,17 @@ from ctviz.planning.grounding import (
 )
 
 MAX_LIMIT: Final = 50
-MAX_COMPARED: Final = 4
+MAX_COMPARED: Final = 5
 DATE_DIMENSIONS: Final = frozenset(
     {"start_date", "primary_completion_date", "completion_date", "first_posted_date"}
 )
+# The dimension that counts trials by each kind of entity.
+_KIND_DIMENSIONS: Final = {
+    "drug": "drug",
+    "condition": "condition",
+    "sponsor": "sponsor",
+    "country": "country",
+}
 # A trial has several values of these, so they cannot split another count into disjoint parts.
 MULTI_VALUED: Final = frozenset({"intervention_type", "age_group"})
 # A trial has exactly one lead sponsor, so no trial links two sponsors.
@@ -53,9 +68,17 @@ _YEARS_AFTER_TODAY: Final = 5
 FAMILY_ENUMS: Final[dict[FilterFamily, tuple[str, ...]]] = {
     "phases": get_args(Phase),
     "statuses": get_args(Status),
+    "exclude_statuses": get_args(Status),
     "study_types": get_args(StudyType),
     "sponsor_classes": get_args(SponsorClass),
     "intervention_types": get_args(InterventionType),
+    "sexes": get_args(Sex),
+    "age_groups": get_args(AgeGroup),
+    "allocations": get_args(Allocation),
+    "maskings": get_args(Masking),
+    "primary_purposes": get_args(PrimaryPurpose),
+    "has_results": get_args(ResultsPosted),
+    "intervention_models": get_args(InterventionModel),
 }
 
 
@@ -104,10 +127,12 @@ def _is_unclean(text: str, facts: Facts) -> bool:
 def apply_fixes(plan: QueryPlan, facts: Facts, found: Findings) -> QueryPlan:
     """Run the fixes in the order of the plan, except that rule 15 runs before rule 14 (see `fix_limits`)."""
     plan = fix_all_values_filters(plan, found)
+    plan = fix_dangling_evidence(plan, found)
     plan = fix_empty_entities(plan, found)
     plan = fix_inverted_years(plan, found)
     plan = fix_single_compare(plan, found)
     plan = fix_too_many_compare(plan, found)
+    plan = fix_compare_dimension(plan, found)
     plan = fix_series_with_compare(plan, found)
     plan = fix_series_not_allowed(plan, found)
     plan = fix_time_unit(plan, found)
@@ -128,6 +153,17 @@ def fix_all_values_filters(plan: QueryPlan, found: Findings) -> QueryPlan:
             )
             plan = drop_family(plan, family)
     return plan
+
+
+def fix_dangling_evidence(plan: QueryPlan, found: Findings) -> QueryPlan:
+    """Evidence for a filter list that is empty states nothing: it is dropped."""
+    kept = [item for item in plan.filters.evidence if getattr(plan.filters, item.family)]
+    if len(kept) == len(plan.filters.evidence):
+        return plan
+    found.adjust(
+        "dangling_evidence", "/filters/evidence", "Evidence quoted for a filter that is empty.", "dropped"
+    )
+    return _filters(plan, evidence=kept)
 
 
 def fix_empty_entities(plan: QueryPlan, found: Findings) -> QueryPlan:
@@ -189,19 +225,49 @@ def fix_too_many_compare(plan: QueryPlan, found: Findings) -> QueryPlan:
 
 
 def fix_series_with_compare(plan: QueryPlan, found: Findings) -> QueryPlan:
-    """Rule 10: compared groups take the one series channel."""
+    """Rule 10: compared groups are the series of a scatter plot; an aggregate keeps its closed split.
+
+    An aggregate with compared groups and a split draws one series per (group, split value) pair.
+    """
     if _compared(plan) < 2:
         return plan
     analysis = plan.analysis
-    if isinstance(analysis, Aggregate) and analysis.series is not None:
-        path, plan = "/analysis/series", _analysis(plan, series=None)
-    elif isinstance(analysis, Relate) and analysis.color_by is not None:
-        path, plan = "/analysis/color_by", _analysis(plan, color_by=None)
-    else:
-        return plan
-    found.adjust("series_with_compare", path, "Compared groups already use the series channel.", "dropped")
-    found.warn("series_dropped", "The split was left out because the compared names already split the chart.")
+    if isinstance(analysis, Relate) and analysis.color_by is not None:
+        plan = _analysis(plan, color_by=None)
+        found.adjust(
+            "series_with_compare",
+            "/analysis/color_by",
+            "Compared groups already use the series channel.",
+            "dropped",
+        )
+        found.warn(
+            "series_dropped", "The split was left out because the compared names already split the chart."
+        )
     return plan
+
+
+def fix_compare_dimension(plan: QueryPlan, found: Findings) -> QueryPlan:
+    """Rule 10b: compared names of one kind cannot also be the dimension: that has the same kind on two axes.
+
+    With a closed split the split becomes the dimension, so "countries by phase" is counted by phase for
+    each country. Without one the plan goes back to the model.
+    """
+    analysis = plan.analysis
+    kinds = {e.kind for e in plan.entities if e.role == "compare"}
+    if _compared(plan) < 2 or len(kinds) != 1 or not isinstance(analysis, Aggregate):
+        return plan
+    if analysis.dimension != _KIND_DIMENSIONS.get(next(iter(kinds))):
+        return plan
+    if analysis.series is None:
+        return plan  # `find_blocking` sends it to the model
+    found.adjust(
+        "compare_dimension_same_kind",
+        "/analysis/dimension",
+        f"The compared {analysis.dimension} values cannot also be the dimension; counted by "
+        f"{analysis.series} for each of them instead.",
+        "replaced",
+    )
+    return _analysis(plan, dimension=analysis.series, series=None)
 
 
 def fix_series_not_allowed(plan: QueryPlan, found: Findings) -> QueryPlan:
@@ -305,7 +371,7 @@ def _allowed_charts(plan: QueryPlan) -> frozenset[ChartType]:
     if isinstance(analysis, Aggregate):
         if analysis.dimension in DATE_DIMENSIONS:
             return frozenset({"time_series", "bar_chart", "table"})
-        if analysis.dimension == "enrollment":
+        if analysis.dimension == "enrollment" and analysis.statistic is None:
             return frozenset({"histogram", "bar_chart", "table"})
         return frozenset({"bar_chart", "table"})
     if analysis.kind == "total":
@@ -345,6 +411,9 @@ def find_blocking(plan: QueryPlan, facts: Facts, found: Findings) -> None:
         _ungrounded_years(plan, facts, found)
         _ungrounded_filters(plan, facts, found)
     _mixed_compare_kinds(plan, found)
+    _exclusion_conflicts(plan, found)
+    _compare_dimension_same_kind(plan, found)
+    _measure_problems(plan, found)
     if facts.mode != "structured":
         _relate_same_measure(plan, found)
         _network_pair_unsupported(plan, found)
@@ -403,6 +472,61 @@ def _phrase_in_question(phrase: str, facts: Facts) -> bool:
 def _mixed_compare_kinds(plan: QueryPlan, found: Findings) -> None:
     if len({entity.kind for entity in plan.entities if entity.role == "compare"}) > 1:
         found.block("mixed_compare_kinds", "/entities", "Compared names must all be of one kind.")
+
+
+def _measure_problems(plan: QueryPlan, found: Findings) -> None:
+    analysis = plan.analysis
+    if not isinstance(analysis, Aggregate | Total):
+        return
+    if (analysis.statistic is None) != (analysis.of is None):
+        found.block(
+            "measure_incomplete",
+            "/analysis/statistic",
+            "A statistic needs both `statistic` and `of`; leave both null to count trials.",
+        )
+    elif analysis.statistic == "sum" and analysis.of == "duration_months":
+        found.block(
+            "measure_not_sensible",
+            "/analysis/statistic",
+            "A sum of durations means nothing; use 'median' or 'mean' of duration_months.",
+        )
+
+
+def _compare_dimension_same_kind(plan: QueryPlan, found: Findings) -> None:
+    analysis = plan.analysis
+    kinds = {e.kind for e in plan.entities if e.role == "compare"}
+    if (
+        isinstance(analysis, Aggregate)
+        and _compared(plan) >= 2
+        and len(kinds) == 1
+        and analysis.dimension == _KIND_DIMENSIONS.get(next(iter(kinds)))
+    ):
+        found.block(
+            "compare_dimension_same_kind",
+            "/analysis/dimension",
+            f"The compared names are {analysis.dimension} values, so the dimension cannot be "
+            f"{analysis.dimension}. Choose what each compared name is broken down by (for example phase), "
+            "or use analysis total to count each name.",
+        )
+
+
+def _exclusion_conflicts(plan: QueryPlan, found: Findings) -> None:
+    """Leaving out what the question also asks for would match nothing."""
+    both = set(plan.filters.statuses) & set(plan.filters.exclude_statuses)
+    if both:
+        found.block(
+            "exclusion_conflict",
+            "/filters/exclude_statuses",
+            f"{', '.join(sorted(both))} is both required and left out. Keep one of them.",
+        )
+    wanted = {(e.kind, tokens(e.value)) for e in plan.entities if e.role != "exclude"}
+    for index, entity in enumerate(plan.entities):
+        if entity.role == "exclude" and (entity.kind, tokens(entity.value)) in wanted:
+            found.block(
+                "exclusion_conflict",
+                f"/entities/{index}",
+                f"'{entity.value}' is both required and left out. Keep one of them.",
+            )
 
 
 def _relate_same_measure(plan: QueryPlan, found: Findings) -> None:

@@ -313,8 +313,8 @@
     }
   },
   "meta": {
-    "request_id": "92486a30-ae06-438f-8fa2-c97b00cb17fd",
-    "generated_at": "2026-10-07T00:59:43.699390Z",
+    "request_id": "71b695af-ef1d-4dbe-b01c-efab72d3fac2",
+    "generated_at": "2026-10-07T02:20:15.990779Z",
     "query": "List the 10 largest lung cancer trials.",
     "filters": {
       "drug_name": [],
@@ -329,10 +329,25 @@
       "study_type": [],
       "sponsor_class": [],
       "intervention_type": [],
+      "sex": [],
+      "age_group": [],
+      "allocation": [],
+      "masking": [],
+      "primary_purpose": [],
+      "has_results": [],
+      "intervention_model": [],
       "start_year": null,
       "end_year": null,
       "date_field": "start_date",
-      "compare": null
+      "compare": null,
+      "exclude": {
+        "drug_name": [],
+        "condition": [],
+        "sponsor": [],
+        "country": [],
+        "term": [],
+        "status": []
+      }
     },
     "interpretation": {
       "summary": "Listing trials for lung cancer.",
@@ -384,9 +399,17 @@
       "filters": {
         "phases": [],
         "statuses": [],
+        "exclude_statuses": [],
         "study_types": [],
         "sponsor_classes": [],
         "intervention_types": [],
+        "sexes": [],
+        "age_groups": [],
+        "allocations": [],
+        "maskings": [],
+        "primary_purposes": [],
+        "has_results": [],
+        "intervention_models": [],
         "evidence": [],
         "date_field": "start_date",
         "year_from": null,
@@ -411,15 +434,15 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v1",
+      "prompt_version": "plan-v2",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 4144,
-        "output_tokens": 131,
-        "reasoning_tokens": 21,
-        "cached_tokens": 3840
+        "input_tokens": 7105,
+        "output_tokens": 165,
+        "reasoning_tokens": 19,
+        "cached_tokens": 6912
       }
     },
     "assumptions": [
@@ -431,7 +454,7 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T00:59:43.699390Z",
+      "retrieved_at": "2026-10-07T02:20:15.990779Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
@@ -470,7 +493,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&countTotal=true&pageSize=10&fields=NCTId,BriefTitle,Condition,EnrollmentCount,LeadSponsorName,OverallStatus,Phase,StartDate,StudyFirstPostDate&sort=EnrollmentCount:desc",
           "status": 200,
-          "duration_ms": 124,
+          "duration_ms": 97,
           "total_count": 14604,
           "records_returned": 10,
           "is_cached": false,
@@ -520,10 +543,10 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 1379,
-      "plan_ms": 1251,
+      "total_ms": 1953,
+      "plan_ms": 1853,
       "resolve_ms": 1,
-      "fetch_ms": 125,
+      "fetch_ms": 98,
       "build_ms": 0
     },
     "debug": {
@@ -532,7 +555,7 @@
           "index": 0,
           "type": "plan",
           "summary": "List lung cancer trials by enrollment, largest first.",
-          "duration_ms": 1251,
+          "duration_ms": 1853,
           "request_indexes": [],
           "detail": {}
         },
@@ -552,7 +575,7 @@
           "index": 2,
           "type": "execute",
           "summary": "1 requests",
-          "duration_ms": 125,
+          "duration_ms": 98,
           "request_indexes": [
             3
           ],

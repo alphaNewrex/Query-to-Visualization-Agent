@@ -46,7 +46,7 @@ RESERVED_GRAPH_FIELDS: Final = frozenset(
         "zIndex",
     }
 )
-MAX_SERIES_VALUES: Final = 10
+MAX_SERIES_VALUES: Final = 16
 COUNT_FIELD: Final = "trial_count"
 GROUP_FIELD: Final = "group"  # the series of a comparison: groups are scopes, not a dimension
 _RESERVED_KEYS: Final = frozenset({"citations", "citation_count", "source_url"})
@@ -238,7 +238,16 @@ def _x_channel(viz: Drawn) -> CategoryChannel | None:
 def _rule_4(viz: Drawn) -> list[str]:
     problems = []
     for channel, rows in _quantitative_channels(viz):
-        values = [_value(row, channel.field) for row in rows]
+        # A statistic of no trials has no value: only a row that cites no trial may leave it null.
+        values = [
+            _value(row, channel.field)
+            for row in rows
+            if not (
+                channel.field != COUNT_FIELD
+                and row.citation_count == 0
+                and _value(row, channel.field) is None
+            )
+        ]
         if any(isinstance(v, bool) or not isinstance(v, int | float) for v in values):
             problems.append(f"4: '{channel.field}' holds a value that is not a number")
         elif channel.scale == "log" and any(v <= 0 for v in values if isinstance(v, int | float)):

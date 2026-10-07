@@ -105,10 +105,10 @@ def _choose(
 ) -> _Choice | Outcome:
     if isinstance(plan.rows, ListRows):
         return _Choice("sorted_page", "A list of trials is one page in the requested order.", plan.top_n)
-    if not plan.dimensions and plan.rows is None:
+    if not plan.dimensions and plan.rows is None and plan.measure is None:
         return _Choice("count_fan_out", "A single count, with a few trials to cite.", window=window)
 
-    can_fan_out = plan.rows is None and plan.relation != "network"
+    can_fan_out = plan.rows is None and plan.relation != "network" and plan.measure is None
     bill = fan_out_bill(plan, window) if can_fan_out else None
     fits = bill is not None and bill <= limits.max_fanout_requests
     fan_out = _Choice(

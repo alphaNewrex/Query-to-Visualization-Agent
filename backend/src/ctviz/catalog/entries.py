@@ -212,6 +212,14 @@ def _entries() -> list[FieldSpec]:
             is_ordinal=False,
             buckets=_fixed(vocab.has_results().buckets()),
         ),
+        _closed(
+            "intervention_model",
+            "Intervention model",
+            vocab.intervention_model(),
+            lambda study: study.intervention_model,
+            f"{design_info}.interventionModel",
+            has_missing_bucket=True,
+        ),
         FieldSpec(
             key="country",
             title="Country",

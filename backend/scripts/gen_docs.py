@@ -1,31 +1,40 @@
-"""Regenerate the JSON Schema files under docs/schema/ from the Pydantic models.
+"""Regenerate the documents that are written from the code.
 
 Run from backend/:  uv run python scripts/gen_docs.py [--check]
 
-With --check nothing is written: the files are regenerated in memory and the exit status is 1
-when any committed file is missing or differs, so a stale schema fails the build.
+Writes docs/schema/*.json (the JSON Schemas and the OpenAPI document), docs/SCHEMA.md, docs/examples/README.md
+and the generated blocks of the README (the text between its `<!-- gen:NAME:start -->` and `end` lines).
+With --check nothing is written: the documents are regenerated in memory and the exit status is 1 when
+any committed one is missing or differs, so a stale document fails the build.
 """
 
 import argparse
 import sys
 from collections.abc import Sequence
 
-from ctviz.docgen import SCHEMA_DIRECTORY, stale_schema_files, write_schema_files
+from ctviz.docgen import DocumentError, stale_documents, write_documents
+from ctviz.settings import REPOSITORY_ROOT
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0] if __doc__ else None)
-    parser.add_argument("--check", action="store_true", help="fail if a committed file is out of date")
+    parser.add_argument("--check", action="store_true", help="fail if a committed document is out of date")
     arguments = parser.parse_args(argv)
 
-    if arguments.check:
-        stale = stale_schema_files()
-        for name in stale:
-            print(f"stale: {SCHEMA_DIRECTORY / name}", file=sys.stderr)
-        return 1 if stale else 0
+    try:
+        if arguments.check:
+            stale = stale_documents()
+            for path in stale:
+                print(f"stale: {path.relative_to(REPOSITORY_ROOT)}", file=sys.stderr)
+            if stale:
+                print("run `make docs` to regenerate", file=sys.stderr)
+            return 1 if stale else 0
 
-    for path in write_schema_files():
-        print(f"wrote {path}")
+        for path in write_documents():
+            print(f"wrote {path.relative_to(REPOSITORY_ROOT)}")
+    except DocumentError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
     return 0
 
 

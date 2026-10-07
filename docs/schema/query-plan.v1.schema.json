@@ -21,6 +21,7 @@
             "masking",
             "primary_purpose",
             "has_results",
+            "intervention_model",
             "country",
             "sponsor",
             "drug",
@@ -47,7 +48,8 @@
                 "allocation",
                 "masking",
                 "primary_purpose",
-                "has_results"
+                "has_results",
+                "intervention_model"
               ],
               "type": "string"
             },
@@ -85,6 +87,38 @@
             }
           ],
           "description": "Only when the user asks for a number of items; otherwise null."
+        },
+        "statistic": {
+          "anyOf": [
+            {
+              "enum": [
+                "median",
+                "mean",
+                "sum"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead."
+        },
+        "of": {
+          "anyOf": [
+            {
+              "enum": [
+                "enrollment",
+                "duration_months",
+                "site_count"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The numeric field of a statistic; null when counting."
         }
       },
       "required": [
@@ -92,7 +126,9 @@
         "dimension",
         "series",
         "time_unit",
-        "top_n"
+        "top_n",
+        "statistic",
+        "of"
       ],
       "title": "Aggregate",
       "type": "object"
@@ -152,10 +188,11 @@
           "type": "string"
         },
         "role": {
-          "description": "'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison.",
+          "description": "'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison. 'exclude': no counted trial may match ('excluding', 'without', 'not involving').",
           "enum": [
             "filter",
-            "compare"
+            "compare",
+            "exclude"
           ],
           "type": "string"
         }
@@ -175,9 +212,17 @@
           "enum": [
             "phases",
             "statuses",
+            "exclude_statuses",
             "study_types",
             "sponsor_classes",
-            "intervention_types"
+            "intervention_types",
+            "sexes",
+            "age_groups",
+            "allocations",
+            "maskings",
+            "primary_purposes",
+            "has_results",
+            "intervention_models"
           ],
           "type": "string"
         },
@@ -285,6 +330,29 @@
           },
           "type": "array"
         },
+        "exclude_statuses": {
+          "description": "Empty unless the question leaves statuses out, e.g. 'exclude terminated studies'.",
+          "items": {
+            "enum": [
+              "NOT_YET_RECRUITING",
+              "RECRUITING",
+              "ENROLLING_BY_INVITATION",
+              "ACTIVE_NOT_RECRUITING",
+              "COMPLETED",
+              "SUSPENDED",
+              "TERMINATED",
+              "WITHDRAWN",
+              "AVAILABLE",
+              "NO_LONGER_AVAILABLE",
+              "TEMPORARILY_NOT_AVAILABLE",
+              "APPROVED_FOR_MARKETING",
+              "WITHHELD",
+              "UNKNOWN"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
         "study_types": {
           "description": "Empty unless the question restricts study type.",
           "items": {
@@ -330,6 +398,100 @@
               "PROCEDURE",
               "RADIATION",
               "OTHER"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "sexes": {
+          "description": "Empty unless the question restricts the sexes eligible.",
+          "items": {
+            "enum": [
+              "FEMALE",
+              "MALE",
+              "ALL"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "age_groups": {
+          "description": "Empty unless the question restricts the age group.",
+          "items": {
+            "enum": [
+              "CHILD",
+              "ADULT",
+              "OLDER_ADULT"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "allocations": {
+          "description": "Empty unless the question restricts allocation: 'randomized' is RANDOMIZED.",
+          "items": {
+            "enum": [
+              "RANDOMIZED",
+              "NON_RANDOMIZED",
+              "NA"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "maskings": {
+          "description": "Empty unless the question restricts masking, e.g. 'double-blind' is DOUBLE.",
+          "items": {
+            "enum": [
+              "NONE",
+              "SINGLE",
+              "DOUBLE",
+              "TRIPLE",
+              "QUADRUPLE"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "primary_purposes": {
+          "description": "Empty unless the question restricts the primary purpose, e.g. 'prevention trials'.",
+          "items": {
+            "enum": [
+              "TREATMENT",
+              "PREVENTION",
+              "DIAGNOSTIC",
+              "ECT",
+              "SUPPORTIVE_CARE",
+              "SCREENING",
+              "HEALTH_SERVICES_RESEARCH",
+              "BASIC_SCIENCE",
+              "DEVICE_FEASIBILITY",
+              "OTHER"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "has_results": {
+          "description": "Empty unless the question restricts whether results are posted: ['true'] or ['false'].",
+          "items": {
+            "enum": [
+              "true",
+              "false"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "intervention_models": {
+          "description": "Empty unless the question restricts the assignment model, e.g. 'crossover'.",
+          "items": {
+            "enum": [
+              "PARALLEL",
+              "CROSSOVER",
+              "FACTORIAL",
+              "SEQUENTIAL",
+              "SINGLE_GROUP"
             ],
             "type": "string"
           },
@@ -389,9 +551,17 @@
       "required": [
         "phases",
         "statuses",
+        "exclude_statuses",
         "study_types",
         "sponsor_classes",
         "intervention_types",
+        "sexes",
+        "age_groups",
+        "allocations",
+        "maskings",
+        "primary_purposes",
+        "has_results",
+        "intervention_models",
         "evidence",
         "date_field",
         "year_from",
@@ -437,7 +607,8 @@
                 "allocation",
                 "masking",
                 "primary_purpose",
-                "has_results"
+                "has_results",
+                "intervention_model"
               ],
               "type": "string"
             },
@@ -462,10 +633,44 @@
         "kind": {
           "const": "total",
           "type": "string"
+        },
+        "statistic": {
+          "anyOf": [
+            {
+              "enum": [
+                "median",
+                "mean",
+                "sum"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead."
+        },
+        "of": {
+          "anyOf": [
+            {
+              "enum": [
+                "enrollment",
+                "duration_months",
+                "site_count"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The numeric field of a statistic; null when counting."
         }
       },
       "required": [
-        "kind"
+        "kind",
+        "statistic",
+        "of"
       ],
       "title": "Total",
       "type": "object"

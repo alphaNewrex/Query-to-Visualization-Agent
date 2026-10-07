@@ -19,11 +19,18 @@ from typing import Annotated, Any, Literal
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
 from ctviz.contract.plan import (
+    AgeGroup,
+    Allocation,
     DateField,
     EntityKind,
+    InterventionModel,
     InterventionType,
+    Masking,
     Phase,
+    PrimaryPurpose,
     QueryPlan,
+    ResultsPosted,
+    Sex,
     SponsorClass,
     Status,
     StudyType,
@@ -377,6 +384,17 @@ class PlannerInfo(Model):
     usage: Usage | None
 
 
+class AppliedExclusions(Model):
+    """What the answer leaves out, in request field names (`exclude` of the request)."""
+
+    drug_name: list[str]
+    condition: list[str]
+    sponsor: list[str]
+    country: list[str]
+    term: list[str]
+    status: list[Status]
+
+
 class AppliedFilters(Model):
     """The effective scope in request field names: it can be sent back as request fields."""
 
@@ -390,10 +408,18 @@ class AppliedFilters(Model):
     study_type: list[StudyType]
     sponsor_class: list[SponsorClass]
     intervention_type: list[InterventionType]
+    sex: list[Sex]
+    age_group: list[AgeGroup]
+    allocation: list[Allocation]
+    masking: list[Masking]
+    primary_purpose: list[PrimaryPurpose]
+    has_results: list[ResultsPosted]
+    intervention_model: list[InterventionModel]
     start_year: int | None
     end_year: int | None
     date_field: DateField | None
     compare: CompareSpec | None
+    exclude: AppliedExclusions
 
 
 class OtherReading(Model):
@@ -426,8 +452,9 @@ class EntityResolution(Model):
 
 
 class Measure(Model):
-    aggregate: Literal["count"]
-    of: Literal["trials"]
+    aggregate: Literal["count", "median", "mean", "sum"]
+    of: Literal["trials", "enrollment", "duration_months", "site_count"]
+    unit: str = Field(description="What `of` is counted in: trials, participants, months or sites.")
 
 
 class StrategyStep(Model):
