@@ -59,3 +59,9 @@ export function formatDatum(datum: Datum, channel: Formatted & { field: string }
   const value = cellNumber(datum, channel.field);
   return value === null ? MISSING : formatWithUnit(value, channel);
 }
+
+/** "2026-10-07T00:59:23.301713Z" as "2026-10-07 00:59 UTC": a timestamp of the contract is UTC, and the day alone would differ from the data date. */
+export function utcMinute(timestamp: string): string {
+  const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})[\d:.]*(?:Z|\+00:00)$/.exec(timestamp);
+  return match ? `${match[1]} ${match[2]} UTC` : timestamp.slice(0, 10);
+}

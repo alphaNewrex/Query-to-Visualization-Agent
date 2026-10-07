@@ -176,6 +176,26 @@ export function markLabel(xLabel: string, seriesLabel: string | null): string {
   return seriesLabel === null ? xLabel : `${xLabel} · ${seriesLabel}`;
 }
 
+/** The room a tick label takes besides its characters: the gap to its neighbour. */
+const TICK_GAP = 14;
+/** Width of one character of the 12 px axis font. */
+const TICK_CHAR_WIDTH = 6.6;
+
+/**
+ * The labels of a category axis that fit into `plotWidth`: all of them when there is room, and
+ * otherwise every n-th one, counted back from the last, so that the latest period is always named.
+ * Recharts' own thinning (`preserveStartEnd`) drops the label next to the last one instead. Null
+ * while the width is not known: the chart then leaves the choice to Recharts.
+ */
+export function fittingTicks(labels: readonly string[], plotWidth: number): string[] | null {
+  if (plotWidth <= 0 || labels.length === 0) {
+    return null;
+  }
+  const longest = labels.reduce((max, label) => Math.max(max, label.length), 0);
+  const step = Math.max(1, Math.ceil((longest * TICK_CHAR_WIDTH + TICK_GAP) / (plotWidth / labels.length)));
+  return labels.filter((_, index) => (labels.length - 1 - index) % step === 0);
+}
+
 /** Greedy word wrap: a word longer than `maxChars` stands alone on its line. */
 function wrapWords(text: string, maxChars: number): string[] {
   const lines: string[] = [];

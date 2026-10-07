@@ -50,6 +50,16 @@ describe("registry", () => {
     expect(within(notes).getByRole("button", { name: "Split by phase" })).toBeTruthy();
   });
 
+  it("lists a statement once when the backend makes it both a warning and an assumption", () => {
+    const repeated = structuredClone(timeSeries);
+    repeated.meta.warnings = [{ code: "left_out", message: "Pembrolizumab is in most trials, so it is left out." }];
+    repeated.meta.assumptions = ["Pembrolizumab is in most trials, so it is left out.", "Counts are per trial."];
+    show(repeated);
+    const notes = screen.getByTestId("notes");
+    expect(within(notes).getAllByText("Pembrolizumab is in most trials, so it is left out.")).toHaveLength(1);
+    expect(within(notes).getByText("Counts are per trial.")).toBeTruthy();
+  });
+
   it("sends a follow-up's ready-made request", async () => {
     const onRun = vi.fn();
     render(<ResultView response={timeSeries} request={null} onSelect={() => undefined} onRun={onRun} />);
@@ -131,5 +141,23 @@ describe("citation sheet", () => {
     expect(screen.getByText(/“2015-03”/)).toBeTruthy();
     expect(screen.getByRole("link", { name: /All trials behind this value/ })).toBeTruthy();
     expect(screen.getByText(/2 of 120 trials shown/)).toBeTruthy();
+  });
+
+  it("leaves out the 'In scope because' line when the response records no evidence for a trial", () => {
+    const bare = structuredClone(timeSeries);
+    for (const reference of Object.values(bare.references)) {
+      reference.scope_evidence = [];
+    }
+    const datum = (bare.visualization as { data: DatumSelection["datum"][] }).data[0];
+    render(<CitationSheet selection={{ label: "2015", value: "120 trials", datum }} response={bare} onClose={() => undefined} />);
+    expect(screen.getByRole("link", { name: new RegExp(datum.citations[0].nct_id) })).toBeTruthy();
+    expect(screen.queryByText(/In scope because/)).toBeNull();
+    expect(screen.queryByText(/no evidence recorded/)).toBeNull();
+  });
+
+  it("shows the evidence when there is some", () => {
+    const datum = (timeSeries.visualization as { data: DatumSelection["datum"][] }).data[0];
+    render(<CitationSheet selection={{ label: "2015", value: "120 trials", datum }} response={timeSeries} onClose={() => undefined} />);
+    expect(screen.getAllByText(/In scope because/).length).toBeGreaterThan(0);
   });
 });

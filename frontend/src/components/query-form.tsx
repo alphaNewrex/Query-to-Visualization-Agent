@@ -30,16 +30,25 @@ export function QueryForm({
   onSubmit,
   busy,
   focus,
+  reveal,
 }: {
   values: FormValues;
   onChange: (values: FormValues) => void;
   onSubmit: () => void;
   busy: boolean;
   focus: FocusRequest | null;
+  /** Changes whenever a request that fills a structured field is put into the form: the block opens to show it. */
+  reveal: number;
 }) {
   const [open, setOpen] = React.useState(false);
   const [errors, setErrors] = React.useState<FormErrors>({});
   const [lastNonce, setLastNonce] = React.useState(0);
+  const [lastReveal, setLastReveal] = React.useState(0);
+
+  if (reveal !== lastReveal) {
+    setLastReveal(reveal);
+    setOpen(true);
+  }
 
   // A clarification names the missing fields: open the block when one is in it, then focus the first.
   if (focus && focus.nonce !== lastNonce) {

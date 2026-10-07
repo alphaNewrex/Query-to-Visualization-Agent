@@ -5,7 +5,7 @@
  * not JSON, with a code of this file's own.
  */
 import { isErrorEnvelope, isQueryResponse, isRecord } from "./guards";
-import type { AnalysisRequest, QueryRequest, QueryResponse } from "./types";
+import type { AnalysisRequest, QueryPlan, QueryRequest, QueryResponse } from "./types";
 
 const BASE = "/api/backend";
 
@@ -128,68 +128,63 @@ export async function postAnalysis(request: AnalysisRequest, signal?: AbortSigna
 }
 
 // ---------------------------------------------------------------------------------------------
-// Examples and capabilities. PLAN 5 does not fix the shape of these two endpoints, so they are
-// read defensively: what cannot be read is left out, and the page falls back to its own list.
+// Examples and capabilities (PLAN 4.17). The listing names each recorded run and says what it
+// shows; one example carries its request, its plan and its response.
 // ---------------------------------------------------------------------------------------------
 
-export interface ExampleSummary {
+/** One row of GET /v1/examples. */
+export interface ExampleListing {
   slug: string;
-  title: string;
-  request: QueryRequest;
+  /** The recorded question. Two recordings can share it: one carries a structured field that the other lacks. */
+  query: string;
+  /** What the recording answered with: its chart type, or its `kind` when it has no chart. */
+  outcome: string | null;
 }
 
-export interface ExampleRun extends ExampleSummary {
-  /** The recorded response, when the endpoint sends one. */
-  response: QueryResponse | null;
+/** GET /v1/examples/{slug}: a recorded run in full. */
+export interface RecordedExample {
+  slug: string;
+  request: QueryRequest;
+  plan: QueryPlan;
+  response: QueryResponse;
 }
 
 export interface Capabilities {
   planner: { is_available: boolean; model: string | null } | null;
 }
 
-function firstText(...candidates: unknown[]): string | null {
-  const found = candidates.find((candidate) => typeof candidate === "string" && candidate.trim() !== "");
-  return typeof found === "string" ? found : null;
-}
-
-function toExample(item: unknown): ExampleRun | null {
-  if (!isRecord(item)) {
-    return null;
-  }
-  // The request comes from the backend; only its question is checked here.
-  const request =
-    isRecord(item.request) && typeof item.request.query === "string"
-      ? (item.request as unknown as QueryRequest)
-      : typeof item.query === "string"
-        ? { query: item.query }
-        : null;
-  const slug = firstText(item.slug, item.id);
-  if (request === null || slug === null) {
-    return null;
-  }
-  return {
-    slug,
-    title: firstText(item.title, item.label, item.name) ?? request.query,
-    request,
-    response: isQueryResponse(item.response) ? item.response : null,
-  };
-}
-
-export async function getExamples(signal?: AbortSignal): Promise<ExampleSummary[]> {
+export async function getExamples(signal?: AbortSignal): Promise<ExampleListing[]> {
   const body = await call("v1/examples", { signal });
-  const items = Array.isArray(body) ? body : isRecord(body) && Array.isArray(body.examples) ? body.examples : [];
+  const items: unknown[] = Array.isArray(body) ? body : [];
   return items.flatMap((item) => {
-    const example = toExample(item);
-    return example ? [{ slug: example.slug, title: example.title, request: example.request }] : [];
+    if (!isRecord(item) || typeof item.slug !== "string" || typeof item.query !== "string") {
+      return [];
+    }
+    const type = typeof item.visualization_type === "string" ? item.visualization_type : null;
+    const kind = typeof item.kind === "string" ? item.kind : null;
+    return [{ slug: item.slug, query: item.query, outcome: type ?? kind }];
   });
 }
 
-export async function getExample(slug: string, signal?: AbortSignal): Promise<ExampleRun> {
-  const example = toExample(await call(`v1/examples/${encodeURIComponent(slug)}`, { signal }));
-  if (example === null) {
-    throw new ApiError({ code: "invalid_response", message: "The example could not be read.", status: 200 });
+export async function getExample(slug: string, signal?: AbortSignal): Promise<RecordedExample> {
+  const body = await call(`v1/examples/${encodeURIComponent(slug)}`, { signal });
+  // The backend wrote these files itself; only what the page relies on is checked.
+  if (
+    isRecord(body) &&
+    typeof body.slug === "string" &&
+    isRecord(body.request) &&
+    typeof body.request.query === "string" &&
+    isRecord(body.plan) &&
+    isQueryResponse(body.response)
+  ) {
+    return {
+      slug: body.slug,
+      request: body.request as unknown as QueryRequest,
+      plan: body.plan as unknown as QueryPlan,
+      response: body.response,
+    };
   }
-  return example;
+  throw new ApiError({ code: "invalid_response", message: "The example could not be read.", status: 200 });
 }
 
 export async function getCapabilities(signal?: AbortSignal): Promise<Capabilities> {

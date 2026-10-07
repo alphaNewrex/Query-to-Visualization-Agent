@@ -118,6 +118,17 @@ export function validate(values: FormValues): FormErrors {
   return errors;
 }
 
+/** Whether any of the structured fields holds a value: the question alone does not count. */
+export function hasStructuredValues(values: FormValues): boolean {
+  return (
+    TEXT_FIELDS.some(({ name }) => values[name].trim() !== "") ||
+    values.trial_phase.length > 0 ||
+    values.status !== "" ||
+    values.start_year.trim() !== "" ||
+    values.end_year.trim() !== ""
+  );
+}
+
 export function toRequest(values: FormValues): QueryRequest {
   const request: QueryRequest = { query: values.query.trim() };
   for (const { name } of TEXT_FIELDS) {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatNumber, formatWithUnit } from "@/lib/format";
+import { formatNumber, formatWithUnit, utcMinute } from "@/lib/format";
 import { pivot } from "@/lib/pivot";
 
 import { datum } from "./fixtures/build";
@@ -18,6 +18,17 @@ describe("formatNumber", () => {
     expect(formatWithUnit(120, { format: ",d", unit: "trials" })).toBe("120 trials");
     expect(formatWithUnit(1, { format: ",d", unit: "trials" })).toBe("1 trial");
     expect(formatWithUnit(5, { format: ",d", unit: null })).toBe("5");
+  });
+});
+
+describe("utcMinute", () => {
+  it("names the minute and the zone, because the day alone would differ from the data date", () => {
+    expect(utcMinute("2026-10-07T00:59:23.301713Z")).toBe("2026-10-07 00:59 UTC");
+    expect(utcMinute("2026-10-06T12:00:00+00:00")).toBe("2026-10-06 12:00 UTC");
+  });
+
+  it("falls back to the day for a timestamp in another form", () => {
+    expect(utcMinute("2026-10-06T09:00:05")).toBe("2026-10-06");
   });
 });
 

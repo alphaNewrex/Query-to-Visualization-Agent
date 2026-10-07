@@ -10,10 +10,24 @@ import { pivot, type Pivoted } from "@/lib/pivot";
 import type { FieldDef, QuantitativeChannel } from "@/lib/types";
 
 import { BarsChart } from "./bars";
-import { ChartFrame, markLabel, selection, seriesConfig, seriesFill, TooltipPanel, tooltipRowsAt } from "./chart-kit";
+import {
+  ChartFrame,
+  fittingTicks,
+  markLabel,
+  selection,
+  seriesConfig,
+  seriesFill,
+  TooltipPanel,
+  tooltipRowsAt,
+  useElementWidth,
+} from "./chart-kit";
 import type { RendererProps } from "./renderer-props";
 
 const HEIGHT = 340;
+/** What the chart keeps beside its plot: the value axis and the right margin. */
+const BESIDE_PLOT = 64;
+/** Width of one character of the 12 px axis font. */
+const LABEL_CHAR_WIDTH = 6.6;
 const LINE_WIDTH = 2;
 /** Markers are at least 8 px across (r 4); a dense series gets smaller ones. */
 const DOT_RADIUS = 4;
@@ -33,6 +47,9 @@ export function TimeSeriesView({ spec, onSelect }: RendererProps<"time_series">)
     [spec.data, x.field, y.field, y.title, series],
   );
 
+  const [ref, width] = useElementWidth<HTMLDivElement>();
+  const ticks = React.useMemo(() => fittingTicks(pivoted.rows.map((row) => row.x), width - BESIDE_PLOT), [pivoted.rows, width]);
+
   const onPick = (period: string, seriesKey: string) => {
     const datum = pivoted.find(period, seriesKey);
     if (datum === undefined) {
@@ -43,28 +60,32 @@ export function TimeSeriesView({ spec, onSelect }: RendererProps<"time_series">)
   };
 
   return (
-    <ChartFrame yTitle={y.title} xTitle={x.title} series={series ? pivoted.series : []} legendLabel={series?.title ?? "Series"}>
-      {spec.mark === "bar" ? (
-        <BarsChart
-          pivoted={pivoted}
-          y={y}
-          extras={tooltip}
-          stacked={spec.stack === "stacked"}
-          horizontal={false}
-          height={HEIGHT}
-          onPick={onPick}
-        />
-      ) : (
-        <LinesChart
-          pivoted={pivoted}
-          y={y}
-          extras={tooltip}
-          area={spec.mark === "area"}
-          stacked={spec.mark === "area" && spec.stack === "stacked"}
-          onPick={onPick}
-        />
-      )}
-    </ChartFrame>
+    <div ref={ref}>
+      <ChartFrame yTitle={y.title} xTitle={x.title} series={series ? pivoted.series : []} legendLabel={series?.title ?? "Series"}>
+        {spec.mark === "bar" ? (
+          <BarsChart
+            pivoted={pivoted}
+            y={y}
+            extras={tooltip}
+            stacked={spec.stack === "stacked"}
+            horizontal={false}
+            xTicks={ticks}
+            height={HEIGHT}
+            onPick={onPick}
+          />
+        ) : (
+          <LinesChart
+            pivoted={pivoted}
+            y={y}
+            extras={tooltip}
+            area={spec.mark === "area"}
+            stacked={spec.mark === "area" && spec.stack === "stacked"}
+            ticks={ticks}
+            onPick={onPick}
+          />
+        )}
+      </ChartFrame>
+    </div>
   );
 }
 
@@ -74,13 +95,18 @@ interface LinesChartProps {
   extras: readonly FieldDef[];
   area: boolean;
   stacked: boolean;
+  /** The period labels to name on the axis; null leaves the choice to Recharts. */
+  ticks: string[] | null;
   onPick: (period: string, seriesKey: string) => void;
 }
 
-function LinesChart({ pivoted, y, extras, area, stacked, onPick }: LinesChartProps) {
+function LinesChart({ pivoted, y, extras, area, stacked, ticks, onPick }: LinesChartProps) {
   const config = React.useMemo(() => seriesConfig(pivoted.series), [pivoted.series]);
   const isLog = y.scale === "log";
   const dense = pivoted.rows.length > DENSE_AFTER;
+  // The last point sits on the right edge of the plot, and its label is centred on it: the margin holds the label's right half.
+  const longestLabel = pivoted.rows.reduce((max, row) => Math.max(max, row.x.length), 0);
+  const marginRight = Math.max(12, Math.ceil((longestLabel * LABEL_CHAR_WIDTH) / 2) + 4);
 
   /**
    * Each point is drawn by this function as a circle with its own click handler, and the chart
@@ -132,7 +158,8 @@ function LinesChart({ pivoted, y, extras, area, stacked, onPick }: LinesChartPro
       <CartesianGrid vertical={false} />
       <XAxis
         dataKey="x"
-        interval="preserveStartEnd"
+        ticks={ticks ?? undefined}
+        interval={ticks ? 0 : "preserveStartEnd"}
         minTickGap={20}
         tickMargin={8}
         tickLine={false}
@@ -164,7 +191,7 @@ function LinesChart({ pivoted, y, extras, area, stacked, onPick }: LinesChartPro
   return (
     <ChartContainer config={config} className="aspect-auto w-full" style={{ height: HEIGHT }}>
       {area ? (
-        <AreaChart data={pivoted.rows} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
+        <AreaChart data={pivoted.rows} margin={{ top: 8, right: marginRight, bottom: 0, left: 0 }}>
           {axes}
           {pivoted.series.map((entry) => (
             <Area
@@ -184,7 +211,7 @@ function LinesChart({ pivoted, y, extras, area, stacked, onPick }: LinesChartPro
           ))}
         </AreaChart>
       ) : (
-        <LineChart data={pivoted.rows} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
+        <LineChart data={pivoted.rows} margin={{ top: 8, right: marginRight, bottom: 0, left: 0 }}>
           {axes}
           {pivoted.series.map((entry) => (
             <Line

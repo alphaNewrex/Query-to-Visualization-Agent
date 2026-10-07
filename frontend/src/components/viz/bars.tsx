@@ -13,8 +13,8 @@ import { seriesConfig, seriesFill, tooltipRowsAt, TooltipPanel, truncate, Wrappe
 /** Bars never fill their slot: the data is the only thing allowed to be loud (dataviz mark spec). */
 const MAX_BAR_SIZE = 24;
 const CORNER = 4;
-/** Average width of one character of the 12 px axis font, used to size the category axis. */
-const CHAR_WIDTH = 6.6;
+/** Width of one character of the 12 px axis font (a little over the average, so that a label is not wrapped for a pixel), used to size the category axis. */
+const CHAR_WIDTH = 7;
 
 export interface BarsChartProps {
   pivoted: Pivoted;
@@ -30,6 +30,10 @@ export interface BarsChartProps {
   tipLabels?: boolean;
   /** Vertical bars only: wrap the category labels to this many characters and lines, as the width allows. */
   categoryLabels?: { maxChars: number; maxLines: number };
+  /** Vertical bars only: the category labels to name on the axis, when the caller has worked out which fit. */
+  xTicks?: string[] | null;
+  /** Vertical bars only: slant the category labels, for a row of labels that cannot be wrapped, such as bin ranges. */
+  angledLabels?: boolean;
   height: number;
   /** A bar was clicked: its x label and its positional series key. */
   onPick: (xLabel: string, seriesKey: string) => void;
@@ -37,7 +41,13 @@ export interface BarsChartProps {
 
 export function categoryAxisWidth(labels: readonly string[], maxChars: number): number {
   const longest = labels.reduce((max, label) => Math.max(max, Math.min(label.length, maxChars)), 0);
-  return Math.min(220, Math.max(64, Math.round(longest * CHAR_WIDTH + 16)));
+  return Math.min(220, Math.max(64, Math.round(longest * CHAR_WIDTH + 24)));
+}
+
+/** The height a row of labels slanted by 45 degrees needs: the longest label's drop, and room around it. */
+export function slantedHeight(labels: readonly string[]): number {
+  const longest = labels.reduce((max, label) => Math.max(max, label.length), 0);
+  return Math.ceil(longest * CHAR_WIDTH * Math.SQRT1_2) + 20;
 }
 
 /** One bar chart body for the bar chart, the bar form of a time series and the histogram. */
@@ -50,6 +60,8 @@ export function BarsChart({
   contiguous = false,
   tipLabels = false,
   categoryLabels,
+  xTicks,
+  angledLabels = false,
   height,
   onPick,
 }: BarsChartProps) {
@@ -99,7 +111,8 @@ export function BarsChart({
           <>
             <XAxis
               dataKey="x"
-              interval={labelCount > 14 ? "preserveStartEnd" : 0}
+              ticks={xTicks ?? undefined}
+              interval={xTicks || labelCount <= 14 ? 0 : "preserveStartEnd"}
               minTickGap={12}
               tickMargin={8}
               tick={
@@ -109,7 +122,9 @@ export function BarsChart({
                     )
                   : undefined
               }
-              height={categoryLabels ? 20 + categoryLabels.maxLines * 14 : undefined}
+              angle={angledLabels ? -45 : undefined}
+              textAnchor={angledLabels ? "end" : undefined}
+              height={categoryLabels ? 20 + categoryLabels.maxLines * 14 : angledLabels ? slantedHeight(pivoted.rows.map((row) => row.x)) : undefined}
               tickLine={false}
               axisLine={{ stroke: "var(--border)" }}
             />

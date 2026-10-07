@@ -25,10 +25,18 @@ export const emptyFilters: AppliedFilters = {
   study_type: [],
   sponsor_class: [],
   intervention_type: [],
+  sex: [],
+  age_group: [],
+  allocation: [],
+  masking: [],
+  primary_purpose: [],
+  has_results: [],
+  intervention_model: [],
   start_year: null,
   end_year: null,
   date_field: null,
   compare: null,
+  exclude: { drug_name: [], condition: [], sponsor: [], country: [], term: [], status: [] },
 };
 
 export function quant(field: string, title: string, extra: Partial<QuantitativeChannel> = {}): QuantitativeChannel {

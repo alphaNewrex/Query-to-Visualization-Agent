@@ -34,56 +34,65 @@ export function DataTable({ columns, rows, rowLabel, rowValue, onSelect, caption
   const select = (row: Datum, index: number) => onSelect?.({ label: rowLabel(row, index), value: rowValue(row), datum: row });
 
   return (
-    <Table>
-      {caption ? <caption className="sr-only">{caption}</caption> : null}
-      <TableHeader>
-        <TableRow className="hover:bg-transparent">
-          {columns.map((column) => (
-            <TableHead key={column.field} className={cn(column.type === "quantitative" && "text-right")}>
-              {column.title}
-            </TableHead>
-          ))}
-          {onSelect ? <TableHead className="w-px text-right">Citations</TableHead> : null}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {rows.map((row, index) => (
-          <TableRow
-            key={index}
-            data-mark="row"
-            className={cn(onSelect && "cursor-pointer")}
-            onClick={onSelect ? () => select(row, index) : undefined}
-          >
+    <div className="flex flex-col gap-1.5">
+      {/* On a phone a table of many columns scrolls inside its frame; the page itself never does. */}
+      {columns.length + (onSelect ? 1 : 0) > 3 ? (
+        <p className="text-xs text-muted-foreground sm:hidden">Swipe sideways for the other columns.</p>
+      ) : null}
+      <Table>
+        {caption ? <caption className="sr-only">{caption}</caption> : null}
+        <TableHeader>
+          <TableRow className="hover:bg-transparent">
             {columns.map((column) => (
-              <TableCell
-                key={column.field}
-                className={cn(
-                  column.type === "quantitative" ? "text-right tabular-nums" : "max-w-[26rem] whitespace-normal",
-                )}
-              >
-                <CellContent row={row} column={column} />
-              </TableCell>
+              <TableHead key={column.field} className={cn(column.type === "quantitative" && "text-right")}>
+                {column.title}
+              </TableHead>
             ))}
-            {onSelect ? (
-              <TableCell className="text-right">
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  aria-label={`Citations for ${rowLabel(row, index)}`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    select(row, index);
-                  }}
-                >
-                  <QuoteIcon aria-hidden />
-                  {row.citation_count}
-                </Button>
-              </TableCell>
-            ) : null}
+            {onSelect ? <TableHead className="w-px text-right">Citations</TableHead> : null}
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {rows.map((row, index) => (
+            <TableRow
+              key={index}
+              data-mark="row"
+              className={cn(onSelect && "cursor-pointer")}
+              onClick={onSelect ? () => select(row, index) : undefined}
+            >
+              {columns.map((column) => (
+                <TableCell
+                  key={column.field}
+                  className={cn(
+                    column.type === "quantitative" && "text-right tabular-nums",
+                    // A date such as 2000-01-01 is never broken at its hyphens.
+                    column.type === "temporal" && "whitespace-nowrap",
+                    column.type !== "quantitative" && column.type !== "temporal" && "max-w-[26rem] whitespace-normal",
+                  )}
+                >
+                  <CellContent row={row} column={column} />
+                </TableCell>
+              ))}
+              {onSelect ? (
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    aria-label={`Citations for ${rowLabel(row, index)}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      select(row, index);
+                    }}
+                  >
+                    <QuoteIcon aria-hidden />
+                    {row.citation_count}
+                  </Button>
+                </TableCell>
+              ) : null}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }
 

@@ -10,7 +10,7 @@ import { DataTable } from "@/components/viz/table-view";
 import { VisualizationView } from "@/components/viz/registry";
 import { dataTablesFor, rowName, rowValue } from "@/lib/data-tables";
 import { classify } from "@/lib/guards";
-import type { DatumSelection, QueryRequest, QueryResponse, Viz } from "@/lib/types";
+import type { AnalysisRequest, DatumSelection, QueryRequest, QueryResponse, Viz } from "@/lib/types";
 
 import { ErrorBoundary } from "./error-boundary";
 import { Notes } from "./notes";
@@ -67,7 +67,8 @@ export function ResultView({
   busy,
 }: {
   response: QueryResponse;
-  request: QueryRequest | null;
+  /** What was sent for this answer: a question, or a plan that ran without a model. */
+  request: QueryRequest | AnalysisRequest | null;
   onSelect: (selection: DatumSelection) => void;
   onRun: (request: QueryRequest) => void;
   onRerun?: () => void;

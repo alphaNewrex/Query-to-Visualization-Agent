@@ -50,6 +50,9 @@ export function ErrorCard({ error, onRetry }: { error: ApiError | Error; onRetry
       <AlertTitle>{api ? "The request failed" : "Something went wrong"}</AlertTitle>
       <AlertDescription className="flex flex-col gap-2">
         <p>{error.message}</p>
+        {api?.code === "planner_unavailable" ? (
+          <p>This server has no model, so it cannot read a typed question. The recorded examples above need none.</p>
+        ) : null}
         <p className="font-mono text-xs">
           {api ? `${api.code}${api.status ? ` · HTTP ${api.status}` : ""}` : null}
           {api?.requestId ? ` · request ${api.requestId}` : null}

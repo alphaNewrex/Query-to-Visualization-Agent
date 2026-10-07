@@ -24,9 +24,16 @@ function filterChips(filters: Meta["filters"]): string[] {
       chips.push(`${key}: ${value.join(", ")}`);
     } else if (typeof value === "number" || (typeof value === "string" && value !== "")) {
       chips.push(`${key}: ${value}`);
+    } else if (key === "exclude" && value && typeof value === "object") {
+      for (const [name, left] of Object.entries(value as Record<string, string[]>)) {
+        if (left.length > 0) chips.push(`excluding ${name}: ${left.join(", ")}`);
+      }
     } else if (value && typeof value === "object" && !Array.isArray(value)) {
-      const compare = value as { field: string; values: string[] };
-      chips.push(`compare ${compare.field}: ${compare.values.join(" vs ")}`);
+      // A comparison names its field and its values; any other object a later minor version adds is left out, not crashed on.
+      const compare = value as { field?: unknown; values?: unknown };
+      if (typeof compare.field === "string" && Array.isArray(compare.values)) {
+        chips.push(`compare ${compare.field}: ${compare.values.join(" vs ")}`);
+      }
     }
   }
   return chips;
@@ -169,8 +176,11 @@ export function TraceTab({ meta, onRerun, disabled }: { meta: Meta; onRerun?: ()
       ) : null}
 
       {source && source.requests.length > 0 ? (
-        <Section title="Upstream requests">
-          <ul className="m-0 list-none p-0">
+        // A walk of the registry can take dozens of requests: they are all here, behind one line, so that the
+        // rest of the trace (and the re-run button below it) is not pushed out of reach.
+        <details>
+          <summary className="cursor-pointer text-sm font-medium">Upstream requests ({source.requests.length})</summary>
+          <ul className="m-0 mt-2 list-none p-0">
             {source.requests.map((request, index) => (
               <li key={index} className="break-all">
                 {isHttpUrl(request.url) ? (
@@ -186,7 +196,7 @@ export function TraceTab({ meta, onRerun, disabled }: { meta: Meta; onRerun?: ()
               </li>
             ))}
           </ul>
-        </Section>
+        </details>
       ) : null}
 
       <Section title="Timing">

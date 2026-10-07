@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { wrapLabel } from "@/components/viz/chart-kit";
+import { fittingTicks, wrapLabel } from "@/components/viz/chart-kit";
 import { layoutGraph } from "@/components/viz/graph-layout";
 import type { VizOf } from "@/lib/types";
 
@@ -28,6 +28,32 @@ describe("wrapLabel", () => {
 
   it("leaves a word that is too long on a line of its own", () => {
     expect(wrapLabel("Not Applicable", 6)).toEqual(["Not", "Applicable"]);
+  });
+});
+
+describe("fittingTicks", () => {
+  const years = Array.from({ length: 19 }, (_, index) => String(2008 + index));
+
+  it("names every period when there is room, so that no label next to the last one is dropped", () => {
+    expect(fittingTicks(years, 900)).toEqual(years);
+  });
+
+  it("otherwise names every n-th period counted back from the last, which is always named", () => {
+    expect(fittingTicks(years, 290)).toEqual(["2008", "2011", "2014", "2017", "2020", "2023", "2026"]);
+    // Twelve periods: every second one, ending on the last, so the first is not named.
+    expect(fittingTicks(years.slice(7), 290)).toEqual(["2016", "2018", "2020", "2022", "2024", "2026"]);
+  });
+
+  it("leaves the choice to the chart while the width is not known", () => {
+    expect(fittingTicks(years, 0)).toBeNull();
+    expect(fittingTicks([], 500)).toBeNull();
+  });
+
+  it("allows for longer labels", () => {
+    const quarters = Array.from({ length: 12 }, (_, index) => `${2023 + Math.floor(index / 4)}-Q${(index % 4) + 1}`);
+    const ticks = fittingTicks(quarters, 400) ?? [];
+    expect(ticks.length).toBeLessThan(quarters.length);
+    expect(ticks[ticks.length - 1]).toBe("2025-Q4");
   });
 });
 

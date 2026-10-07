@@ -148,6 +148,47 @@ export interface QueryRequest {
       )[]
     | null;
   /**
+   * Sexes the trials accept, any of.
+   */
+  sex?: ("FEMALE" | "MALE" | "ALL")[] | null;
+  /**
+   * Age groups the trials include, any of.
+   */
+  age_group?: ("CHILD" | "ADULT" | "OLDER_ADULT")[] | null;
+  /**
+   * Allocation of interventional trials, any of (RANDOMIZED, NON_RANDOMIZED, NA).
+   */
+  allocation?: ("RANDOMIZED" | "NON_RANDOMIZED" | "NA")[] | null;
+  /**
+   * Masking of interventional trials, any of.
+   */
+  masking?: ("NONE" | "SINGLE" | "DOUBLE" | "TRIPLE" | "QUADRUPLE")[] | null;
+  /**
+   * Primary purposes, any of.
+   */
+  primary_purpose?:
+    | (
+        | "TREATMENT"
+        | "PREVENTION"
+        | "DIAGNOSTIC"
+        | "ECT"
+        | "SUPPORTIVE_CARE"
+        | "SCREENING"
+        | "HEALTH_SERVICES_RESEARCH"
+        | "BASIC_SCIENCE"
+        | "DEVICE_FEASIBILITY"
+        | "OTHER"
+      )[]
+    | null;
+  /**
+   * 'true': results posted; 'false': none posted.
+   */
+  has_results?: ("true" | "false")[] | null;
+  /**
+   * Assignment models of interventional trials, any of.
+   */
+  intervention_model?: ("PARALLEL" | "CROSSOVER" | "FACTORIAL" | "SEQUENTIAL" | "SINGLE_GROUP")[] | null;
+  /**
    * First year, inclusive, of the date named by `date_field`. Not after `end_year`.
    */
   start_year?: number | null;
@@ -164,7 +205,11 @@ export interface QueryRequest {
    */
   compare?: CompareSpec | null;
   /**
-   * Analysis hint: the first key is the axis, the second the series. The second key must be one of the closed dimensions (phase, overall_status, study_type, sponsor_class, intervention_type, sex, age_group, allocation, masking, primary_purpose, has_results). Overrides what the planner chose. Required when `options.planner` is 'structured'.
+   * Leave out trials that match any listed entity or have any listed status ('excluding diabetes', 'without terminated studies'). Replaces what the planner read for the same entity kind or for statuses; an empty object is no exclusion.
+   */
+  exclude?: ExcludeSpec | null;
+  /**
+   * Analysis hint: the first key is the axis, the second the series. The second key must be one of the closed dimensions (phase, overall_status, study_type, sponsor_class, intervention_type, sex, age_group, allocation, masking, primary_purpose, has_results, intervention_model). Overrides what the planner chose. Required when `options.planner` is 'structured'.
    */
   group_by?:
     | [
@@ -179,6 +224,7 @@ export interface QueryRequest {
         | "masking"
         | "primary_purpose"
         | "has_results"
+        | "intervention_model"
         | "country"
         | "sponsor"
         | "drug"
@@ -202,6 +248,7 @@ export interface QueryRequest {
           | "masking"
           | "primary_purpose"
           | "has_results"
+          | "intervention_model"
           | "country"
           | "sponsor"
           | "drug"
@@ -224,6 +271,7 @@ export interface QueryRequest {
           | "masking"
           | "primary_purpose"
           | "has_results"
+          | "intervention_model"
           | "country"
           | "sponsor"
           | "drug"
@@ -258,9 +306,94 @@ export interface CompareSpec {
   field: "drug_name" | "condition" | "sponsor" | "country";
   /**
    * @minItems 2
-   * @maxItems 4
+   * @maxItems 5
    */
-  values: [string, string] | [string, string, string] | [string, string, string, string];
+  values:
+    | [string, string]
+    | [string, string, string]
+    | [string, string, string, string]
+    | [string, string, string, string, string];
+}
+/**
+ * Trials to leave out: those that match any of these entities or have any of these statuses.
+ */
+export interface ExcludeSpec {
+  /**
+   * Drugs to leave out; same searches as the filter fields.
+   */
+  drug_name?:
+    | []
+    | [string]
+    | [string, string]
+    | [string, string, string]
+    | [string, string, string, string]
+    | [string, string, string, string, string]
+    | null;
+  /**
+   * Conditions to leave out.
+   */
+  condition?:
+    | []
+    | [string]
+    | [string, string]
+    | [string, string, string]
+    | [string, string, string, string]
+    | [string, string, string, string, string]
+    | null;
+  /**
+   * Lead sponsors to leave out.
+   */
+  sponsor?:
+    | []
+    | [string]
+    | [string, string]
+    | [string, string, string]
+    | [string, string, string, string]
+    | [string, string, string, string, string]
+    | null;
+  /**
+   * Countries to leave out (any site there).
+   */
+  country?:
+    | []
+    | [string]
+    | [string, string]
+    | [string, string, string]
+    | [string, string, string, string]
+    | [string, string, string, string, string]
+    | null;
+  /**
+   * Other search words to leave out.
+   */
+  term?:
+    | []
+    | [string]
+    | [string, string]
+    | [string, string, string]
+    | [string, string, string, string]
+    | [string, string, string, string, string]
+    | null;
+  /**
+   * Overall statuses to leave out.
+   */
+  status?:
+    | (
+        | "NOT_YET_RECRUITING"
+        | "RECRUITING"
+        | "ENROLLING_BY_INVITATION"
+        | "ACTIVE_NOT_RECRUITING"
+        | "COMPLETED"
+        | "SUSPENDED"
+        | "TERMINATED"
+        | "WITHDRAWN"
+        | "AVAILABLE"
+        | "NO_LONGER_AVAILABLE"
+        | "TEMPORARILY_NOT_AVAILABLE"
+        | "APPROVED_FOR_MARKETING"
+        | "WITHHELD"
+        | "UNKNOWN"
+      )[]
+    | null;
 }
 /**
  * Behaviour switches of one request; `meta.options` echoes the effective values.
@@ -337,9 +470,9 @@ export interface Entity {
    */
   value: string;
   /**
-   * 'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison.
+   * 'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison. 'exclude': no counted trial may match ('excluding', 'without', 'not involving').
    */
-  role: "filter" | "compare";
+  role: "filter" | "compare" | "exclude";
 }
 export interface PlanFilters {
   /**
@@ -350,6 +483,25 @@ export interface PlanFilters {
    * Empty unless the question restricts status. 'recruiting' means RECRUITING only.
    */
   statuses: (
+    | "NOT_YET_RECRUITING"
+    | "RECRUITING"
+    | "ENROLLING_BY_INVITATION"
+    | "ACTIVE_NOT_RECRUITING"
+    | "COMPLETED"
+    | "SUSPENDED"
+    | "TERMINATED"
+    | "WITHDRAWN"
+    | "AVAILABLE"
+    | "NO_LONGER_AVAILABLE"
+    | "TEMPORARILY_NOT_AVAILABLE"
+    | "APPROVED_FOR_MARKETING"
+    | "WITHHELD"
+    | "UNKNOWN"
+  )[];
+  /**
+   * Empty unless the question leaves statuses out, e.g. 'exclude terminated studies'.
+   */
+  exclude_statuses: (
     | "NOT_YET_RECRUITING"
     | "RECRUITING"
     | "ENROLLING_BY_INVITATION"
@@ -390,6 +542,45 @@ export interface PlanFilters {
     | "OTHER"
   )[];
   /**
+   * Empty unless the question restricts the sexes eligible.
+   */
+  sexes: ("FEMALE" | "MALE" | "ALL")[];
+  /**
+   * Empty unless the question restricts the age group.
+   */
+  age_groups: ("CHILD" | "ADULT" | "OLDER_ADULT")[];
+  /**
+   * Empty unless the question restricts allocation: 'randomized' is RANDOMIZED.
+   */
+  allocations: ("RANDOMIZED" | "NON_RANDOMIZED" | "NA")[];
+  /**
+   * Empty unless the question restricts masking, e.g. 'double-blind' is DOUBLE.
+   */
+  maskings: ("NONE" | "SINGLE" | "DOUBLE" | "TRIPLE" | "QUADRUPLE")[];
+  /**
+   * Empty unless the question restricts the primary purpose, e.g. 'prevention trials'.
+   */
+  primary_purposes: (
+    | "TREATMENT"
+    | "PREVENTION"
+    | "DIAGNOSTIC"
+    | "ECT"
+    | "SUPPORTIVE_CARE"
+    | "SCREENING"
+    | "HEALTH_SERVICES_RESEARCH"
+    | "BASIC_SCIENCE"
+    | "DEVICE_FEASIBILITY"
+    | "OTHER"
+  )[];
+  /**
+   * Empty unless the question restricts whether results are posted: ['true'] or ['false'].
+   */
+  has_results: ("true" | "false")[];
+  /**
+   * Empty unless the question restricts the assignment model, e.g. 'crossover'.
+   */
+  intervention_models: ("PARALLEL" | "CROSSOVER" | "FACTORIAL" | "SEQUENTIAL" | "SINGLE_GROUP")[];
+  /**
    * One item for every non-empty list above.
    */
   evidence: FilterEvidence[];
@@ -407,7 +598,20 @@ export interface PlanFilters {
   year_to: number | null;
 }
 export interface FilterEvidence {
-  family: "phases" | "statuses" | "study_types" | "sponsor_classes" | "intervention_types";
+  family:
+    | "phases"
+    | "statuses"
+    | "exclude_statuses"
+    | "study_types"
+    | "sponsor_classes"
+    | "intervention_types"
+    | "sexes"
+    | "age_groups"
+    | "allocations"
+    | "maskings"
+    | "primary_purposes"
+    | "has_results"
+    | "intervention_models";
   /**
    * The words of the question that state this filter, copied verbatim.
    */
@@ -430,6 +634,7 @@ export interface Aggregate {
     | "masking"
     | "primary_purpose"
     | "has_results"
+    | "intervention_model"
     | "country"
     | "sponsor"
     | "drug"
@@ -455,6 +660,7 @@ export interface Aggregate {
         | "masking"
         | "primary_purpose"
         | "has_results"
+        | "intervention_model"
       )
     | null;
   /**
@@ -465,9 +671,25 @@ export interface Aggregate {
    * Only when the user asks for a number of items; otherwise null.
    */
   top_n: number | null;
+  /**
+   * Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead.
+   */
+  statistic: ("median" | "mean" | "sum") | null;
+  /**
+   * The numeric field of a statistic; null when counting.
+   */
+  of: ("enrollment" | "duration_months" | "site_count") | null;
 }
 export interface Total {
   kind: "total";
+  /**
+   * Null counts trials. 'median', 'mean' or 'sum' of the numeric field `of` instead.
+   */
+  statistic: ("median" | "mean" | "sum") | null;
+  /**
+   * The numeric field of a statistic; null when counting.
+   */
+  of: ("enrollment" | "duration_months" | "site_count") | null;
 }
 export interface Relate {
   kind: "relate";
@@ -486,6 +708,7 @@ export interface Relate {
         | "masking"
         | "primary_purpose"
         | "has_results"
+        | "intervention_model"
       )
     | null;
 }
@@ -967,10 +1190,55 @@ export interface AppliedFilters {
     | "RADIATION"
     | "OTHER"
   )[];
+  sex: ("FEMALE" | "MALE" | "ALL")[];
+  age_group: ("CHILD" | "ADULT" | "OLDER_ADULT")[];
+  allocation: ("RANDOMIZED" | "NON_RANDOMIZED" | "NA")[];
+  masking: ("NONE" | "SINGLE" | "DOUBLE" | "TRIPLE" | "QUADRUPLE")[];
+  primary_purpose: (
+    | "TREATMENT"
+    | "PREVENTION"
+    | "DIAGNOSTIC"
+    | "ECT"
+    | "SUPPORTIVE_CARE"
+    | "SCREENING"
+    | "HEALTH_SERVICES_RESEARCH"
+    | "BASIC_SCIENCE"
+    | "DEVICE_FEASIBILITY"
+    | "OTHER"
+  )[];
+  has_results: ("true" | "false")[];
+  intervention_model: ("PARALLEL" | "CROSSOVER" | "FACTORIAL" | "SEQUENTIAL" | "SINGLE_GROUP")[];
   start_year: number | null;
   end_year: number | null;
   date_field: ("start_date" | "primary_completion_date" | "completion_date" | "first_posted_date") | null;
   compare: CompareSpec | null;
+  exclude: AppliedExclusions;
+}
+/**
+ * What the answer leaves out, in request field names (`exclude` of the request).
+ */
+export interface AppliedExclusions {
+  drug_name: string[];
+  condition: string[];
+  sponsor: string[];
+  country: string[];
+  term: string[];
+  status: (
+    | "NOT_YET_RECRUITING"
+    | "RECRUITING"
+    | "ENROLLING_BY_INVITATION"
+    | "ACTIVE_NOT_RECRUITING"
+    | "COMPLETED"
+    | "SUSPENDED"
+    | "TERMINATED"
+    | "WITHDRAWN"
+    | "AVAILABLE"
+    | "NO_LONGER_AVAILABLE"
+    | "TEMPORARILY_NOT_AVAILABLE"
+    | "APPROVED_FOR_MARKETING"
+    | "WITHHELD"
+    | "UNKNOWN"
+  )[];
 }
 /**
  * How the question was read, resolved and executed.
@@ -1001,8 +1269,12 @@ export interface Interpretation {
   chart_rationale: string;
 }
 export interface Measure {
-  aggregate: "count";
-  of: "trials";
+  aggregate: "count" | "median" | "mean" | "sum";
+  of: "trials" | "enrollment" | "duration_months" | "site_count";
+  /**
+   * What `of` is counted in: trials, participants, months or sites.
+   */
+  unit: string;
 }
 /**
  * What the registry made of one entity of the plan.

@@ -28,7 +28,10 @@ export function Followups({
 
 /** Compact list under the chart: the assumptions and warnings; the Trace tab keeps the detail. */
 export function Notes({ meta, onRun }: { meta: Meta; onRun: (request: QueryRequest) => void }) {
-  const hasNotes = meta.assumptions.length > 0 || meta.warnings.length > 0;
+  // The backend can state one thing as both a warning and an assumption: it is listed once, as the warning.
+  const warned = new Set(meta.warnings.map((warning) => warning.message));
+  const assumptions = meta.assumptions.filter((assumption) => !warned.has(assumption));
+  const hasNotes = assumptions.length > 0 || meta.warnings.length > 0;
   if (!hasNotes && meta.suggested_followups.length === 0) {
     return null;
   }
@@ -42,7 +45,7 @@ export function Notes({ meta, onRun }: { meta: Meta; onRun: (request: QueryReque
               <span>{warning.message}</span>
             </li>
           ))}
-          {meta.assumptions.map((assumption, index) => (
+          {assumptions.map((assumption, index) => (
             <li key={`a${index}`} className="flex gap-2">
               <InfoIcon className="mt-0.5 size-4 shrink-0" aria-label="Assumption" />
               <span>{assumption}</span>

@@ -70,22 +70,22 @@ export function CitationSheet({
                     </li>
                   ))}
                 </ul>
-                <div className="text-xs text-muted-foreground">
-                  <span className="font-medium">In scope because: </span>
-                  {evidence.length === 0
-                    ? "no evidence recorded."
-                    : evidence.map((item, index) => (
-                        <span key={index} className="block break-words">
-                          {item.field === null || item.excerpt === null ? (
-                            <>“{item.entity_text}” matched by ClinicalTrials.gov&apos;s own search.</>
-                          ) : (
-                            <>
-                              “{item.entity_text}” in <code className="font-mono break-all">{item.field}</code>: “{item.excerpt}”
-                            </>
-                          )}
-                        </span>
-                      ))}
-                </div>
+                {evidence.length > 0 ? (
+                  <div className="text-xs text-muted-foreground">
+                    <span className="font-medium">In scope because: </span>
+                    {evidence.map((item, index) => (
+                      <span key={index} className="block break-words">
+                        {item.field === null || item.excerpt === null ? (
+                          <>“{item.entity_text}” matched by ClinicalTrials.gov&apos;s own search.</>
+                        ) : (
+                          <>
+                            “{item.entity_text}” in <code className="font-mono break-all">{item.field}</code>: “{item.excerpt}”
+                          </>
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
                   {links.record ? (
                     <a href={links.record} target="_blank" rel="noopener noreferrer" className={LINK}>
