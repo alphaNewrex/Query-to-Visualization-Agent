@@ -265,17 +265,22 @@ With more time I would add an evaluation harness with repeated runs, drug class 
 
 ## How this was built
 
-I used AI-assisted development deliberately throughout this project, primarily to accelerate implementation, testing, documentation, and other repetitive engineering work rather than to substitute for system design.
+I used AI tools throughout this project, mainly to speed up implementation, testing and documentation. The system design I did myself.
 
-Before implementation began, I worked through the architecture, data flow, API boundaries, visualization schema, aggregation strategy, failure modes, and major design tradeoffs. These decisions were captured in an implementation plan that I reviewed and approved before coding started. Where there were multiple reasonable approaches, I used discussions with Claude-family models to explore the tradeoffs, then cross-checked important assumptions and decisions with OpenAI models to identify missed edge cases or alternative approaches.
+Before any code was written I worked out the architecture, the data flow, the API and visualization schema, the aggregation strategy, the failure modes and the main tradeoffs. These went into an implementation plan that I reviewed and approved before coding started. Where there was more than one reasonable approach, I talked the options through with Claude models and then cross-checked the important decisions with OpenAI models to catch missed edge cases.
 
-I also used a separate model family as a review layer rather than relying only on the model that produced an implementation. The test suite and adversarial query set were reviewed and extended using OpenAI-family models, with particular attention to aggregation correctness, citation behavior, ambiguous queries, unsupported assumptions, and edge cases in ClinicalTrials.gov data. This helped reduce the risk of a single model both introducing and overlooking the same class of error.
+I also used a second model family as a reviewer, so that one model would not both introduce and overlook the same kind of mistake. OpenAI models reviewed and extended the test suite and the set of adversarial queries, with attention to aggregation, citations, ambiguous questions and odd ClinicalTrials.gov data.
 
-AI-based review was only one part of validation. I also performed manual checks without model assistance. These included inspecting representative ClinicalTrials.gov responses directly, tracing selected queries through the planner and execution pipeline, manually verifying filters and aggregation logic against returned study records, checking deduplication behavior for multi-site and multi-intervention studies, reviewing citations against their underlying sources, and comparing rendered visualizations with the aggregated data passed to the frontend. I also exercised the application interactively to catch UI, loading, error-handling, and integration issues that are easy to miss in automated tests.
+AI review was only part of the validation. I also checked things by hand, without a model:
 
-The final system was validated through offline test suites, live planner checks, citation and aggregation audits, difficult end-to-end prompts, re-recorded example outputs, manual spot checks, and screenshots captured from the running application. Generated artifacts such as the schema reference, example index, frontend types, and documentation tables are derived directly from the code and are checked for staleness during the build. The ten examples shown in this repository are recorded system outputs rather than manually constructed examples.
+- read raw ClinicalTrials.gov responses
+- traced selected queries through the planner and the execution pipeline
+- verified filters and aggregates against the returned study records
+- checked how trials with several sites or several interventions are deduplicated
+- compared citations with their sources, and rendered charts with the data sent to the frontend
+- used the app myself to catch UI, loading and error-handling problems that automated tests miss
 
-Overall, AI was used as an engineering multiplier: for implementation speed, repetitive work, exploration, adversarial review, and test generation. I retained responsibility for the architecture, design choices, constraints, evaluation criteria, manual verification, and final validation of the system.
+The automated checks are listed under [How correctness was validated](#how-correctness-was-validated). The schema reference, example index, frontend types and documentation tables are generated from the code, and the build checks that they are current. The ten examples are recorded outputs of the system, not hand-written ones.
 
 ## Data source and attribution
 
