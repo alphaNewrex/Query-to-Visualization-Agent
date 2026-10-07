@@ -103,6 +103,7 @@ DimensionKey = Literal[
     "has_results",
     "intervention_model",  # closed
     "country",
+    "state",
     "sponsor",
     "drug",
     "condition",  # open

@@ -16,6 +16,7 @@ from ctviz.contract.plan import TimeUnit
 from ctviz.ctgov.essie import Expr
 
 if TYPE_CHECKING:
+    from ctviz.ctgov.params import Scope
     from ctviz.ctgov.study import Study
 
 
@@ -93,6 +94,11 @@ class FieldSpec:
     missing: Bucket | None = None  # where trials without a value go; None means excluded and counted
     presence: Expr | None = None  # true when the field has a value; pushed down before a walk
     prepare: Callable[[Sequence[Study]], FieldContext] | None = None  # the fit step
+    # Instead of `prepare`, for a field whose values depend on what the question scopes to: state.
+    prepare_in_scope: Callable[[Sequence[Study], Scope], FieldContext] | None = None
+    hint: str | None = (
+        None  # a sentence for the planner's glossary, where the title alone does not say enough
+    )
     notes: tuple[str, ...] = ()  # assumption sentences added whenever the field is used
 
 

@@ -323,6 +323,10 @@ def _holds(study: Study, piece: str, argument: str) -> bool:
         return study.lead_sponsor_name == argument.strip('"')
     if piece == "Phase":
         return not study.phases if argument == "MISSING" else argument in study.phases
+    if piece == "LocationCountry":
+        return any(site.country == argument.strip('"') for site in study.locations)
+    if piece == "LocationState":
+        return any(site.state == argument.strip('"') for site in study.locations)
     raise ValueError(f"The fake registry does not know {piece}.")
 
 

@@ -12,6 +12,7 @@ from ctviz.catalog import periods, vocab
 from ctviz.catalog.conditions import ConditionLabels, fold
 from ctviz.catalog.drugs import DrugNormalizer
 from ctviz.catalog.fields import BoundDimension, Evidence, FieldContext, Value
+from ctviz.catalog.states import StateScope
 from ctviz.ctgov.study import Study, StudyDate
 
 Extractor = Callable[[Study, FieldContext | None, BoundDimension], Sequence[Value]]
@@ -120,6 +121,27 @@ def country(study: Study, _context: FieldContext | None, _dimension: BoundDimens
         if name and name not in found:
             path = f"{PROTOCOL}.contactsLocationsModule.locations[{location.index}].country"
             found[name] = Value(name, name, (Evidence(path, location.country),))
+    return list(found.values())
+
+
+def state(study: Study, context: FieldContext | None, _dimension: BoundDimension) -> Sequence[Value]:
+    """Each distinct state with a site once, however many sites it has there, read at its first site.
+
+    Only sites in the countries the question names count (every site when it names none). A site's
+    evidence is its state and its country, both quoted from the record.
+    """
+    scope = context if isinstance(context, StateScope) else StateScope(())
+    found: dict[str, Value] = {}
+    for location in study.locations:
+        if location.state is None or not scope.includes(location.country):
+            continue
+        name = location.state.strip()
+        if name and name not in found:
+            base = f"{PROTOCOL}.contactsLocationsModule.locations[{location.index}]"
+            evidence = [Evidence(f"{base}.state", location.state)]
+            if location.country is not None:
+                evidence.append(Evidence(f"{base}.country", location.country))
+            found[name] = Value(name, name, tuple(evidence))
     return list(found.values())
 
 

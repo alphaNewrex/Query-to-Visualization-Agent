@@ -402,6 +402,27 @@ def interpretation_summary(
 # --- Assumptions, warnings and notes ------------------------------------------------------------------
 
 
+def state_sites_note(countries: Sequence[str], *, is_open: bool) -> str:
+    """Which sites a state grouping used: those in the countries the question names, else every site."""
+    if countries and not is_open:
+        return (
+            f"States are those of sites in {' and '.join(countries)}, the "
+            f"{'country' if len(countries) == 1 else 'countries'} the question names; sites elsewhere are "
+            "not grouped, and a trial with no state at such a site is left out."
+        )
+    return (
+        "The question names no country, so the sites of every country were grouped by state; a state name "
+        "that two countries share is one group."
+    )
+
+
+STATE_SHARE_NOTE: Final = (
+    "'Share of trials' is a share of the trials analysed (those with a state at a counted site). "
+    "'Share of the bars' total' is a share of the sum of the bars drawn, which is more than the number of "
+    "trials when a trial is in several states."
+)
+
+
 def partial_period(period: str, data_date: str) -> Note:
     return Note(code="partial_period", message=f"{period} is incomplete: data as of {data_date}.")
 

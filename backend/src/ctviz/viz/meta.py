@@ -11,6 +11,7 @@ from datetime import date, datetime
 from typing import Final, Literal
 
 from ctviz.applied import MAX_COMPARED
+from ctviz.catalog.states import StateScope
 from ctviz.contract.plan import Clarify, QueryPlan, Unsupported
 from ctviz.contract.request import CompareSpec, QueryRequest, RequestOptions
 from ctviz.contract.response import (
@@ -355,6 +356,8 @@ def _assumptions(plan: EnginePlan, shaped: ShapedResult | None) -> list[str]:
     if plan.relation == "network":
         first, second = plan.dimensions[0].spec.key, plan.dimensions[1].spec.key
         notes.append(text.link_note(first, second, plan.pairing))
+    if any(dimension.spec.key == "state" for dimension in plan.dimensions):
+        notes.extend(_state_notes(plan))
     if plan.measure is not None:
         label = text.measure_label(plan.measure.statistic, plan.measure.field)
         notes.append(text.statistic_note(plan.measure.statistic, label))
@@ -364,6 +367,16 @@ def _assumptions(plan: EnginePlan, shaped: ShapedResult | None) -> list[str]:
     if shaped is not None and shaped.trials_in_several_series:
         labels = [text.scope_name(scope) or scope.id for scope in plan.scopes]
         notes.append(text.overlap_note(shaped.trials_in_several_series, labels))
+    return notes
+
+
+def _state_notes(plan: EnginePlan) -> list[str]:
+    """Which country's sites were grouped by state, and what the two shares of a state chart are of."""
+    stated = [StateScope.of(scope).countries for scope in plan.scopes]
+    countries = tuple(dict.fromkeys(name for names in stated for name in names))
+    notes = [text.state_sites_note(countries, is_open=any(not names for names in stated))]
+    if len(plan.dimensions) == 1 and len(plan.scopes) == 1 and plan.measure is None:
+        notes.append(text.STATE_SHARE_NOTE)
     return notes
 
 

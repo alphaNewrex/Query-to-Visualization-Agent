@@ -10,12 +10,12 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Final
 
-from ctviz.catalog.fields import BoundDimension, FieldContexts, Window
+from ctviz.catalog.fields import BoundDimension, FieldContext, FieldContexts, Window
 from ctviz.contract.response import Note
 from ctviz.ctgov import essie
 from ctviz.ctgov.client import RequestLog
 from ctviz.ctgov.essie import Expr
-from ctviz.ctgov.params import canonical_url
+from ctviz.ctgov.params import Scope, canonical_url
 from ctviz.ctgov.study import Study
 from ctviz.engine.aggregate import aggregate, missing_reason
 from ctviz.engine.evidence import projection
@@ -81,7 +81,9 @@ async def walk_frame(
     """Walk a scope and group what was read into a frame."""
     read = await read_scope(run, plan, client, ctx)
     windowed = dataclasses.replace(plan, window=window)
-    frame = aggregate(read.studies, windowed, run.scope, _fit(plan, read.studies), plan.citations_per_datum)
+    frame = aggregate(
+        read.studies, windowed, run.scope, _fit(plan, read.studies, run.scope), plan.citations_per_datum
+    )
     frame.strategy = run.strategy
     frame.matched = read.matched
     frame.subset = read.subset
@@ -128,13 +130,16 @@ def _bucket_expr(dimension: BoundDimension, key: str, window: Window | None) -> 
     return bucket.expr if bucket is not None else None
 
 
-def _fit(plan: EnginePlan, studies: tuple[Study, ...]) -> FieldContexts:
-    """The state some fields fit to the whole result set before values are extracted."""
-    return {
-        dimension.spec.key: dimension.spec.prepare(studies)
-        for dimension in plan.dimensions
-        if dimension.spec.prepare is not None
-    }
+def _fit(plan: EnginePlan, studies: tuple[Study, ...], scope: Scope) -> FieldContexts:
+    """The state some fields fit to the whole result set, or to the scope, before values are extracted."""
+    contexts: dict[str, FieldContext] = {}
+    for dimension in plan.dimensions:
+        spec = dimension.spec
+        if spec.prepare_in_scope is not None:
+            contexts[spec.key] = spec.prepare_in_scope(studies, scope)
+        elif spec.prepare is not None:
+            contexts[spec.key] = spec.prepare(studies)
+    return contexts
 
 
 def _pushed_reason(plan: EnginePlan, run: ScopeRun) -> tuple[str, str]:

@@ -3,7 +3,7 @@
 from collections.abc import Callable, Sequence
 from typing import Final
 
-from ctviz.catalog import extractors, periods, vocab
+from ctviz.catalog import extractors, periods, states, vocab
 from ctviz.catalog.conditions import ConditionLabels
 from ctviz.catalog.countries import load_country_table
 from ctviz.catalog.drugs import DRUG_TYPES, DrugNormalizer
@@ -110,6 +110,13 @@ def _date_field(
 
 def _country_bucket(name: str) -> Bucket | None:
     return Bucket(name, name, area("LocationCountry", name)) if name in load_country_table() else None
+
+
+def _state_bucket(name: str) -> Bucket | None:
+    try:
+        return Bucket(name, name, area("LocationState", name))
+    except ValueError:
+        return None
 
 
 def _entries() -> list[FieldSpec]:
@@ -233,6 +240,24 @@ def _entries() -> list[FieldSpec]:
             notes=(
                 "A trial counts once for each country with a site, so the bars can overlap. "
                 "Trials whose locations were removed after completion are not attributed to a country.",
+            ),
+        ),
+        FieldSpec(
+            key="state",
+            title="State",
+            kind="entity",
+            pieces=("LocationState", "LocationCountry"),
+            extract=extractors.state,
+            is_exclusive=False,
+            is_ordinal=False,
+            bucket_for=_state_bucket,
+            presence=_present("LocationState"),
+            prepare_in_scope=states.fit,
+            hint="the state, province or region of a trial's sites, for any country; a country the "
+            "question names is also an entity of kind country with role filter, and limits the sites",
+            notes=(
+                "A trial counts once for each state with a site, so the bars can overlap. "
+                "Trials with no state on any counted site are left out, as are sites with no state.",
             ),
         ),
         FieldSpec(

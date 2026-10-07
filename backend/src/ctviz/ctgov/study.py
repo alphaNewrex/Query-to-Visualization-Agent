@@ -41,6 +41,7 @@ class Intervention:
 class Location:
     index: int  # position in the record's `locations` array
     country: str | None
+    state: str | None = None
 
 
 @dataclass(frozen=True)
@@ -141,7 +142,7 @@ def parse_study(record: JsonObject) -> Study:
             if (term := _text(mesh.get("term"))) is not None
         ),
         locations=tuple(
-            Location(index=index, country=_text(item.get("country")))
+            Location(index=index, country=_text(item.get("country")), state=_text(item.get("state")))
             for index, item in _items(_dig(protocol, "contactsLocationsModule", "locations"))
         ),
         sex=_text(_dig(eligibility, "sex")),

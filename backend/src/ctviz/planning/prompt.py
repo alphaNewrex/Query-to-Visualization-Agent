@@ -38,7 +38,7 @@ from ctviz.contract.plan import (
 from ctviz.contract.request import QueryRequest
 from ctviz.planning.structured import NO_FILTERS
 
-PROMPT_VERSION: Final = "plan-v3"
+PROMPT_VERSION: Final = "plan-v4"
 
 RULES: Final = """\
 You translate a question about clinical trials into a query plan for a service that counts
@@ -127,7 +127,7 @@ and you never write counts, trial names or identifiers.
 
 _CLOSED: Final = frozenset(get_args(ClosedDimension))
 _DATES: Final = frozenset({"start_date", "primary_completion_date", "completion_date", "first_posted_date"})
-_OPEN: Final = frozenset({"country", "sponsor", "drug", "condition"})
+_OPEN: Final = frozenset({"country", "state", "sponsor", "drug", "condition"})
 _ENUMS: Final[dict[str, tuple[str, ...]]] = {
     "phases": get_args(Phase),
     "statuses": get_args(Status),
@@ -174,7 +174,11 @@ def render_glossary(catalog: Mapping[str, FieldSpec] = CATALOG) -> str:
         entries = [(spec.key, spec.title, spec.kind) for spec in catalog.values()]
     else:
         entries = [(key, key.replace("_", " "), _kind_of(key)) for key in get_args(DimensionKey)]
-    return "\n".join(f"  {key}: {title} ({kind})" for key, title, kind in entries)
+    hints = {spec.key: spec.hint for spec in catalog.values() if spec.hint}
+    return "\n".join(
+        f"  {key}: {title} ({kind})" + (f": {hints[key]}" if key in hints else "")
+        for key, title, kind in entries
+    )
 
 
 def _label(code: str) -> str:

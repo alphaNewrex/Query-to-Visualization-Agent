@@ -59,6 +59,7 @@ COUNT_FIELD = "trial_count"
 GROUP_FIELD = "group"
 SPLIT_SERIES_FIELD = "group_split"
 SHARE_FIELD = "share"
+SHOWN_SHARE_FIELD = "share_of_shown"  # a state's count over the sum of the counts of the bars drawn
 _ColumnType = Literal["nominal", "temporal", "quantitative"]
 _TABLE_COLUMNS = ("phase", "overall_status", "start_date", "enrollment", "lead_sponsor")
 
@@ -341,7 +342,12 @@ def _split_title(i: _Inputs, grid: _Grid) -> str | None:
 
 
 def _grid_row(
-    i: _Inputs, mark: _Mark, x_field: str, series: CategoryChannel | None, with_share: bool
+    i: _Inputs,
+    mark: _Mark,
+    x_field: str,
+    series: CategoryChannel | None,
+    with_share: bool,
+    shown_total: int | None = None,
 ) -> Datum:
     fields: dict[str, Scalar] = {x_field: mark.x}
     if series is not None:
@@ -354,6 +360,8 @@ def _grid_row(
         fields[measures.row_key(i.plan.measure)] = measures.value_of(mark.cell.values, i.plan.measure)
     elif with_share:
         fields[SHARE_FIELD] = round(mark.cell.trials / mark.analyzed, 4) if mark.analyzed else 0.0
+    if shown_total is not None:
+        fields[SHOWN_SHARE_FIELD] = round(mark.cell.trials / shown_total, 4) if shown_total else 0.0
     if i.plan.dimensions[0].spec.key == "country":
         fields["iso_alpha3"] = load_country_table().iso_alpha3(mark.x)  # so a map can be added later
     return _datum(fields, i.book.for_cell(mark.cell))
@@ -475,7 +483,10 @@ def _bar_chart(i: _Inputs) -> Built:
     grid = _grid(i)
     series = _series_channel(i, grid)
     x = _category_channel(axis, grid.x_labels)
-    rows = [_grid_row(i, mark, x.field, series, with_share=True) for mark in grid.marks]
+    shown_total = _shown_total(i, grid)
+    rows = [
+        _grid_row(i, mark, x.field, series, with_share=True, shown_total=shown_total) for mark in grid.marks
+    ]
     series_title = _split_title(i, grid) or (series.title if series else None)
     measure = i.plan.measure
     viz = BarChart(
@@ -502,7 +513,21 @@ def _bar_chart(i: _Inputs) -> Built:
                     unit=None,
                     format=".1%",
                     href_field=None,
-                )
+                ),
+                *(
+                    [
+                        FieldDef(
+                            field=SHOWN_SHARE_FIELD,
+                            title="Share of the bars' total",
+                            type="quantitative",
+                            unit=None,
+                            format=".1%",
+                            href_field=None,
+                        )
+                    ]
+                    if shown_total is not None
+                    else []
+                ),
             ],
         ),
         data=rows,
@@ -515,6 +540,18 @@ def _bar_chart(i: _Inputs) -> Built:
     else:
         message = text.largest_in_series_message(top.x, top.series, top.cell.trials)
     return Built(viz, message, len(rows))
+
+
+def _shown_total(i: _Inputs, grid: _Grid) -> int | None:
+    """The sum of the drawn bars of a state chart: its own denominator, as a state's trials overlap.
+
+    A trial in three states is in three bars, so this is not a number of trials; it is what the bars add
+    up to, which a reader asking for "the percentage of the top-N total" means.
+    """
+    is_plain = len(i.plan.dimensions) == 1 and not i.is_comparison and i.plan.measure is None
+    if i.plan.dimensions[0].spec.key != "state" or not is_plain:
+        return None
+    return sum(mark.cell.trials for mark in grid.marks)
 
 
 def _measured_row(i: _Inputs, fields: dict[str, Scalar], cell: Cell) -> Datum:

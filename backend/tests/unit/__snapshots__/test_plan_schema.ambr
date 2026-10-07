@@ -21,6 +21,7 @@
               'has_results',
               'intervention_model',
               'country',
+              'state',
               'sponsor',
               'drug',
               'condition',

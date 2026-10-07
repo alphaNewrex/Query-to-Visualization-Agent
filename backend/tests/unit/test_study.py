@@ -10,7 +10,7 @@ from typing import Any
 
 import pytest
 
-from ctviz.ctgov.study import Intervention, Location, StudyDate, parse_study
+from ctviz.ctgov.study import Intervention, StudyDate, parse_study
 
 FIXTURES = Path(__file__).parent.parent / "fixtures"
 
@@ -61,7 +61,7 @@ def test_an_observational_study_has_no_phases() -> None:
     study = parse_study(load("observational_no_phases.json"))
 
     assert (study.study_type, study.phases) == ("OBSERVATIONAL", ())
-    assert study.locations == (Location(0, "China"), Location(1, "China"))
+    assert [(site.index, site.country) for site in study.locations] == [(0, "China"), (1, "China")]
     assert (study.allocation, study.masking, study.primary_purpose) == (None, None, None)
     assert study.has_results is False
 
