@@ -475,7 +475,7 @@ _SECTIONS: Final = (
         "stability promise. `StrategyStep.name` lists `sample_then_recount`, a strategy that this version "
         "never uses.",
         _names(
-            "Meta AppliedFilters AppliedExclusions Interpretation EntityResolution OtherReading "
+            "Meta AppliedFilters AppliedExclusions Interpretation EntityResolution RegistryTerm OtherReading "
             "SponsorCandidate Measure StrategyStep PlannerInfo Usage Adjustment Note Source "
             "UpstreamRequest Counts SeriesCounts ExclusionCount Truncation TruncationItem CitationsInfo "
             "CacheInfo Timing Debug TraceStep"

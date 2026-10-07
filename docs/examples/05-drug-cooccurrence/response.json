@@ -5311,8 +5311,8 @@
     }
   },
   "meta": {
-    "request_id": "10b95728-6890-43ab-acc2-05bb2445f3d2",
-    "generated_at": "2026-10-07T02:20:09.835764Z",
+    "request_id": "1b091f08-597e-488f-bcde-057e71cfcf18",
+    "generated_at": "2026-10-07T02:47:33.235306Z",
     "query": "Which drugs frequently co-occur in combination studies with pembrolizumab?",
     "filters": {
       "drug_name": [
@@ -5365,6 +5365,7 @@
       "entities": [
         {
           "kind": "drug",
+          "planned_kind": "drug",
           "source": "question",
           "text": "pembrolizumab",
           "term_searched": "pembrolizumab",
@@ -5372,6 +5373,8 @@
           "status": "ok",
           "trials_matched": 2971,
           "strict_name_matches": 2567,
+          "condition_name_matches": 15,
+          "registry_term": null,
           "other_readings": [
             {
               "kind": "condition",
@@ -5426,7 +5429,8 @@
         "target": "drug",
         "link": "same_arm"
       },
-      "chart_preference": null
+      "chart_preference": null,
+      "unapplied": []
     },
     "options": {
       "planner": "llm",
@@ -5439,19 +5443,19 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v2",
+      "prompt_version": "plan-v3",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 7111,
-        "output_tokens": 182,
-        "reasoning_tokens": 29,
-        "cached_tokens": 6912
+        "input_tokens": 8253,
+        "output_tokens": 200,
+        "reasoning_tokens": 42,
+        "cached_tokens": 7936
       }
     },
     "assumptions": [
-      "Matched 'pembrolizumab' with the registry's intervention search (names, other names, arm labels, titles, descriptions and MeSH terms, with synonyms): 2,971 trials. 2,567 of them name it as an intervention.",
+      "Read 'pembrolizumab' as a drug: 2,567 trials have it in an intervention name and 15 in a condition. Matched 'pembrolizumab' with the registry's intervention search (names, other names, arm labels, titles, descriptions and MeSH terms, with synonyms): 2,971 trials. 2,567 of them name it as an intervention.",
       "'Pembrolizumab' is in most of the analysed trials, so it is left out and the graph shows how the other drugs go with each other.",
       "Drug names are normalised from free text: doses and forms are removed, placebos and non-drug care are left out, and a combination is split only when each part is a known drug.",
       "Two drugs are linked when they share an arm label in a trial. An arm that offers a choice of agents lists both, so some links are alternatives."
@@ -5471,7 +5475,7 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T02:20:09.835764Z",
+      "retrieved_at": "2026-10-07T02:47:33.235306Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
@@ -5508,6 +5512,46 @@
         },
         {
           "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BCondition%5D%22pembrolizumab%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 15,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.term=pembrolizumab&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 3111,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&countTotal=true&pageSize=50&fields=NCTId,InterventionBrowseModule",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 2971,
+          "records_returned": 50,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BInterventionMeshTerm%5D%22pembrolizumab%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 2563,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
           "duration_ms": 0,
@@ -5520,7 +5564,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate",
           "status": 200,
-          "duration_ms": 757,
+          "duration_ms": 709,
           "total_count": 2877,
           "records_returned": 1000,
           "is_cached": false,
@@ -5530,7 +5574,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate&pageToken=ZVNj7o2Elu8o3lpwS9785unumpOQJJxuYfag2vwakA",
           "status": 200,
-          "duration_ms": 835,
+          "duration_ms": 705,
           "total_count": null,
           "records_returned": 1000,
           "is_cached": false,
@@ -5540,7 +5584,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BInterventionType%5D%28DRUG%20OR%20BIOLOGICAL%20OR%20GENETIC%20OR%20COMBINATION_PRODUCT%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,StudyFirstPostDate&pageToken=ZVNj7o2Elu8o3lpwS9785unumpOQJJxtbPGj3P0TkA",
           "status": 200,
-          "duration_ms": 991,
+          "duration_ms": 749,
           "total_count": null,
           "records_returned": 877,
           "is_cached": false,
@@ -5596,10 +5640,10 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 4521,
-      "plan_ms": 1821,
-      "resolve_ms": 1,
-      "fetch_ms": 2694,
+      "total_ms": 4048,
+      "plan_ms": 1592,
+      "resolve_ms": 2,
+      "fetch_ms": 2445,
       "build_ms": 1
     },
     "debug": {
@@ -5608,7 +5652,7 @@
           "index": 0,
           "type": "plan",
           "summary": "Link drugs that share an arm with pembrolizumab in combination studies.",
-          "duration_ms": 1821,
+          "duration_ms": 1592,
           "request_indexes": [],
           "detail": {}
         },
@@ -5616,12 +5660,16 @@
           "index": 1,
           "type": "resolve_entity",
           "summary": "1 entities",
-          "duration_ms": 1,
+          "duration_ms": 2,
           "request_indexes": [
             0,
             1,
             2,
-            3
+            3,
+            4,
+            5,
+            6,
+            7
           ],
           "detail": {}
         },
@@ -5629,11 +5677,11 @@
           "index": 2,
           "type": "execute",
           "summary": "3 requests",
-          "duration_ms": 2694,
+          "duration_ms": 2445,
           "request_indexes": [
-            4,
-            5,
-            6
+            8,
+            9,
+            10
           ],
           "detail": {}
         }

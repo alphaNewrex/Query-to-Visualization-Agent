@@ -6,18 +6,21 @@ replaced by an explanation. The entities then become scopes, one per compared gr
 """
 
 import dataclasses
+from collections import Counter
 from collections.abc import Awaitable, Callable, Mapping
 from typing import Final, Literal, Protocol, cast
 
 from ctviz.contract.plan import FAMILY_DIMENSIONS, Aggregate, DateField, Entity, EntityKind, QueryPlan
 from ctviz.contract.request import QueryRequest
 from ctviz.contract.response import (
+    Adjustment,
     Clarification,
     EntityResolution,
     MatchDefinition,
     Note,
     OtherReading,
     Outcome,
+    RegistryTerm,
 )
 from ctviz.ctgov import essie
 from ctviz.ctgov.client import RequestLog
@@ -29,6 +32,16 @@ from ctviz.engine.registry import Registry
 # Another reading must be this many times larger than the one used before the answer says so.
 _OTHER_READING_FACTOR: Final = 5
 _MAX_RELAXED_COUNTS: Final = 4
+# A name that is in the intervention names of fewer than this share of the trials the intervention search
+# matched is mostly matched through titles, descriptions and MeSH terms, as a class or a topic would be.
+_NAME_SHARE_FLOOR: Final = 0.2
+# The registry's own term for the matched trials is reported when it covers this many times more trials.
+_REGISTRY_TERM_FACTOR: Final = 2
+_VOCABULARY_SAMPLE: Final = 50
+_VOCABULARY_MIN_SHARE: Final = 0.3
+_BROWSE_PIECE: Final = {"drug": "InterventionBrowseModule", "condition": "ConditionBrowseModule"}
+_BROWSE_KEY: Final = {"drug": "interventionBrowseModule", "condition": "conditionBrowseModule"}
+_MESH_AREA: Final = {"drug": "InterventionMeshTerm", "condition": "ConditionMeshTerm"}
 
 _REQUEST_FIELD_OF: Final[Mapping[EntityKind, str]] = {
     "drug": "drug_name",
@@ -102,41 +115,143 @@ class EntityResolver:
         self._low_match_threshold = low_match_threshold
 
     async def resolve(
-        self, kind: EntityKind, text: str, ctx: RequestLog, *, drug_match: DrugMatch
+        self,
+        kind: EntityKind,
+        text: str,
+        ctx: RequestLog,
+        *,
+        drug_match: DrugMatch,
+        may_reread: bool = True,
     ) -> EntityResolution:
-        """Raises ValueError when the text has no letter or digit to search for."""
+        """Raises ValueError when the text has no letter or digit to search for.
+
+        `may_reread` lets the registry's counts decide between drug, condition and term for a name the
+        model classified. A kind the client wrote, in a field of the request or in a supplied plan, stays.
+        """
         if kind == "country":
             return await self._country(text, ctx)
         term = essie.literal(text)
-        primary = Params(((_PARAMETER_OF[_DEFINITION[kind]], term),))
-        strict: int | None = None
-        other_readings: list[OtherReading] = []
-        if kind == "drug":
-            broad, strict, as_condition = await self._counts(
-                ctx,
-                primary,
-                Params(advanced=essie.area("InterventionName", text)),
-                Params((("query.cond", term),)),
+        if kind == "sponsor":
+            (matched,) = await self._counts(ctx, Params((("query.lead", term),)))
+            return self._resolution(
+                kind, text, term, "lead_sponsor_search", matched, await self._status(kind, matched)
             )
-            other_readings.append(OtherReading(kind="condition", trials_matched=as_condition))
-        elif kind == "condition":
-            broad, as_drug = await self._counts(ctx, primary, Params((("query.intr", term),)))
-            other_readings.append(OtherReading(kind="drug", trials_matched=as_drug))
-        else:
-            (broad,) = await self._counts(ctx, primary)
+        return await self._free_text(kind, text, term, ctx, drug_match, may_reread)
 
-        use_name_only = kind == "drug" and drug_match == "name_only"
-        matched = strict if use_name_only and strict is not None else broad
+    async def _free_text(
+        self,
+        planned: EntityKind,
+        text: str,
+        term: str,
+        ctx: RequestLog,
+        drug_match: DrugMatch,
+        may_reread: bool,
+    ) -> EntityResolution:
+        """A drug, a condition or a term: counted under each reading, then read as the one the registry holds.
+
+        The plan's kind is the model's guess and the model is not always the same; the counts are the
+        registry's. Each reading is counted in the field that would hold the name (intervention names, the
+        conditions list) and broadly (the registry's own search). The reading with the larger field count
+        wins; the plan's kind decides only when neither field holds the words, or when they tie.
+        """
+        broad_drug, name_drug, broad_cond, name_cond, anywhere = await self._counts(
+            ctx,
+            Params((("query.intr", term),)),
+            Params(advanced=essie.area("InterventionName", text)),
+            Params((("query.cond", term),)),
+            Params(advanced=essie.area("Condition", text)),
+            Params((("query.term", term),)),
+        )
+        kind = _read_as(planned, name_drug, name_cond) if may_reread else planned
+        definition: MatchDefinition
+        if kind == "drug":
+            matched, definition = broad_drug, "intervention_search"
+            others = [OtherReading(kind="condition", trials_matched=broad_cond)]
+            if drug_match == "name_only":
+                matched, definition = name_drug, "intervention_name"
+        elif kind == "condition":
+            matched, definition = broad_cond, "condition_search"
+            others = [OtherReading(kind="drug", trials_matched=broad_drug)]
+        else:
+            matched, definition = anywhere, "term_search"
+            others = [
+                OtherReading(kind="drug", trials_matched=broad_drug),
+                OtherReading(kind="condition", trials_matched=broad_cond),
+            ]
+        registry_term = None if kind == "term" else await self._registry_term(kind, term, matched, ctx)
+        return self._resolution(
+            kind,
+            text,
+            term,
+            definition,
+            matched,
+            await self._status(kind, matched),
+            planned=planned,
+            strict=name_drug,
+            condition_name=name_cond,
+            registry_term=registry_term,
+            other_readings=others,
+        )
+
+    async def _registry_term(
+        self, kind: EntityKind, term: str, matched: int, ctx: RequestLog
+    ) -> RegistryTerm | None:
+        """The MeSH term the registry most often gives the matched trials, when it covers far more of them.
+
+        A wording the registry does not link to its own vocabulary (an abbreviation, a local spelling)
+        matches fewer trials than the vocabulary term that its matches carry; the difference is reported.
+        """
+        parameter = "query.cond" if kind == "condition" else "query.intr"
+        page = await self._client.sample(
+            Params(((parameter, term),)),
+            ctx,
+            fields=[_BROWSE_PIECE[kind]],
+            page_size=_VOCABULARY_SAMPLE,
+            sort=None,
+            origin="resolution",
+        )
+        terms = Counter(name for study in page.studies for name in _mesh_terms(study.raw, kind))
+        if not terms or not page.studies:
+            return None
+        name, holders = terms.most_common(1)[0]
+        share = holders / len(page.studies)
+        if share < _VOCABULARY_MIN_SHARE:
+            return None
+        covered = await self._client.count(
+            Params(advanced=essie.area(_MESH_AREA[kind], name)), ctx, origin="resolution"
+        )
+        if covered < _REGISTRY_TERM_FACTOR * max(matched, 1):
+            return None
+        return RegistryTerm(term=name, trials_matched=covered, sample_share=round(share, 2))
+
+    def _resolution(
+        self,
+        kind: EntityKind,
+        text: str,
+        term: str,
+        definition: MatchDefinition,
+        matched: int,
+        status: ResolutionStatus,
+        *,
+        planned: EntityKind | None = None,
+        strict: int | None = None,
+        condition_name: int | None = None,
+        registry_term: RegistryTerm | None = None,
+        other_readings: list[OtherReading] | None = None,
+    ) -> EntityResolution:
         return EntityResolution(
             kind=kind,
+            planned_kind=planned or kind,
             source="question",
             text=text,
             term_searched=term,
-            definition="intervention_name" if use_name_only else _DEFINITION[kind],
-            status=await self._status(kind, matched),
+            definition=definition,
+            status=status,
             trials_matched=matched,
             strict_name_matches=strict,
-            other_readings=other_readings,
+            condition_name_matches=condition_name,
+            registry_term=registry_term,
+            other_readings=other_readings or [],
             candidates=[],
         )
 
@@ -145,17 +260,8 @@ class EntityResolver:
         matched = await self._client.count(
             Params(advanced=essie.area("LocationCountry", name)), ctx, origin="resolution"
         )
-        return EntityResolution(
-            kind="country",
-            source="question",
-            text=text,
-            term_searched=name,
-            definition="country_exact",
-            status=await self._status("country", matched),
-            trials_matched=matched,
-            strict_name_matches=None,
-            other_readings=[],
-            candidates=[],
+        return self._resolution(
+            "country", text, name, "country_exact", matched, await self._status("country", matched)
         )
 
     async def _counts(self, ctx: RequestLog, *searches: Params) -> list[int]:
@@ -179,6 +285,27 @@ _SEARCH_AREA: Final[Mapping[MatchDefinition, str]] = {
 }
 
 
+def _read_as(planned: EntityKind, name_drug: int, name_condition: int) -> EntityKind:
+    """The kind a free-text name is read as: the field that holds it more often, else the plan's kind."""
+    if name_drug > name_condition:
+        return "drug"
+    if name_condition > name_drug:
+        return "condition"
+    return planned
+
+
+def _mesh_terms(record: Mapping[str, object], kind: EntityKind) -> list[str]:
+    """The MeSH terms the registry lists for a record's interventions or conditions."""
+    derived = record.get("derivedSection")
+    module = derived.get(_BROWSE_KEY[kind]) if isinstance(derived, Mapping) else None
+    meshes = module.get("meshes") if isinstance(module, Mapping) else None
+    if not isinstance(meshes, list):
+        return []
+    return [
+        mesh["term"] for mesh in meshes if isinstance(mesh, Mapping) and isinstance(mesh.get("term"), str)
+    ]
+
+
 def bind_excluded(resolution: EntityResolution) -> BoundTerm:
     """The entity as an expression that selects the trials to leave out, searched as `bind_term` would."""
     definition, text = resolution.definition, resolution.text
@@ -186,6 +313,9 @@ def bind_excluded(resolution: EntityResolution) -> BoundTerm:
         inner = essie.area("LocationCountry", resolution.term_searched)
     elif definition == "intervention_name":
         inner = essie.area("InterventionName", text)
+    elif len(resolution.term_searched.split()) > 1:
+        # What is left out is the phrase the user wrote, not every trial that holds its words apart.
+        inner = essie.search_phrase(_SEARCH_AREA[definition], text)
     else:
         inner = essie.search(_SEARCH_AREA[definition], resolution.term_searched)
     return BoundTerm(
@@ -195,7 +325,8 @@ def bind_excluded(resolution: EntityResolution) -> BoundTerm:
         parameter=None,
         expr=essie.not_(inner),
         definition=definition,
-        note=f"Trials that match '{text}' as a {resolution.kind} (same search as for a filter) are left out.",
+        note=f"Trials that match '{text}' as a {resolution.kind} are left out"
+        + (" (the whole phrase, in order)." if len(resolution.term_searched.split()) > 1 else "."),
     )
 
 
@@ -208,7 +339,7 @@ def bind_term(resolution: EntityResolution) -> BoundTerm:
         note = f"Trials with at least one site in {resolution.term_searched}."
     elif definition == "intervention_name":
         expr, parameter = essie.area("InterventionName", text), None
-        note = f"Matched '{text}' in intervention names and their synonyms only."
+        note = f"{_reading_note(resolution)}Matched '{text}' in intervention names and their synonyms only."
     else:
         expr, parameter = None, _PARAMETER_OF[definition]
         note = _search_note(resolution, count)
@@ -232,7 +363,10 @@ async def resolve_entities(planned: PlannedLike, deps: ResolveDeps, ctx: Request
     plan = planned.plan
     try:
         resolutions = await gather(
-            [_resolver_call(deps, entity, ctx, planned.options.drug_match) for entity in plan.entities]
+            [
+                _resolver_call(deps, entity, ctx, planned.options.drug_match, planned.request)
+                for entity in plan.entities
+            ]
         )
     except ValueError as error:
         return _clarify(f"A name in the question could not be searched: {error}")
@@ -240,6 +374,21 @@ async def resolve_entities(planned: PlannedLike, deps: ResolveDeps, ctx: Request
         resolution.model_copy(update={"source": _source(planned.request, entity)})
         for entity, resolution in zip(plan.entities, resolutions, strict=True)
     ]
+    adjustments = tuple(
+        Adjustment(
+            code="entity_kind", path=f"/entities/{index}/kind", message=_kind_message(r), action="replaced"
+        )
+        for index, r in enumerate(resolutions)
+        if r.kind != r.planned_kind
+    )
+    plan = plan.model_copy(
+        update={
+            "entities": [
+                entity.model_copy(update={"kind": resolution.kind})
+                for entity, resolution in zip(plan.entities, resolutions, strict=True)
+            ]
+        }
+    )
     for entity, resolution in zip(plan.entities, resolutions, strict=True):
         if outcome := _entity_outcome(entity, resolution):
             return outcome
@@ -259,13 +408,18 @@ async def resolve_entities(planned: PlannedLike, deps: ResolveDeps, ctx: Request
         matched=matched,
         warnings=tuple(_warnings(resolutions)),
         assumptions=tuple(term.note for term in terms),
+        plan=plan,
+        adjustments=adjustments,
     )
 
 
 def _resolver_call(
-    deps: ResolveDeps, entity: Entity, ctx: RequestLog, drug_match: DrugMatch
+    deps: ResolveDeps, entity: Entity, ctx: RequestLog, drug_match: DrugMatch, request: QueryRequest | None
 ) -> Callable[[], Awaitable[EntityResolution]]:
-    return lambda: deps.resolver.resolve(entity.kind, entity.value, ctx, drug_match=drug_match)
+    may_reread = _source(request, entity) == "question"
+    return lambda: deps.resolver.resolve(
+        entity.kind, entity.value, ctx, drug_match=drug_match, may_reread=may_reread
+    )
 
 
 def _probe_call(deps: ResolveDeps, scope: Scope, ctx: RequestLog) -> Callable[[], Awaitable[int]]:
@@ -276,19 +430,52 @@ def _counter(client: Registry, params: Params, ctx: RequestLog) -> Callable[[], 
     return lambda: client.count(params, ctx, origin="resolution")
 
 
+def _reading_note(resolution: EntityResolution) -> str:
+    """Why a free-text name was searched as a drug, a condition or a term, in the registry's own counts."""
+    if resolution.strict_name_matches is None or resolution.condition_name_matches is None:
+        return ""
+    named, listed = resolution.strict_name_matches, resolution.condition_name_matches
+    text = resolution.text
+    if resolution.kind == "term":
+        return (
+            f"'{text}' is neither clearly a drug nor a condition ({named:,} trials have it in an "
+            f"intervention "
+            f"name, {listed:,} in a condition), so it is searched anywhere in the record. "
+        )
+    changed = (
+        f" (the plan called it a {resolution.planned_kind})"
+        if resolution.kind != resolution.planned_kind
+        else ""
+    )
+    return (
+        f"Read '{text}' as a {resolution.kind}{changed}: {named:,} trials have it in an intervention "
+        f"name and "
+        f"{listed:,} in a condition. "
+    )
+
+
+def _kind_message(resolution: EntityResolution) -> str:
+    return (
+        f"'{resolution.text}' was read as a {resolution.kind}, not as the {resolution.planned_kind} the plan "
+        f"named: {resolution.strict_name_matches or 0:,} trials have it in an intervention name and "
+        f"{resolution.condition_name_matches or 0:,} in a condition."
+    )
+
+
 def _search_note(resolution: EntityResolution, count: int) -> str:
     text = resolution.text
+    reading = _reading_note(resolution)
     match resolution.definition:
         case "intervention_search":
             return (
-                f"Matched '{text}' with the registry's intervention search (names, other names, arm labels, "
-                f"titles, descriptions and MeSH terms, with synonyms): {count:,} trials. "
+                f"{reading}Matched '{text}' with the registry's intervention search (names, other names, arm "
+                f"labels, titles, descriptions and MeSH terms, with synonyms): {count:,} trials. "
                 f"{resolution.strict_name_matches or 0:,} of them name it as an intervention."
             )
         case "condition_search":
             return (
-                f"Matched '{text}' with the registry's condition search "
-                "(conditions, titles, keywords and MeSH terms, with synonyms)."
+                f"{reading}Matched '{text}' with the registry's condition search "
+                f"(conditions, titles, keywords and MeSH terms, with synonyms): {count:,} trials."
             )
         case "lead_sponsor_search":
             return (
@@ -296,7 +483,7 @@ def _search_note(resolution: EntityResolution, count: int) -> str:
                 "organisations that mention the name are included."
             )
         case _:
-            return f"Matched '{text}' anywhere in the record."
+            return f"{reading}Matched '{text}' anywhere in the record: {count:,} trials."
 
 
 def _source(request: QueryRequest | None, entity: Entity) -> str:
@@ -351,6 +538,7 @@ def _warnings(resolutions: list[EntityResolution]) -> list[Note]:
                     "If this is a misspelling, correct it and ask again.",
                 )
             )
+        notes.extend(_name_notes(resolution))
         for other in resolution.other_readings:
             if count and other.trials_matched >= _OTHER_READING_FACTOR * count:
                 notes.append(
@@ -360,6 +548,37 @@ def _warnings(resolutions: list[EntityResolution]) -> list[Note]:
                         f"{other.trials_matched:,} as a {other.kind}.",
                     )
                 )
+    return notes
+
+
+def _name_notes(resolution: EntityResolution) -> list[Note]:
+    """Warnings about how well the wording matches what the registry itself holds under that name."""
+    text, count = resolution.text, resolution.trials_matched
+    notes: list[Note] = []
+    named = resolution.strict_name_matches
+    is_search = resolution.kind == "drug" and resolution.definition == "intervention_search"
+    if is_search and count and named is not None and named < _NAME_SHARE_FLOOR * count:
+        notes.append(
+            Note(
+                code="drug_name_barely_matches",
+                message=f"'{text}' is in the intervention names of only {named:,} of the {count:,} trials "
+                "that "
+                "the intervention search matched; the rest mention it only in titles, descriptions, arm "
+                "labels or MeSH terms. If it names a group of drugs rather than one drug, the trials of "
+                "the individual drugs that never mention the group are not counted, so every figure here "
+                "and the counts per drug in particular can be far too low. Set drug_match to "
+                "'name_only' to count only the trials that name it as an intervention.",
+            )
+        )
+    if (term := resolution.registry_term) is not None:
+        notes.append(
+            Note(
+                code="wording_narrower_than_registry_term",
+                message=f"'{text}' matched {count:,} trials, but the registry's own term for those trials, "
+                f"'{term.term}', covers {term.trials_matched:,}. A synonym or the registry's own wording "
+                "may give a different count.",
+            )
+        )
     return notes
 
 

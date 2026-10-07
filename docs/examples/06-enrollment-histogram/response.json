@@ -668,8 +668,8 @@
     }
   },
   "meta": {
-    "request_id": "8462e138-71ab-4014-918c-962c863757e8",
-    "generated_at": "2026-10-07T02:20:11.748537Z",
+    "request_id": "5389ff49-e1fc-4b17-b767-b382d9c026d5",
+    "generated_at": "2026-10-07T02:47:34.843951Z",
     "query": "What is the distribution of enrollment sizes for pembrolizumab trials?",
     "filters": {
       "drug_name": [
@@ -721,6 +721,7 @@
       "entities": [
         {
           "kind": "drug",
+          "planned_kind": "drug",
           "source": "question",
           "text": "pembrolizumab",
           "term_searched": "pembrolizumab",
@@ -728,6 +729,8 @@
           "status": "ok",
           "trials_matched": 2971,
           "strict_name_matches": 2567,
+          "condition_name_matches": 15,
+          "registry_term": null,
           "other_readings": [
             {
               "kind": "condition",
@@ -749,7 +752,7 @@
       "chart_rationale": "Rule 6: enrollment for one scope without a series, so a histogram."
     },
     "plan": {
-      "interpretation": "Count pembrolizumab trials by enrollment size.",
+      "interpretation": "Count pembrolizumab trials by planned enrollment size.",
       "entities": [
         {
           "kind": "drug",
@@ -785,7 +788,8 @@
         "statistic": null,
         "of": null
       },
-      "chart_preference": "histogram"
+      "chart_preference": null,
+      "unapplied": []
     },
     "options": {
       "planner": "llm",
@@ -798,19 +802,19 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v2",
+      "prompt_version": "plan-v3",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 7110,
-        "output_tokens": 193,
-        "reasoning_tokens": 30,
-        "cached_tokens": 6912
+        "input_tokens": 8252,
+        "output_tokens": 187,
+        "reasoning_tokens": 19,
+        "cached_tokens": 7936
       }
     },
     "assumptions": [
-      "Matched 'pembrolizumab' with the registry's intervention search (names, other names, arm labels, titles, descriptions and MeSH terms, with synonyms): 2,971 trials. 2,567 of them name it as an intervention.",
+      "Read 'pembrolizumab' as a drug: 2,567 trials have it in an intervention name and 15 in a condition. Matched 'pembrolizumab' with the registry's intervention search (names, other names, arm labels, titles, descriptions and MeSH terms, with synonyms): 2,971 trials. 2,567 of them name it as an intervention.",
       "Enrollment counts, estimated and actual, are grouped into fixed bins."
     ],
     "warnings": [],
@@ -819,7 +823,7 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T02:20:11.748537Z",
+      "retrieved_at": "2026-10-07T02:47:34.843951Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
@@ -856,6 +860,46 @@
         },
         {
           "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BCondition%5D%22pembrolizumab%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 15,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.term=pembrolizumab&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 3111,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&countTotal=true&pageSize=50&fields=NCTId,InterventionBrowseModule",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 2971,
+          "records_returned": 50,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BInterventionMeshTerm%5D%22pembrolizumab%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 2563,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
           "duration_ms": 0,
@@ -868,7 +912,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B0,0%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 72,
+          "duration_ms": 159,
           "total_count": 132,
           "records_returned": 5,
           "is_cached": false,
@@ -878,7 +922,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B1,9%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 186,
+          "duration_ms": 265,
           "total_count": 213,
           "records_returned": 5,
           "is_cached": false,
@@ -888,7 +932,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B10,24%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 191,
+          "duration_ms": 263,
           "total_count": 462,
           "records_returned": 5,
           "is_cached": false,
@@ -898,7 +942,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B25,49%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 189,
+          "duration_ms": 261,
           "total_count": 649,
           "records_returned": 5,
           "is_cached": false,
@@ -908,7 +952,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B50,99%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 134,
+          "duration_ms": 225,
           "total_count": 492,
           "records_returned": 5,
           "is_cached": false,
@@ -918,7 +962,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B100,249%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 193,
+          "duration_ms": 292,
           "total_count": 495,
           "records_returned": 5,
           "is_cached": false,
@@ -928,7 +972,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B250,499%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 258,
+          "duration_ms": 358,
           "total_count": 246,
           "records_returned": 5,
           "is_cached": false,
@@ -938,7 +982,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B500,999%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 260,
+          "duration_ms": 363,
           "total_count": 177,
           "records_returned": 5,
           "is_cached": false,
@@ -948,7 +992,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B1000,4999%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 271,
+          "duration_ms": 368,
           "total_count": 93,
           "records_returned": 5,
           "is_cached": false,
@@ -958,7 +1002,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B5000,9999%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 257,
+          "duration_ms": 360,
           "total_count": 3,
           "records_returned": 3,
           "is_cached": false,
@@ -968,7 +1012,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B10000,MAX%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 338,
+          "duration_ms": 425,
           "total_count": 4,
           "records_returned": 4,
           "is_cached": false,
@@ -978,7 +1022,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DMISSING&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 148,
+          "duration_ms": 60,
           "total_count": 5,
           "records_returned": 1,
           "is_cached": false,
@@ -1021,19 +1065,19 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 1904,
-      "plan_ms": 1411,
+      "total_ms": 1592,
+      "plan_ms": 1102,
       "resolve_ms": 2,
-      "fetch_ms": 489,
-      "build_ms": 1
+      "fetch_ms": 487,
+      "build_ms": 0
     },
     "debug": {
       "trace": [
         {
           "index": 0,
           "type": "plan",
-          "summary": "Count pembrolizumab trials by enrollment size.",
-          "duration_ms": 1411,
+          "summary": "Count pembrolizumab trials by planned enrollment size.",
+          "duration_ms": 1102,
           "request_indexes": [],
           "detail": {}
         },
@@ -1046,7 +1090,11 @@
             0,
             1,
             2,
-            3
+            3,
+            4,
+            5,
+            6,
+            7
           ],
           "detail": {}
         },
@@ -1054,12 +1102,8 @@
           "index": 2,
           "type": "execute",
           "summary": "12 requests",
-          "duration_ms": 489,
+          "duration_ms": 487,
           "request_indexes": [
-            4,
-            5,
-            6,
-            7,
             8,
             9,
             10,
@@ -1067,7 +1111,11 @@
             12,
             13,
             14,
-            15
+            15,
+            16,
+            17,
+            18,
+            19
           ],
           "detail": {}
         }

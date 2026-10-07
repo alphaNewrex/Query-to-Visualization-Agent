@@ -1148,6 +1148,17 @@
           ],
           "type": "string"
         },
+        "planned_kind": {
+          "description": "The kind the plan named. It differs from `kind` when the registry's counts decided which of drug, condition or term the words are.",
+          "enum": [
+            "drug",
+            "condition",
+            "sponsor",
+            "country",
+            "term"
+          ],
+          "type": "string"
+        },
         "source": {
           "enum": [
             "question",
@@ -1197,7 +1208,29 @@
               "type": "null"
             }
           ],
-          "description": "Drugs only: the count of `AREA[InterventionName]`."
+          "description": "Drug, condition and term readings: the count of `AREA[InterventionName]`."
+        },
+        "condition_name_matches": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Drug, condition and term readings: the count of `AREA[Condition]`."
+        },
+        "registry_term": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RegistryTerm"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Drug and condition readings: the registry's own term for the trials found, when it covers far more trials than the wording did."
         },
         "other_readings": {
           "items": {
@@ -1215,6 +1248,7 @@
       },
       "required": [
         "kind",
+        "planned_kind",
         "source",
         "text",
         "term_searched",
@@ -1222,6 +1256,8 @@
         "status",
         "trials_matched",
         "strict_name_matches",
+        "condition_name_matches",
+        "registry_term",
         "other_readings",
         "candidates"
       ],
@@ -2767,6 +2803,14 @@
             }
           ],
           "description": "Only when the user names a chart form; otherwise null."
+        },
+        "unapplied": {
+          "description": "Words copied from the question that ask to make part of the chart look different (highlight, mark, annotate, colour); empty otherwise, and empty for most questions. Never a counting rule or a wish for a clear chart, and never a reason for 'unsupported'.",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 5,
+          "type": "array"
         }
       },
       "required": [
@@ -2774,7 +2818,8 @@
         "entities",
         "filters",
         "analysis",
-        "chart_preference"
+        "chart_preference",
+        "unapplied"
       ],
       "title": "QueryPlan",
       "type": "object"
@@ -3333,6 +3378,31 @@
         "query"
       ],
       "title": "QueryRequest",
+      "type": "object"
+    },
+    "RegistryTerm": {
+      "additionalProperties": false,
+      "description": "The vocabulary term the registry itself most often assigns to the trials a wording matched.",
+      "properties": {
+        "term": {
+          "description": "A MeSH term as the registry's records list it.",
+          "type": "string"
+        },
+        "trials_matched": {
+          "description": "The trials that carry this term in the registry.",
+          "type": "integer"
+        },
+        "sample_share": {
+          "description": "The share of the sampled matching trials that carry it.",
+          "type": "number"
+        }
+      },
+      "required": [
+        "term",
+        "trials_matched",
+        "sample_share"
+      ],
+      "title": "RegistryTerm",
       "type": "object"
     },
     "Relate": {

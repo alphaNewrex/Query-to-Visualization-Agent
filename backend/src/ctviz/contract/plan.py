@@ -322,6 +322,12 @@ class QueryPlan(PlanModel):
     chart_preference: ChartType | None = Field(
         description="Only when the user names a chart form; otherwise null."
     )
+    unapplied: list[str] = Field(
+        max_length=5,
+        description="Words copied from the question that ask to make part of the chart look different "
+        "(highlight, mark, annotate, colour); empty otherwise, and empty for most questions. Never a "
+        "counting rule or a wish for a clear chart, and never a reason for 'unsupported'.",
+    )
 
 
 @dataclass(frozen=True)

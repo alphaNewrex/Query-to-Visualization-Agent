@@ -36,6 +36,7 @@ PLAN = QueryPlan.model_validate(
         },
         "analysis": {"kind": "total", "statistic": None, "of": None},
         "chart_preference": None,
+        "unapplied": [],
     }
 )
 SCOPE = Scope(id="s0", label=None, terms=(), enum_filters={}, date_range=None)

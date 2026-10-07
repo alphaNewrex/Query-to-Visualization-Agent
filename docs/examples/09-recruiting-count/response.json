@@ -80,8 +80,8 @@
     }
   },
   "meta": {
-    "request_id": "3f1e36ed-ac93-4e4e-bb30-f7b9d2cba701",
-    "generated_at": "2026-10-07T02:20:17.535217Z",
+    "request_id": "35b1e0a6-d36b-4339-92b6-0f2cecc3f86a",
+    "generated_at": "2026-10-07T02:47:39.155668Z",
     "query": "How many recruiting trials are there for Duchenne muscular dystrophy?",
     "filters": {
       "drug_name": [],
@@ -133,13 +133,16 @@
       "entities": [
         {
           "kind": "condition",
+          "planned_kind": "condition",
           "source": "question",
           "text": "Duchenne muscular dystrophy",
           "term_searched": "Duchenne muscular dystrophy",
           "definition": "condition_search",
           "status": "ok",
           "trials_matched": 499,
-          "strict_name_matches": null,
+          "strict_name_matches": 12,
+          "condition_name_matches": 462,
+          "registry_term": null,
           "other_readings": [
             {
               "kind": "drug",
@@ -161,7 +164,7 @@
       "chart_rationale": "Rule 3: one number for one scope, so a metric."
     },
     "plan": {
-      "interpretation": "Count recruiting Duchenne muscular dystrophy trials.",
+      "interpretation": "Count recruiting trials for Duchenne muscular dystrophy.",
       "entities": [
         {
           "kind": "condition",
@@ -200,7 +203,8 @@
         "statistic": null,
         "of": null
       },
-      "chart_preference": null
+      "chart_preference": null,
+      "unapplied": []
     },
     "options": {
       "planner": "llm",
@@ -213,19 +217,19 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v2",
+      "prompt_version": "plan-v3",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 7109,
-        "output_tokens": 171,
-        "reasoning_tokens": 12,
-        "cached_tokens": 6912
+        "input_tokens": 8251,
+        "output_tokens": 175,
+        "reasoning_tokens": 10,
+        "cached_tokens": 7936
       }
     },
     "assumptions": [
-      "Matched 'Duchenne muscular dystrophy' with the registry's condition search (conditions, titles, keywords and MeSH terms, with synonyms)."
+      "Read 'Duchenne muscular dystrophy' as a condition: 12 trials have it in an intervention name and 462 in a condition. Matched 'Duchenne muscular dystrophy' with the registry's condition search (conditions, titles, keywords and MeSH terms, with synonyms): 499 trials."
     ],
     "warnings": [],
     "source": {
@@ -233,21 +237,11 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T02:20:17.535217Z",
+      "retrieved_at": "2026-10-07T02:47:39.155668Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
       "requests": [
-        {
-          "method": "GET",
-          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
-          "status": 200,
-          "duration_ms": 0,
-          "total_count": 499,
-          "records_returned": 1,
-          "is_cached": true,
-          "origin": "resolution"
-        },
         {
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
@@ -260,9 +254,69 @@
         },
         {
           "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BInterventionName%5D%22Duchenne%20muscular%20dystrophy%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 12,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 499,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BCondition%5D%22Duchenne%20muscular%20dystrophy%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 462,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.term=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 543,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=50&fields=NCTId,ConditionBrowseModule",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 499,
+          "records_returned": 50,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BConditionMeshTerm%5D%22Muscular%20Dystrophy,%20Duchenne%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 476,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&filter.overallStatus=RECRUITING&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 136,
+          "duration_ms": 56,
           "total_count": 61,
           "records_returned": 1,
           "is_cached": false,
@@ -272,7 +326,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&filter.overallStatus=RECRUITING&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,OverallStatus,StudyFirstPostDate&sort=%40relevance",
           "status": 200,
-          "duration_ms": 70,
+          "duration_ms": 58,
           "total_count": 61,
           "records_returned": 5,
           "is_cached": false,
@@ -309,10 +363,10 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 1536,
-      "plan_ms": 1326,
-      "resolve_ms": 137,
-      "fetch_ms": 72,
+      "total_ms": 1379,
+      "plan_ms": 1261,
+      "resolve_ms": 58,
+      "fetch_ms": 59,
       "build_ms": 0
     },
     "debug": {
@@ -320,8 +374,8 @@
         {
           "index": 0,
           "type": "plan",
-          "summary": "Count recruiting Duchenne muscular dystrophy trials.",
-          "duration_ms": 1326,
+          "summary": "Count recruiting trials for Duchenne muscular dystrophy.",
+          "duration_ms": 1261,
           "request_indexes": [],
           "detail": {}
         },
@@ -329,11 +383,16 @@
           "index": 1,
           "type": "resolve_entity",
           "summary": "1 entities",
-          "duration_ms": 137,
+          "duration_ms": 58,
           "request_indexes": [
             0,
             1,
-            2
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
           ],
           "detail": {}
         },
@@ -341,9 +400,9 @@
           "index": 2,
           "type": "execute",
           "summary": "1 requests",
-          "duration_ms": 72,
+          "duration_ms": 59,
           "request_indexes": [
-            3
+            8
           ],
           "detail": {}
         }

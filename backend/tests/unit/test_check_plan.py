@@ -555,3 +555,64 @@ def test_a_supplied_nct_id_entity_is_blocking() -> None:
     model = plan(entities=[entity("term", "NCT01234567")])
     result = check_plan(model, None, mode="supplied", countries=None, today=TODAY)
     assert [i.code for i in result.blocking] == ["nct_id_entity"]
+
+
+# --- unsupported before any entity question, and extras that are not applied ---------------------------
+
+
+def _unsupported(category: str = "analysis_not_supported") -> dict[str, Any]:
+    return {"kind": "unsupported", "category": category, "reason": "free text the model wrote"}
+
+
+def test_an_unsupported_plan_is_reported_before_an_unknown_country_asks_a_question() -> None:
+    model = plan(entities=[entity("country", "Atlantis")], analysis=_unsupported())
+
+    result = check(model)
+
+    assert result.outcome is not None and result.outcome.kind == "unsupported"
+    assert "free text the model wrote" not in result.outcome.message
+    assert "grouping, measure or comparison" in result.outcome.message
+    assert "trials by" in result.outcome.message
+
+
+@pytest.mark.parametrize(
+    ("category", "fragment"),
+    [
+        ("not_about_clinical_trials", "not about clinical trials"),
+        ("needs_data_not_in_registry", "does not hold"),
+        ("single_trial_lookup", "about one trial"),
+    ],
+)
+def test_each_unsupported_category_has_its_own_sentence(category: str, fragment: str) -> None:
+    result = check(plan(analysis=_unsupported(category)))
+
+    assert result.outcome is not None and fragment in result.outcome.message
+
+
+def test_a_request_the_chart_cannot_honour_is_a_note_and_the_chart_is_still_drawn() -> None:
+    question = request("How are pembrolizumab trials distributed across phases? Highlight the biggest ones.")
+
+    result = check(plan(unapplied=["Highlight the biggest ones"]), question)
+
+    assert result.outcome is None and result.blocking == ()
+    (warning,) = result.warnings
+    assert (
+        warning.code == "request_not_applied"
+        and "Not applied: 'Highlight the biggest ones'" in warning.message
+    )
+
+
+def test_words_that_are_not_in_the_question_are_not_quoted_back() -> None:
+    result = check(plan(unapplied=["paint it blue"]))
+
+    assert result.warnings == () and result.plan.unapplied == []
+    assert codes(result) == {"unapplied_not_quoted"}
+
+
+def test_a_plan_that_stays_blocked_says_what_was_wrong() -> None:
+    model = plan(filters={"statuses": ["RECRUITING"], "exclude_statuses": ["RECRUITING"]})
+
+    result = check(model, after_repair=True)
+
+    assert result.outcome is not None and result.outcome.kind == "clarification"
+    assert "RECRUITING is both required and left out" in result.outcome.message

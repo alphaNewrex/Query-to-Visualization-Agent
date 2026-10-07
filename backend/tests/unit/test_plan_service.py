@@ -45,7 +45,7 @@ async def test_a_good_plan_takes_one_call_and_is_canonical() -> None:
     primary = FakePlanner([GOOD])
     planned = await produce(service(primary))
     assert planned.info.attempts == 1 and not planned.info.is_repaired and not planned.info.is_fallback
-    assert planned.info.mode == "llm" and planned.info.prompt_version == "plan-v2"
+    assert planned.info.mode == "llm" and planned.info.prompt_version == "plan-v3"
     assert planned.info.model == "fake-model" and planned.info.usage is not None
     assert planned.info.usage.input_tokens == 10 and planned.outcome is None
     assert planned.plan.filters.date_field == "start_date"

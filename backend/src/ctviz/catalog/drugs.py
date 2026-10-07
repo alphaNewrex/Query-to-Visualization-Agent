@@ -46,8 +46,24 @@ SPLIT_RE: Final = re.compile(
 HAS_SEPARATOR: Final = re.compile(r"\+|/|&|,|\band\b|\bplus\b|\bwith\b|\bor\b")
 
 
+# A design word: an intervention named like this is the arm it belongs to, not a compound.
+ARM_WORD_RE: Final = re.compile(r"\b(?:groups?|arms?|cohorts?)\b", re.IGNORECASE)
+
+
 def is_noise(raw_name: str) -> bool:
     return NOISE_RE.search(raw_name) is not None
+
+
+def is_arm_label(item: Intervention) -> bool:
+    """The intervention is named as the arm it is given in ("... group"): a label, not a drug.
+
+    Sponsors sometimes register an arm as its own intervention, with the arm's label as the name. Both
+    conditions must hold, so a drug whose arm is merely named after it is kept.
+    """
+    name = (item.name or "").strip().casefold()
+    labels = {label.strip().casefold() for label in item.arm_group_labels}
+    # The words in brackets are asides ("ACE-031 (extension of cohort 1)") and say nothing about the name.
+    return ARM_WORD_RE.search(normalise(name)) is not None and name in labels
 
 
 def normalise(name: str) -> str:
@@ -71,11 +87,11 @@ def split_combination(normalised: str, known: frozenset[str]) -> list[str]:
 
 
 def _drug_interventions(study: Study) -> list[tuple[Intervention, str]]:
-    """The interventions that can be drugs, with their raw names, noise left out."""
+    """The interventions that can be drugs, with their raw names, noise and arm labels left out."""
     return [
         (item, item.name)
         for item in study.interventions
-        if item.type in DRUG_TYPES and item.name and not is_noise(item.name)
+        if item.type in DRUG_TYPES and item.name and not is_noise(item.name) and not is_arm_label(item)
     ]
 
 

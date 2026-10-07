@@ -139,7 +139,7 @@ async def test_resolving_builds_a_scope_with_filters_probes_it_and_warns_about_a
         ("filter.advanced", "(AREA[Phase]PHASE3) AND (AREA[StartDate]RANGE[2015-01-01,MAX])"),
     )
     assert resolved.matched == {"s0": 4}
-    assert [note.code for note in resolved.warnings] == ["low_match_count"]
+    assert [note.code for note in resolved.warnings] == ["low_match_count", "drug_name_barely_matches"]
     assert [entity.source for entity in resolved.entities] == ["plan"]
     assert [request.origin for request in ctx.requests][-1] == "probe"
 
@@ -221,3 +221,165 @@ async def test_an_empty_combination_says_what_matches_without_each_part() -> Non
         "No trials match all of these together. Without 'x', 5,000 trials match. "
         "Without the phase filter, 90 trials match."
     )
+
+
+def reading(term: str, *, drug_names: int, condition_names: int, broad: int = 100) -> dict[Params, int]:
+    return {
+        search("query.intr", term): broad,
+        strict(term): drug_names,
+        search("query.cond", term): broad,
+        Params(advanced=essie.area("Condition", term)): condition_names,
+        search("query.term", term): broad + 1,
+    }
+
+
+@pytest.mark.parametrize(
+    ("planned", "drug_names", "condition_names", "expected"),
+    [
+        ("term", 300, 4, "drug"),
+        ("condition", 300, 4, "drug"),
+        ("drug", 4, 300, "condition"),
+        ("term", 4, 300, "condition"),
+        ("drug", 7, 7, "drug"),
+        ("term", 0, 0, "term"),
+        ("condition", 0, 0, "condition"),
+    ],
+)
+async def test_a_free_text_name_is_read_as_the_kind_the_registry_holds_it_under(
+    planned: str, drug_names: int, condition_names: int, expected: str
+) -> None:
+    deps = deps_for(reading("x", drug_names=drug_names, condition_names=condition_names))
+
+    result = await deps.resolver.resolve(planned, "x", FakeContext(), drug_match="broad")  # type: ignore[arg-type]
+
+    assert (result.kind, result.planned_kind) == (expected, planned)
+
+
+async def test_the_same_words_give_the_same_reading_whichever_kind_the_plan_named() -> None:
+    deps = deps_for(reading("x", drug_names=300, condition_names=4))
+
+    results = [
+        await deps.resolver.resolve(kind, "x", FakeContext(), drug_match="broad")  # type: ignore[arg-type]
+        for kind in ("drug", "term", "condition")
+    ]
+
+    assert {(r.kind, r.definition, r.trials_matched) for r in results} == {
+        ("drug", "intervention_search", 100)
+    }
+
+
+async def test_a_resolved_kind_replaces_the_plans_and_is_recorded_as_an_adjustment() -> None:
+    deps = deps_for({**reading("x", drug_names=300, condition_names=4), search("query.intr", "x"): 100})
+    plan = plan_of(Entity(kind="term", value="x", role="filter"))
+
+    resolved = await resolve_entities(
+        Planned(plan, request=QueryRequest(query="How many x trials are there?")), deps, FakeContext()
+    )
+
+    assert isinstance(resolved, Resolved) and resolved.plan is not None
+    assert [e.kind for e in resolved.plan.entities] == ["drug"]
+    assert [(a.code, a.path) for a in resolved.adjustments] == [("entity_kind", "/entities/0/kind")]
+    assert "Read 'x' as a drug (the plan called it a term)" in resolved.assumptions[0]
+
+
+async def test_a_drug_name_found_in_few_intervention_names_is_warned_about() -> None:
+    deps = deps_for(reading("grp", drug_names=10, condition_names=0, broad=200))
+
+    resolved = await resolve_entities(Planned(plan_of(drug("grp"))), deps, FakeContext())
+
+    assert isinstance(resolved, Resolved)
+    (warning,) = [w for w in resolved.warnings if w.code == "drug_name_barely_matches"]
+    assert "only 10 of the 200" in warning.message and "name_only" in warning.message
+
+
+async def test_a_drug_name_that_is_mostly_an_intervention_name_is_not_warned_about() -> None:
+    deps = deps_for(reading("one", drug_names=150, condition_names=0, broad=200))
+
+    resolved = await resolve_entities(Planned(plan_of(drug("one"))), deps, FakeContext())
+
+    assert isinstance(resolved, Resolved)
+    assert not [w for w in resolved.warnings if w.code == "drug_name_barely_matches"]
+
+
+class VocabularyClient(FakeClient):
+    """Answers the vocabulary sample with trials that all carry one MeSH term."""
+
+    mesh: str = "Registry Term"
+
+    async def sample(self, params, ctx, *, fields, page_size, sort, origin):  # type: ignore[no-untyped-def]
+        from ctviz.ctgov.client import Page
+        from ctviz.ctgov.study import parse_study
+
+        records = [
+            parse_study(
+                {
+                    "protocolSection": {"identificationModule": {"nctId": f"NCT{n:08d}"}},
+                    "derivedSection": {
+                        "conditionBrowseModule": {"meshes": [{"id": "D1", "term": self.mesh}]}
+                    },
+                }
+            )
+            for n in range(1, 11)
+        ]
+        return Page(total=len(records), studies=tuple(records), url="https://registry.test/sample")
+
+
+def vocabulary_deps(wording: int, registry_term: int) -> Deps:
+    sizes = {
+        **reading("abbr", drug_names=0, condition_names=wording, broad=wording),
+        Params(advanced=essie.area("ConditionMeshTerm", "Registry Term")): registry_term,
+    }
+    client = VocabularyClient([], sizes=sizes)
+    return Deps(client, EntityResolver(client, Countries(), low_match_threshold=10))  # type: ignore[arg-type]
+
+
+async def test_a_wording_far_narrower_than_the_registrys_own_term_is_reported() -> None:
+    deps = vocabulary_deps(wording=1000, registry_term=12000)
+
+    result = await deps.resolver.resolve("condition", "abbr", FakeContext(), drug_match="broad")
+
+    assert result.registry_term is not None
+    assert (result.registry_term.term, result.registry_term.trials_matched) == ("Registry Term", 12000)
+    resolved = await resolve_entities(
+        Planned(plan_of(Entity(kind="condition", value="abbr", role="filter"))), deps, FakeContext()
+    )
+    assert isinstance(resolved, Resolved)
+    (warning,) = [w for w in resolved.warnings if w.code == "wording_narrower_than_registry_term"]
+    assert "'Registry Term', covers 12,000" in warning.message
+
+
+async def test_a_wording_that_covers_the_registrys_term_is_not_reported() -> None:
+    deps = vocabulary_deps(wording=1000, registry_term=1500)
+
+    result = await deps.resolver.resolve("condition", "abbr", FakeContext(), drug_match="broad")
+
+    assert result.registry_term is None
+
+
+async def test_a_kind_the_client_wrote_is_not_read_again() -> None:
+    deps = deps_for(reading("x", drug_names=300, condition_names=4))
+
+    kept = await deps.resolver.resolve("condition", "x", FakeContext(), drug_match="broad", may_reread=False)
+
+    assert (kept.kind, kept.definition) == ("condition", "condition_search")
+
+
+async def test_only_entities_the_model_classified_are_read_again() -> None:
+    deps = deps_for(reading("x", drug_names=300, condition_names=4))
+    plan = plan_of(Entity(kind="condition", value="x", role="filter"))
+
+    from_plan = await resolve_entities(Planned(plan, request=None), deps, FakeContext())
+    from_field = await resolve_entities(
+        Planned(plan, request=QueryRequest(query="How many x trials are there?", condition=["x"])),
+        deps,
+        FakeContext(),
+    )
+    from_question = await resolve_entities(
+        Planned(plan, request=QueryRequest(query="How many x trials are there?")), deps, FakeContext()
+    )
+
+    assert isinstance(from_plan, Resolved) and isinstance(from_field, Resolved)
+    assert isinstance(from_question, Resolved)
+    assert [r.entities[0].kind for r in (from_plan, from_field, from_question)] == [
+        "condition", "condition", "drug"
+    ]  # fmt: skip

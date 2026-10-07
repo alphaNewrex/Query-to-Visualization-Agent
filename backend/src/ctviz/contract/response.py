@@ -436,17 +436,38 @@ class SponsorCandidate(Model):
     sample_share: float
 
 
+class RegistryTerm(Model):
+    """The vocabulary term the registry itself most often assigns to the trials a wording matched."""
+
+    term: str = Field(description="A MeSH term as the registry's records list it.")
+    trials_matched: int = Field(description="The trials that carry this term in the registry.")
+    sample_share: float = Field(description="The share of the sampled matching trials that carry it.")
+
+
 class EntityResolution(Model):
     """What the registry made of one entity of the plan."""
 
     kind: EntityKind
+    planned_kind: EntityKind = Field(
+        description="The kind the plan named. It differs from `kind` when the registry's counts decided "
+        "which of drug, condition or term the words are."
+    )
     source: Literal["question", "request_field", "plan"]
     text: str = Field(description="The words used.")
     term_searched: str = Field(description="After `essie.literal()`, or the registry's country name.")
     definition: MatchDefinition
     status: Literal["ok", "low_match", "ambiguous", "no_match", "matches_everything"]
     trials_matched: int
-    strict_name_matches: int | None = Field(description="Drugs only: the count of `AREA[InterventionName]`.")
+    strict_name_matches: int | None = Field(
+        description="Drug, condition and term readings: the count of `AREA[InterventionName]`."
+    )
+    condition_name_matches: int | None = Field(
+        description="Drug, condition and term readings: the count of `AREA[Condition]`."
+    )
+    registry_term: RegistryTerm | None = Field(
+        description="Drug and condition readings: the registry's own term for the trials found, "
+        "when it covers far more trials than the wording did."
+    )
     other_readings: list[OtherReading]
     candidates: list[SponsorCandidate] = Field(description="Sponsors only.")
 

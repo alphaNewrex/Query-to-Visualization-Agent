@@ -813,6 +813,14 @@
         }
       ],
       "description": "Only when the user names a chart form; otherwise null."
+    },
+    "unapplied": {
+      "description": "Words copied from the question that ask to make part of the chart look different (highlight, mark, annotate, colour); empty otherwise, and empty for most questions. Never a counting rule or a wish for a clear chart, and never a reason for 'unsupported'.",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "type": "array"
     }
   },
   "required": [
@@ -820,7 +828,8 @@
     "entities",
     "filters",
     "analysis",
-    "chart_preference"
+    "chart_preference",
+    "unapplied"
   ],
   "title": "QueryPlan",
   "type": "object"

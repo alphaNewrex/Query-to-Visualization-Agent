@@ -462,6 +462,18 @@ export interface QueryPlan {
    */
   chart_preference:
     ("bar_chart" | "time_series" | "histogram" | "scatter_plot" | "network_graph" | "table" | "metric") | null;
+  /**
+   * Words copied from the question that ask to make part of the chart look different (highlight, mark, annotate, colour); empty otherwise, and empty for most questions. Never a counting rule or a wish for a clear chart, and never a reason for 'unsupported'.
+   *
+   * @maxItems 5
+   */
+  unapplied:
+    | []
+    | [string]
+    | [string, string]
+    | [string, string, string]
+    | [string, string, string, string]
+    | [string, string, string, string, string];
 }
 export interface Entity {
   kind: "drug" | "condition" | "sponsor" | "country" | "term";
@@ -1281,6 +1293,10 @@ export interface Measure {
  */
 export interface EntityResolution {
   kind: "drug" | "condition" | "sponsor" | "country" | "term";
+  /**
+   * The kind the plan named. It differs from `kind` when the registry's counts decided which of drug, condition or term the words are.
+   */
+  planned_kind: "drug" | "condition" | "sponsor" | "country" | "term";
   source: "question" | "request_field" | "plan";
   /**
    * The words used.
@@ -1300,14 +1316,39 @@ export interface EntityResolution {
   status: "ok" | "low_match" | "ambiguous" | "no_match" | "matches_everything";
   trials_matched: number;
   /**
-   * Drugs only: the count of `AREA[InterventionName]`.
+   * Drug, condition and term readings: the count of `AREA[InterventionName]`.
    */
   strict_name_matches: number | null;
+  /**
+   * Drug, condition and term readings: the count of `AREA[Condition]`.
+   */
+  condition_name_matches: number | null;
+  /**
+   * Drug and condition readings: the registry's own term for the trials found, when it covers far more trials than the wording did.
+   */
+  registry_term: RegistryTerm | null;
   other_readings: OtherReading[];
   /**
    * Sponsors only.
    */
   candidates: SponsorCandidate[];
+}
+/**
+ * The vocabulary term the registry itself most often assigns to the trials a wording matched.
+ */
+export interface RegistryTerm {
+  /**
+   * A MeSH term as the registry's records list it.
+   */
+  term: string;
+  /**
+   * The trials that carry this term in the registry.
+   */
+  trials_matched: number;
+  /**
+   * The share of the sampled matching trials that carry it.
+   */
+  sample_share: number;
 }
 /**
  * The count if the words were read as another kind of entity.

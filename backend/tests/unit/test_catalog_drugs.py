@@ -2,8 +2,9 @@
 
 import pytest
 
-from ctviz.catalog.drugs import DrugNormalizer, is_noise, normalise, split_combination
+from ctviz.catalog.drugs import DrugNormalizer, is_arm_label, is_noise, normalise, split_combination
 from ctviz.catalog.fields import Value
+from ctviz.ctgov.study import Intervention
 
 from .catalog_samples import pembrolizumab
 
@@ -112,3 +113,21 @@ def test_each_drug_appears_once_per_trial_with_its_arms(normalizer: DrugNormaliz
     )
     pembro = next(v for v in normalizer.values(study) if v.key == "pembrolizumab")
     assert pembro.groups
+
+
+def _intervention(name: str, kind: str, labels: tuple[str, ...]) -> Intervention:
+    return Intervention(index=0, type=kind, name=name, other_names=(), arm_group_labels=labels)
+
+
+def test_an_intervention_named_as_its_arm_group_is_a_label_and_not_a_drug() -> None:
+    assert is_arm_label(_intervention("LSG-Alpha group", "COMBINATION_PRODUCT", ("LSG-Alpha group",)))
+    assert is_arm_label(_intervention("Gamma cohort", "DRUG", ("gamma cohort",)))
+
+
+def test_a_drug_whose_arm_is_named_after_it_is_kept() -> None:
+    assert not is_arm_label(_intervention("Pembrolizumab", "DRUG", ("Pembrolizumab",)))
+    assert not is_arm_label(_intervention("Pembrolizumab", "DRUG", ("Pembrolizumab group",)))
+    assert not is_arm_label(_intervention("Beta group therapy", "DRUG", ("Control arm",)))
+    assert not is_arm_label(
+        _intervention("Alpha (extension of cohort 1)", "BIOLOGICAL", ("alpha (extension of cohort 1)",))
+    )

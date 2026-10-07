@@ -1,5 +1,5 @@
 {
-  "interpretation": "Plot enrollment against duration for completed Duchenne muscular dystrophy trials.",
+  "interpretation": "Plot enrollment against study duration for completed Duchenne muscular dystrophy trials.",
   "entities": [
     {
       "kind": "condition",
@@ -39,5 +39,6 @@
     "y": "duration_months",
     "color_by": null
   },
-  "chart_preference": "scatter_plot"
+  "chart_preference": "scatter_plot",
+  "unapplied": []
 }

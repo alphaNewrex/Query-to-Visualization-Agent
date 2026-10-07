@@ -870,6 +870,15 @@
         'title': 'Interpretation',
         'type': 'string',
       }),
+      'unapplied': dict({
+        'description': "Words copied from the question that ask to make part of the chart look different (highlight, mark, annotate, colour); empty otherwise, and empty for most questions. Never a counting rule or a wish for a clear chart, and never a reason for 'unsupported'.",
+        'items': dict({
+          'type': 'string',
+        }),
+        'maxItems': 5,
+        'title': 'Unapplied',
+        'type': 'array',
+      }),
     }),
     'required': list([
       'interpretation',
@@ -877,6 +886,7 @@
       'filters',
       'analysis',
       'chart_preference',
+      'unapplied',
     ]),
     'title': 'QueryPlan',
     'type': 'object',

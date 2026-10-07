@@ -29,7 +29,7 @@ from ctviz.contract.plan import (
     TrialList,
 )
 from ctviz.contract.request import QueryRequest, RequestOptions
-from ctviz.contract.response import EntityResolution, Note
+from ctviz.contract.response import Adjustment, EntityResolution, Note
 from ctviz.ctgov.params import BoundTerm, DateRange, Scope
 from ctviz.engine import windows
 
@@ -117,6 +117,9 @@ class Resolved:
     matched: Mapping[str, int]  # trials matched by one count probe, by scope id
     warnings: tuple[Note, ...]
     assumptions: tuple[str, ...]
+    # The plan with each entity read as the kind the registry's counts decided, and what changed.
+    plan: QueryPlan | None = None
+    adjustments: tuple[Adjustment, ...] = ()
 
 
 class PlannedLike(Protocol):

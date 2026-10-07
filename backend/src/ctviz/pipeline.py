@@ -221,6 +221,12 @@ async def _run(
     ctx.add_step("resolve_entity", f"{len(resolved.entities)} entities", watch.resolve_ms, first_request)
     context.entities, context.assumptions = resolved.entities, resolved.assumptions
     context.warnings = resolved.warnings
+    if resolved.plan is not None:
+        # The entities read as the kinds the registry's counts decided; the response states the plan it ran.
+        planned = replace(
+            planned, plan=resolved.plan, adjustments=(*planned.adjustments, *resolved.adjustments)
+        )
+        context.planned = planned
 
     plan = lower_plan(planned, resolved, deps.catalog, version)
     limits = Limits.from_settings(deps.settings)
@@ -259,7 +265,7 @@ class _MetaBuilder:
     """The pieces of `meta` known so far, which grow as the stages complete."""
 
     def __init__(self, planned: PlannedQuery, ctx: RequestContext, deps: Deps, watch: _Stopwatch) -> None:
-        self._planned, self._ctx, self._deps, self._watch = planned, ctx, deps, watch
+        self.planned, self._ctx, self._deps, self._watch = planned, ctx, deps, watch
         self.version: ApiVersion | None = None  # unknown until the first stage that needs the registry
         self.entities: tuple[EntityResolution, ...] = ()
         self.assumptions: tuple[str, ...] = ()
@@ -267,7 +273,7 @@ class _MetaBuilder:
         self.strategy: tuple[StrategyStep, ...] = ()
 
     def build(self) -> MetaContext:
-        planned, ctx = self._planned, self._ctx
+        planned, ctx = self.planned, self._ctx
         now = self._deps.clock()
         filters: AppliedFilters = applied_filters(planned.plan)
         request = planned.request

@@ -130,7 +130,7 @@ curl -s -X POST http://127.0.0.1:8000/v1/query -H 'Content-Type: application/jso
 The structured field `drug_name` is what "this drug" refers to, and the answer is a `time_series` of trials started per year. Below is the recorded run [`docs/examples/01-assignment-request/`](docs/examples/01-assignment-request/response.json), cut down: two rows, one citation each, one reference, the `meta` blocks that the schema reference describes folded to `"..."`, and strings cut at 100 characters.
 
 <!-- gen:response-example:start -->
-The service matched 2,971 trials with 32 requests to ClinicalTrials.gov and answered in 7.2 s, of which the model call took 2.5 s. The series starts in 2008, the first period with a trial; empty periods before it are left out.
+The service matched 2,971 trials with 36 requests to ClinicalTrials.gov and answered in 7.2 s, of which the model call took 1.7 s. The series starts in 2008, the first period with a trial; empty periods before it are left out.
 
 ```json
 {
@@ -184,8 +184,8 @@ The service matched 2,971 trials with 32 requests to ClinicalTrials.gov and answ
     "...": "76 more trials"
   },
   "meta": {
-    "request_id": "439d9cee-551e-4fda-8e20-89e4daf9420c",
-    "generated_at": "2026-10-07T02:19:54.443068Z",
+    "request_id": "3bc29ba6-7304-4e2f-8319-dab6b3d19cd3",
+    "generated_at": "2026-10-07T02:47:17.183228Z",
     "query": "How has the number of trials for this drug changed over time?",
     "filters": {
       "drug_name": ["Pembrolizumab"],
@@ -216,7 +216,7 @@ The service matched 2,971 trials with 32 requests to ClinicalTrials.gov and answ
     "options": "...",
     "planner": "...",
     "assumptions": [
-      "Matched 'Pembrolizumab' with the registry's intervention search (names, other names, arm labels, ...",
+      "Read 'Pembrolizumab' as a drug: 2,567 trials have it in an intervention name and 15 in a conditio...",
       "Trials are placed by start date; estimated dates are included, and withdrawn trials keep their pl...",
       "No end year was given, so the axis stops at 2026, the period of the data."
     ],
@@ -226,11 +226,11 @@ The service matched 2,971 trials with 32 requests to ClinicalTrials.gov and answ
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T02:19:54.443068Z",
+      "retrieved_at": "2026-10-07T02:47:17.183228Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
-      "requests": ["... 32 more requests"]
+      "requests": ["... 36 more requests"]
     },
     "counts": {
       "data_points": 19,

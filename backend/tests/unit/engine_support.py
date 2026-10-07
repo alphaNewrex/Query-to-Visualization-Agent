@@ -184,6 +184,7 @@ PUBLIC_PLAN = QueryPlan(
     ),
     analysis=Total(kind="total", statistic=None, of=None),
     chart_preference=None,
+    unapplied=[],
 )  # fmt: skip
 
 

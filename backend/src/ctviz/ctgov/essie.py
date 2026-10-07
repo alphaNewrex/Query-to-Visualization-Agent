@@ -87,6 +87,14 @@ def search(piece: str, term: str) -> Expr:
     return Expr(f"AREA[{_checked_piece(piece)}]({term})")
 
 
+def search_phrase(piece: str, text: str) -> Expr:
+    """`AREA[ConditionSearch]"two words"`: a search area, for the exact phrase.
+
+    The words must occur together and in order, where `search` also accepts them apart.
+    """
+    return Expr(f"AREA[{_checked_piece(piece)}]{_phrase(text)}")
+
+
 def any_of(piece: str, values: Sequence[str]) -> Expr:
     """`AREA[Phase](PHASE2 OR PHASE3)`: the area holds at least one of the enum tokens."""
     return _in_area(piece, _enum_tokens(values), joiner=" OR ")

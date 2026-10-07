@@ -364,4 +364,5 @@ def _declined_plan() -> QueryPlan:
         filters=NO_FILTERS,
         analysis=Unsupported(kind="unsupported", category="other", reason=outcome.message),
         chart_preference=None,
+        unapplied=[],
     )

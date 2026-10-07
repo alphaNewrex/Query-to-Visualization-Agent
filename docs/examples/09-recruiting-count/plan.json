@@ -1,5 +1,5 @@
 {
-  "interpretation": "Count recruiting Duchenne muscular dystrophy trials.",
+  "interpretation": "Count recruiting trials for Duchenne muscular dystrophy.",
   "entities": [
     {
       "kind": "condition",
@@ -38,5 +38,6 @@
     "statistic": null,
     "of": null
   },
-  "chart_preference": null
+  "chart_preference": null,
+  "unapplied": []
 }

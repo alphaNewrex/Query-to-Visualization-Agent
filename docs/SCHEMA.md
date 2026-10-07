@@ -17,7 +17,7 @@ lists every key, so it has no Required column.
 - [Channels](#channels): [`CategoryChannel`](#categorychannel), [`ChannelSort`](#channelsort), [`TemporalChannel`](#temporalchannel), [`QuantitativeChannel`](#quantitativechannel), [`FieldDef`](#fielddef), [`FieldRef`](#fieldref)
 - [Data rows](#data-rows): [`Datum`](#datum), [`Node`](#node), [`Edge`](#edge)
 - [Citations](#citations): [`Citation`](#citation), [`TrialReference`](#trialreference), [`ScopeEvidence`](#scopeevidence)
-- [Metadata](#metadata): [`Meta`](#meta), [`AppliedFilters`](#appliedfilters), [`AppliedExclusions`](#appliedexclusions), [`Interpretation`](#interpretation), [`EntityResolution`](#entityresolution), [`OtherReading`](#otherreading), [`SponsorCandidate`](#sponsorcandidate), [`Measure`](#measure), [`StrategyStep`](#strategystep), [`PlannerInfo`](#plannerinfo), [`Usage`](#usage), [`Adjustment`](#adjustment), [`Note`](#note), [`Source`](#source), [`UpstreamRequest`](#upstreamrequest), [`Counts`](#counts), [`SeriesCounts`](#seriescounts), [`ExclusionCount`](#exclusioncount), [`Truncation`](#truncation), [`TruncationItem`](#truncationitem), [`CitationsInfo`](#citationsinfo), [`CacheInfo`](#cacheinfo), [`Timing`](#timing), [`Debug`](#debug), [`TraceStep`](#tracestep)
+- [Metadata](#metadata): [`Meta`](#meta), [`AppliedFilters`](#appliedfilters), [`AppliedExclusions`](#appliedexclusions), [`Interpretation`](#interpretation), [`EntityResolution`](#entityresolution), [`RegistryTerm`](#registryterm), [`OtherReading`](#otherreading), [`SponsorCandidate`](#sponsorcandidate), [`Measure`](#measure), [`StrategyStep`](#strategystep), [`PlannerInfo`](#plannerinfo), [`Usage`](#usage), [`Adjustment`](#adjustment), [`Note`](#note), [`Source`](#source), [`UpstreamRequest`](#upstreamrequest), [`Counts`](#counts), [`SeriesCounts`](#seriescounts), [`ExclusionCount`](#exclusioncount), [`Truncation`](#truncation), [`TruncationItem`](#truncationitem), [`CitationsInfo`](#citationsinfo), [`CacheInfo`](#cacheinfo), [`Timing`](#timing), [`Debug`](#debug), [`TraceStep`](#tracestep)
 - [Error body](#error-body): [`ErrorResponse`](#errorresponse), [`ErrorBody`](#errorbody)
 
 ## Requests
@@ -144,6 +144,7 @@ The plan is what the planner model writes, what `POST /v1/analyses` accepts and 
 | `filters` | [`PlanFilters`](#planfilters) | yes |  |  |  |
 | `analysis` | [`Aggregate`](#aggregate) \| [`Total`](#total) \| [`Relate`](#relate) \| [`Network`](#network) \| [`TrialList`](#triallist) \| [`Clarify`](#clarify) \| [`Unsupported`](#unsupported) | yes |  |  |  |
 | `chart_preference` | `bar_chart` \| `time_series` \| `histogram` \| `scatter_plot` \| `network_graph` \| `table` \| `metric` \| null | yes |  |  | Only when the user names a chart form; otherwise null. |
+| `unapplied` | string[] | yes |  | at most 5 items | Words copied from the question that ask to make part of the chart look different (highlight, mark, annotate, colour); empty otherwise, and empty for most questions. Never a counting rule or a wish for a clear chart, and never a reason for 'unsupported'. |
 
 ### Entity
 
@@ -783,15 +784,28 @@ What the registry made of one entity of the plan.
 | Field | Type | Description |
 | --- | --- | --- |
 | `kind` | `drug` \| `condition` \| `sponsor` \| `country` \| `term` |  |
+| `planned_kind` | `drug` \| `condition` \| `sponsor` \| `country` \| `term` | The kind the plan named. It differs from `kind` when the registry's counts decided which of drug, condition or term the words are. |
 | `source` | `question` \| `request_field` \| `plan` |  |
 | `text` | string | The words used. |
 | `term_searched` | string | After `essie.literal()`, or the registry's country name. |
 | `definition` | `intervention_search` \| `intervention_name` \| `condition_search` \| `lead_sponsor_search` \| `country_exact` \| `term_search` |  |
 | `status` | `ok` \| `low_match` \| `ambiguous` \| `no_match` \| `matches_everything` |  |
 | `trials_matched` | integer |  |
-| `strict_name_matches` | integer \| null | Drugs only: the count of `AREA[InterventionName]`. |
+| `strict_name_matches` | integer \| null | Drug, condition and term readings: the count of `AREA[InterventionName]`. |
+| `condition_name_matches` | integer \| null | Drug, condition and term readings: the count of `AREA[Condition]`. |
+| `registry_term` | [`RegistryTerm`](#registryterm) \| null | Drug and condition readings: the registry's own term for the trials found, when it covers far more trials than the wording did. |
 | `other_readings` | [`OtherReading`](#otherreading)[] |  |
 | `candidates` | [`SponsorCandidate`](#sponsorcandidate)[] | Sponsors only. |
+
+### RegistryTerm
+
+The vocabulary term the registry itself most often assigns to the trials a wording matched.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `term` | string | A MeSH term as the registry's records list it. |
+| `trials_matched` | integer | The trials that carry this term in the registry. |
+| `sample_share` | number | The share of the sampled matching trials that carry it. |
 
 ### OtherReading
 

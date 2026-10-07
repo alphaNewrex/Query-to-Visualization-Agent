@@ -128,7 +128,7 @@ def _settle_unrepaired(plan: QueryPlan, found: Findings) -> tuple[QueryPlan, Out
     found.warn("plan_not_repaired", f"The plan still had problems after one repair: {codes}.")
     if any(issue.code == "network_pair_unsupported" for issue in remaining):
         return plan, unsupported("analysis_not_supported")
-    return plan, could_not_interpret()
+    return plan, could_not_interpret(remaining)
 
 
 def _with_defaults(plan: QueryPlan) -> QueryPlan:

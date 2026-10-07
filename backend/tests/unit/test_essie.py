@@ -199,3 +199,10 @@ def test_not_keeps_its_operand_whole_inside_a_conjunction() -> None:
     assert essie.and_(Expr("AREA[Phase]PHASE2"), negated) == (
         "(AREA[Phase]PHASE2) AND (NOT ((AREA[Phase]PHASE1) AND (AREA[Sex]FEMALE)))"
     )
+
+
+def test_a_search_phrase_is_quoted_in_its_area() -> None:
+    assert (
+        essie.search_phrase("ConditionSearch", "type 2 diabetes") == 'AREA[ConditionSearch]"type 2 diabetes"'
+    )
+    assert essie.search_phrase("ConditionSearch", 'a "b" NOT c') == 'AREA[ConditionSearch]"a b NOT c"'

@@ -7,7 +7,8 @@ import re
 from collections.abc import Sequence
 from typing import Final
 
-from ctviz.contract.plan import Clarify, QueryPlan, Unsupported
+from ctviz.catalog.fields import CATALOG
+from ctviz.contract.plan import Clarify, PlanIssue, QueryPlan, Unsupported
 from ctviz.contract.response import Clarification, ClarificationReason, LabeledRequest, Outcome
 from ctviz.planning.findings import Findings
 from ctviz.planning.grounding import (
@@ -32,10 +33,17 @@ _FIELD_LABELS: Final = {
     "trial_phase": "phase",
 }
 _UNSUPPORTED_MESSAGES: Final = {
-    "not_about_clinical_trials": "This question is not about registered clinical trials.",
-    "needs_data_not_in_registry": "The registry does not hold the data this question needs.",
-    "single_trial_lookup": "This service charts groups of trials, not a single trial.",
-    "analysis_not_supported": "This service cannot draw that kind of analysis.",
+    "not_about_clinical_trials": "This question is not about clinical trials registered on "
+    "ClinicalTrials.gov, "
+    "so there are no registry records to count for it.",
+    "needs_data_not_in_registry": "The question needs data that ClinicalTrials.gov does not hold "
+    "(results such "
+    "as efficacy, prices, predictions or opinions). The registry describes how trials are designed and run.",
+    "single_trial_lookup": "The question is about one trial. This service charts groups of trials: open the "
+    "trial on ClinicalTrials.gov, or ask how many trials match a description.",
+    "analysis_not_supported": "The question needs a grouping, measure or comparison that this "
+    "service does not "
+    "offer. {offered}",
     "other": "This question cannot be answered by this service.",
 }
 DECLINED_MESSAGE: Final = "The planning model declined this question, so nothing was drawn."
@@ -55,13 +63,28 @@ def clarification(
     return Outcome(kind="clarification", reason=reason, message=message, clarification=detail)
 
 
+def _offered() -> str:
+    """What the service can group by and measure, from the field catalogue, for the unsupported message."""
+    titles = ", ".join(spec.title.lower() for spec in CATALOG.values())
+    return (
+        f"It counts trials by {titles}, or gives the median, mean or sum of enrollment, duration or number "
+        "of sites, optionally split by one more category."
+    )
+
+
 def unsupported(category: str) -> Outcome:
+    """The answer for a plan marked unsupported: a sentence per category, written here, not by the model."""
     message = _UNSUPPORTED_MESSAGES.get(category, _UNSUPPORTED_MESSAGES["other"])
-    return Outcome(kind="unsupported", reason=category, message=message)
+    return Outcome(kind="unsupported", reason=category, message=message.format(offered=_offered()).strip())
 
 
-def could_not_interpret() -> Outcome:
-    return clarification("could_not_interpret", COULD_NOT_INTERPRET_MESSAGE)
+def could_not_interpret(issues: Sequence[PlanIssue] = ()) -> Outcome:
+    """A plan that stayed blocked: the sentences code wrote for each problem say what was wrong."""
+    reasons = " ".join(dict.fromkeys(issue.message for issue in issues))
+    message = (
+        COULD_NOT_INTERPRET_MESSAGE if not reasons else f"{COULD_NOT_INTERPRET_MESSAGE} Problem: {reasons}"
+    )
+    return clarification("could_not_interpret", message)
 
 
 def outcome_of_analysis(plan: QueryPlan) -> Outcome | None:
@@ -84,12 +107,15 @@ def _clarify_message(analysis: Clarify) -> str:
 
 
 def direct_outcome(plan: QueryPlan, facts: Facts, found: Findings) -> tuple[QueryPlan, Outcome | None]:
-    """Rules 24 to 27, in that order; the first that fires decides.
+    """Rules 24 to 27, in that order; the first that fires decides, after a plan marked unsupported.
 
     Rule 24 rewrites the plan's analysis to `clarify` so that posting the canonical plan to
     `/v1/analyses` reproduces the clarification. In structured and supplied modes rules 25 and 27 have
     no outcome to give: the client is told what is wrong, so they are blocking issues.
     """
+    if isinstance(plan.analysis, Unsupported):
+        # A plan marked unsupported is answered before any entity check can ask a question.
+        return plan, unsupported(plan.analysis.category)
     if facts.mode == "model":
         plan, outcome = _placeholders(plan, facts, found)
         if outcome is not None:

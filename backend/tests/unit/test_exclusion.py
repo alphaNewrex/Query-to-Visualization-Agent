@@ -23,6 +23,7 @@ def _resolution(
 
     return EntityResolution(
         kind=kind,  # type: ignore[arg-type]
+        planned_kind=kind,  # type: ignore[arg-type]
         source="question",
         text=text,
         term_searched=term,
@@ -30,6 +31,8 @@ def _resolution(
         status="ok",
         trials_matched=10,
         strict_name_matches=None,
+        condition_name_matches=None,
+        registry_term=None,
         other_readings=[],
         candidates=[],
     )
@@ -167,3 +170,12 @@ def test_an_empty_exclude_object_is_no_exclusion() -> None:
     )
 
     assert fields.exclude is not None and fields.exclude.is_empty
+
+
+def test_a_multi_word_exclusion_is_the_exact_phrase_and_a_single_word_is_not_quoted() -> None:
+    phrase = bind_excluded(_resolution("condition_search", text="type 2 diabetes", term="type 2 diabetes"))  # type: ignore[arg-type]
+    word = bind_excluded(_resolution("condition_search"))  # type: ignore[arg-type]
+
+    assert phrase.expr == 'NOT (AREA[ConditionSearch]"type 2 diabetes")'
+    assert word.expr == "NOT (AREA[ConditionSearch](diabetes))"
+    assert "whole phrase" in phrase.note and "whole phrase" not in word.note

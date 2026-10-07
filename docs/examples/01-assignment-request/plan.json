@@ -35,5 +35,6 @@
     "statistic": null,
     "of": null
   },
-  "chart_preference": null
+  "chart_preference": null,
+  "unapplied": []
 }

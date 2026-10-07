@@ -32,5 +32,6 @@
     "target": "drug",
     "link": "same_arm"
   },
-  "chart_preference": null
+  "chart_preference": null,
+  "unapplied": []
 }

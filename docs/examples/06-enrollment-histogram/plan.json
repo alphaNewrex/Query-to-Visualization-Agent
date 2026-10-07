@@ -1,5 +1,5 @@
 {
-  "interpretation": "Count pembrolizumab trials by enrollment size.",
+  "interpretation": "Count pembrolizumab trials by planned enrollment size.",
   "entities": [
     {
       "kind": "drug",
@@ -35,5 +35,6 @@
     "statistic": null,
     "of": null
   },
-  "chart_preference": "histogram"
+  "chart_preference": null,
+  "unapplied": []
 }

@@ -32,5 +32,6 @@
     "order": "desc",
     "limit": 10
   },
-  "chart_preference": null
+  "chart_preference": null,
+  "unapplied": []
 }

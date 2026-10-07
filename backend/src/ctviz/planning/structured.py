@@ -78,4 +78,5 @@ def plan_from_fields(request: QueryRequest) -> QueryPlan:
             of=None,
         ),
         chart_preference=request.chart_type,
+        unapplied=[],
     )

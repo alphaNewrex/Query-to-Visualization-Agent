@@ -43,6 +43,7 @@ from ctviz.planning.grounding import (
 
 MAX_LIMIT: Final = 50
 MAX_COMPARED: Final = 5
+_MAX_UNAPPLIED_LENGTH: Final = 120
 DATE_DIMENSIONS: Final = frozenset(
     {"start_date", "primary_completion_date", "completion_date", "first_posted_date"}
 )
@@ -139,6 +140,7 @@ def apply_fixes(plan: QueryPlan, facts: Facts, found: Findings) -> QueryPlan:
     plan = fix_link(plan, found)
     plan = fix_limits(plan, facts, found)
     plan = fix_chart_preference(plan, found)
+    plan = fix_unapplied(plan, facts, found)
     if facts.mode == "model":
         plan = fix_ungrounded_phases(plan, facts, found)
     return plan
@@ -347,6 +349,29 @@ _COMPARABLE_CHARTS: Final[dict[str, frozenset[ChartType]]] = {
     "trial_list": frozenset({"table"}),
     "network": frozenset({"network_graph"}),
 }
+
+
+def fix_unapplied(plan: QueryPlan, facts: Facts, found: Findings) -> QueryPlan:
+    """A request the chart cannot honour is answered with the chart and a note, never with a refusal.
+
+    The words must be the question's own: a phrase whose words are not all in the question is dropped. The
+    note quotes those words, so nothing the model wrote freely is shown.
+    """
+    kept: list[str] = []
+    for index, phrase in enumerate(plan.unapplied):
+        words = " ".join(phrase.split())[:_MAX_UNAPPLIED_LENGTH]
+        if not words or (facts.mode == "model" and not _phrase_in_question(words, facts)):
+            found.adjust(
+                "unapplied_not_quoted", f"/unapplied/{index}", "Words not in the question.", "dropped"
+            )
+            continue
+        kept.append(words)
+        found.warn(
+            "request_not_applied",
+            f"Not applied: '{words}'. This service draws counts and statistics of trials and does not "
+            "highlight, mark or annotate parts of a chart, so the chart is drawn without it.",
+        )
+    return plan.model_copy(update={"unapplied": kept}) if kept != plan.unapplied else plan
 
 
 def fix_chart_preference(plan: QueryPlan, found: Findings) -> QueryPlan:

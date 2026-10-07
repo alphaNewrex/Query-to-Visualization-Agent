@@ -38,7 +38,7 @@ from ctviz.contract.plan import (
 from ctviz.contract.request import QueryRequest
 from ctviz.planning.structured import NO_FILTERS
 
-PROMPT_VERSION: Final = "plan-v2"
+PROMPT_VERSION: Final = "plan-v3"
 
 RULES: Final = """\
 You translate a question about clinical trials into a query plan for a service that counts
@@ -77,7 +77,9 @@ and you never write counts, trial names or identifiers.
    clarify      a needed name, or what to show, is missing;
    unsupported  not about registered clinical trials; needs data the registry does not hold
                 (efficacy, prices, predictions, opinions); asks about one trial by NCT ID; or
-                needs a grouping that is not in the glossary.
+                needs a grouping that is not in the glossary. Never use it for an extra that
+                only concerns how the chart looks (rule 15) or for a "top N versus the rest"
+                split (rule 16): plan the part of the question that can be counted.
 8. top_n, limit, time_unit and chart_preference are null unless the question asks for them.
 9. interpretation is one sentence restating what will be counted and how it is grouped. It
    contains no figures other than those in the question.
@@ -109,6 +111,18 @@ and you never write counts, trial names or identifiers.
     total with A, B and C compared. Counting trials leaves statistic and of null. Never "sum" of
     duration_months. Two or more different measures in one question are not supported: use
     "unsupported" with category analysis_not_supported.
+15. Extras: wording that asks to make part of the chart look different (highlighting, emphasising,
+    marking or annotating some bars or points, a colour, a threshold line) cannot be drawn and does
+    not change what is counted. Plan the rest of the question as usual and copy the words of the
+    extra, verbatim, into `unapplied`. The service then draws the chart and says that the extra was
+    not applied. Nothing else goes into `unapplied`: the service always counts a trial once per
+    group however many sites or arms it has, so a request to count each trial once is already met;
+    nor is a wish for a clear or informative chart, or anything the plan already expresses. It is
+    empty for most questions.
+16. "The top N X versus everyone else", "N largest X and all the others", "share held by the top N
+    X": analysis aggregate with dimension X (the kind of thing ranked: sponsor, country, drug,
+    condition) and top_n N. The service puts all other items into one "Other" bar. The ranked kind is
+    the dimension, never an entity with role compare, and the question is not unsupported.
 """
 
 _CLOSED: Final = frozenset(get_args(ClosedDimension))
@@ -186,6 +200,7 @@ def _plan(
     analysis: Aggregate | Total | Network | TrialList | Clarify,
     *,
     filters: dict[str, object] | None = None,
+    unapplied: list[str] | None = None,
 ) -> QueryPlan:
     return QueryPlan(
         interpretation=interpretation,
@@ -193,6 +208,7 @@ def _plan(
         filters=NO_FILTERS.model_copy(update=filters or {}),
         analysis=analysis,
         chart_preference=None,
+        unapplied=unapplied or [],
     )
 
 
@@ -359,6 +375,62 @@ EXAMPLES: Final = (
                 "statuses": ["COMPLETED"],
                 "evidence": [FilterEvidence(family="statuses", phrase="completed")],
             },
+        ),
+    ),
+    Example(
+        QueryRequest(
+            query="What share of recruiting gout trials is held by the five biggest sponsors compared with "
+            "all other sponsors?"
+        ),
+        _plan(
+            "Count recruiting gout trials by lead sponsor: the five largest sponsors, the rest as Other.",
+            [_entity("condition", "gout")],
+            Aggregate.model_validate(
+                {
+                    "kind": "aggregate",
+                    "dimension": "sponsor",
+                    "series": None,
+                    "time_unit": None,
+                    "top_n": 5,
+                    "statistic": None,
+                    "of": None,
+                }
+            ),
+            filters={
+                "statuses": ["RECRUITING"],
+                "evidence": [FilterEvidence(family="statuses", phrase="recruiting")],
+            },
+        ),
+    ),
+    Example(
+        QueryRequest(
+            query="Show the distribution of enrollment sizes for Phase 2 eczema trials and mark the biggest "
+            "ones in red."
+        ),
+        _plan(
+            "Count Phase 2 eczema trials by planned enrollment size.",
+            [_entity("condition", "eczema")],
+            _aggregate("enrollment"),
+            filters={
+                "phases": ["PHASE2"],
+                "evidence": [FilterEvidence(family="phases", phrase="Phase 2")],
+            },
+            unapplied=["mark the biggest ones in red"],
+        ),
+    ),
+    Example(
+        QueryRequest(
+            query="Compare ustekinumab and vedolizumab trials for Crohn's disease per year. Count each trial "
+            "once even if it has many sites, and make the chart easy to read."
+        ),
+        _plan(
+            "Count Crohn's disease trials per start year for ustekinumab and for vedolizumab.",
+            [
+                _entity("condition", "Crohn's disease"),
+                _entity("drug", "ustekinumab", "compare"),
+                _entity("drug", "vedolizumab", "compare"),
+            ],
+            _aggregate("start_date", time_unit="year"),
         ),
     ),
     Example(

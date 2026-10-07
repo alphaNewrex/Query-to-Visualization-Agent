@@ -2047,8 +2047,8 @@
     }
   },
   "meta": {
-    "request_id": "a64a8034-1020-40fc-aa71-66421abf02c3",
-    "generated_at": "2026-10-07T02:20:05.304680Z",
+    "request_id": "9817b67d-159d-4f00-8c3d-93f60cbc7f6d",
+    "generated_at": "2026-10-07T02:47:29.183458Z",
     "query": "Show a network of sponsors and drugs for Duchenne muscular dystrophy trials.",
     "filters": {
       "drug_name": [],
@@ -2101,13 +2101,16 @@
       "entities": [
         {
           "kind": "condition",
+          "planned_kind": "condition",
           "source": "question",
           "text": "Duchenne muscular dystrophy",
           "term_searched": "Duchenne muscular dystrophy",
           "definition": "condition_search",
           "status": "ok",
           "trials_matched": 499,
-          "strict_name_matches": null,
+          "strict_name_matches": 12,
+          "condition_name_matches": 462,
+          "registry_term": null,
           "other_readings": [
             {
               "kind": "drug",
@@ -2162,7 +2165,8 @@
         "target": "drug",
         "link": "same_trial"
       },
-      "chart_preference": "network_graph"
+      "chart_preference": "network_graph",
+      "unapplied": []
     },
     "options": {
       "planner": "llm",
@@ -2175,19 +2179,19 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v2",
+      "prompt_version": "plan-v3",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 7111,
-        "output_tokens": 172,
-        "reasoning_tokens": 21,
-        "cached_tokens": 6912
+        "input_tokens": 8253,
+        "output_tokens": 178,
+        "reasoning_tokens": 22,
+        "cached_tokens": 7936
       }
     },
     "assumptions": [
-      "Matched 'Duchenne muscular dystrophy' with the registry's condition search (conditions, titles, keywords and MeSH terms, with synonyms).",
+      "Read 'Duchenne muscular dystrophy' as a condition: 12 trials have it in an intervention name and 462 in a condition. Matched 'Duchenne muscular dystrophy' with the registry's condition search (conditions, titles, keywords and MeSH terms, with synonyms): 499 trials.",
       "Sponsors are the lead sponsor's name as registered; variants of one name are not merged.",
       "Drug names are normalised from free text: doses and forms are removed, placebos and non-drug care are left out, and a combination is split only when each part is a known drug.",
       "A sponsor and a drug are linked when one trial lists both. The sponsor of a trial is its lead sponsor."
@@ -2203,16 +2207,36 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T02:20:05.304680Z",
+      "retrieved_at": "2026-10-07T02:47:29.183458Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
       "requests": [
         {
           "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 64,
+          "total_count": 462,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BInterventionName%5D%22Duchenne%20muscular%20dystrophy%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 61,
+          "total_count": 12,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 79,
+          "duration_ms": 65,
           "total_count": 499,
           "records_returned": 1,
           "is_cached": false,
@@ -2220,10 +2244,40 @@
         },
         {
           "method": "GET",
-          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BCondition%5D%22Duchenne%20muscular%20dystrophy%22&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 83,
+          "duration_ms": 65,
           "total_count": 462,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.term=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 147,
+          "total_count": 543,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=50&fields=NCTId,ConditionBrowseModule",
+          "status": 200,
+          "duration_ms": 105,
+          "total_count": 499,
+          "records_returned": 50,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BConditionMeshTerm%5D%22Muscular%20Dystrophy,%20Duchenne%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 51,
+          "total_count": 476,
           "records_returned": 1,
           "is_cached": false,
           "origin": "resolution"
@@ -2242,7 +2296,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,Condition,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,LeadSponsorClass,LeadSponsorName,StudyFirstPostDate",
           "status": 200,
-          "duration_ms": 325,
+          "duration_ms": 367,
           "total_count": 499,
           "records_returned": 499,
           "is_cached": false,
@@ -2298,11 +2352,11 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 1942,
-      "plan_ms": 1516,
-      "resolve_ms": 84,
-      "fetch_ms": 337,
-      "build_ms": 3
+      "total_ms": 1926,
+      "plan_ms": 1236,
+      "resolve_ms": 306,
+      "fetch_ms": 382,
+      "build_ms": 1
     },
     "debug": {
       "trace": [
@@ -2310,7 +2364,7 @@
           "index": 0,
           "type": "plan",
           "summary": "Link sponsors to drugs across Duchenne muscular dystrophy trials.",
-          "duration_ms": 1516,
+          "duration_ms": 1236,
           "request_indexes": [],
           "detail": {}
         },
@@ -2318,11 +2372,16 @@
           "index": 1,
           "type": "resolve_entity",
           "summary": "1 entities",
-          "duration_ms": 84,
+          "duration_ms": 306,
           "request_indexes": [
             0,
             1,
-            2
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
           ],
           "detail": {}
         },
@@ -2330,9 +2389,9 @@
           "index": 2,
           "type": "execute",
           "summary": "1 requests",
-          "duration_ms": 337,
+          "duration_ms": 382,
           "request_indexes": [
-            3
+            8
           ],
           "detail": {}
         }

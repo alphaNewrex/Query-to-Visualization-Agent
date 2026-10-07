@@ -32,6 +32,7 @@ PLAN: dict[str, Any] = {
     "analysis": {"kind": "aggregate", "dimension": "start_date", "series": None, "time_unit": "year",
                  "top_n": None, "statistic": None, "of": None},
     "chart_preference": None,
+    "unapplied": [],
 }  # fmt: skip
 
 

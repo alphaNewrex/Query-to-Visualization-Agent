@@ -20,6 +20,7 @@ BASE: dict[str, Any] = {
     "analysis": {"kind": "aggregate", "dimension": "phase", "series": None, "time_unit": None, "top_n": None,
                  "statistic": None, "of": None},
     "chart_preference": None,
+    "unapplied": [],
 }  # fmt: skip
 
 

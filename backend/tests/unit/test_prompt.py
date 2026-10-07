@@ -28,7 +28,7 @@ EVALUATION_ENTITIES = {
 
 
 def test_the_version_names_the_current_prompt() -> None:
-    assert PROMPT_VERSION == "plan-v2"
+    assert PROMPT_VERSION == "plan-v3"
 
 
 def test_the_rules_are_printed_in_the_instructions() -> None:
@@ -51,8 +51,8 @@ def test_the_glossary_is_rendered_from_the_catalogue_when_it_has_entries() -> No
         assert f"  {spec.key}: {spec.title} ({spec.kind})" in glossary
 
 
-def test_there_are_twelve_examples_that_share_no_entity_with_the_evaluation_questions() -> None:
-    assert len(EXAMPLES) == 12
+def test_there_are_fifteen_examples_that_share_no_entity_with_the_evaluation_questions() -> None:
+    assert len(EXAMPLES) == 15
     shown = " ".join(
         entity.value.casefold() for example in EXAMPLES for entity in example.plan.entities
     ) + " ".join(example.request.query.casefold() for example in EXAMPLES)

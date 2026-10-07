@@ -858,8 +858,8 @@
     }
   },
   "meta": {
-    "request_id": "e5b81276-10e1-4fe0-8d0e-7af774c3890f",
-    "generated_at": "2026-10-07T02:20:03.359814Z",
+    "request_id": "2311ff0f-45ef-48ea-8bd8-a26afd498512",
+    "generated_at": "2026-10-07T02:47:27.252642Z",
     "query": "Which countries have the most recruiting trials for lung cancer?",
     "filters": {
       "drug_name": [],
@@ -913,13 +913,16 @@
       "entities": [
         {
           "kind": "condition",
+          "planned_kind": "condition",
           "source": "question",
           "text": "lung cancer",
           "term_searched": "lung cancer",
           "definition": "condition_search",
           "status": "ok",
           "trials_matched": 14604,
-          "strict_name_matches": null,
+          "strict_name_matches": 122,
+          "condition_name_matches": 10634,
+          "registry_term": null,
           "other_readings": [
             {
               "kind": "drug",
@@ -984,7 +987,8 @@
         "statistic": null,
         "of": null
       },
-      "chart_preference": null
+      "chart_preference": null,
+      "unapplied": []
     },
     "options": {
       "planner": "llm",
@@ -997,19 +1001,19 @@
       "mode": "llm",
       "model": "gpt-5.4-mini-2026-03-17",
       "reasoning_effort": "low",
-      "prompt_version": "plan-v2",
+      "prompt_version": "plan-v3",
       "attempts": 1,
       "is_repaired": false,
       "is_fallback": false,
       "usage": {
-        "input_tokens": 7107,
-        "output_tokens": 238,
-        "reasoning_tokens": 66,
-        "cached_tokens": 6912
+        "input_tokens": 8249,
+        "output_tokens": 186,
+        "reasoning_tokens": 9,
+        "cached_tokens": 7936
       }
     },
     "assumptions": [
-      "Matched 'lung cancer' with the registry's condition search (conditions, titles, keywords and MeSH terms, with synonyms).",
+      "Read 'lung cancer' as a condition: 122 trials have it in an intervention name and 10,634 in a condition. Matched 'lung cancer' with the registry's condition search (conditions, titles, keywords and MeSH terms, with synonyms): 14,604 trials.",
       "A trial counts once for each country with a site, so the bars can overlap. Trials whose locations were removed after completion are not attributed to a country."
     ],
     "warnings": [],
@@ -1018,16 +1022,36 @@
       "url": "https://clinicaltrials.gov",
       "api_version": "2.0.5",
       "data_timestamp": "2026-10-06T09:00:05",
-      "retrieved_at": "2026-10-07T02:20:03.359814Z",
+      "retrieved_at": "2026-10-07T02:47:27.252642Z",
       "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
       "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
       "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
       "requests": [
         {
           "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=lung%20cancer&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 221,
+          "total_count": 11628,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BInterventionName%5D%22lung%20cancer%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 327,
+          "total_count": 122,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 113,
+          "duration_ms": 223,
           "total_count": 14604,
           "records_returned": 1,
           "is_cached": false,
@@ -1035,10 +1059,40 @@
         },
         {
           "method": "GET",
-          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=lung%20cancer&countTotal=true&pageSize=1&fields=NCTId",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BCondition%5D%22lung%20cancer%22&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 98,
-          "total_count": 11628,
+          "duration_ms": 330,
+          "total_count": 10634,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.term=lung%20cancer&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 352,
+          "total_count": 20404,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&countTotal=true&pageSize=50&fields=NCTId,ConditionBrowseModule",
+          "status": 200,
+          "duration_ms": 126,
+          "total_count": 14604,
+          "records_returned": 50,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BConditionMeshTerm%5D%22Carcinoma,%20Non-Small-Cell%20Lung%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 61,
+          "total_count": 7033,
           "records_returned": 1,
           "is_cached": false,
           "origin": "resolution"
@@ -1047,7 +1101,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&countTotal=true&pageSize=1&fields=NCTId",
           "status": 200,
-          "duration_ms": 82,
+          "duration_ms": 81,
           "total_count": 2298,
           "records_returned": 1,
           "is_cached": false,
@@ -1057,7 +1111,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=NOT%20%28AREA%5BLocationCountry%5DMISSING%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate",
           "status": 200,
-          "duration_ms": 1003,
+          "duration_ms": 692,
           "total_count": 2298,
           "records_returned": 1000,
           "is_cached": false,
@@ -1067,7 +1121,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=NOT%20%28AREA%5BLocationCountry%5DMISSING%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&pageToken=ZVNj7o2Elu8o3lpwS9785unumpOQJJxubfWn3_YfkA",
           "status": 200,
-          "duration_ms": 644,
+          "duration_ms": 662,
           "total_count": null,
           "records_returned": 1000,
           "is_cached": false,
@@ -1077,7 +1131,7 @@
           "method": "GET",
           "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=NOT%20%28AREA%5BLocationCountry%5DMISSING%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&pageToken=ZVNj7o2Elu8o3lpwS9785unumpOQJJxsY_Gk2_MckA",
           "status": 200,
-          "duration_ms": 262,
+          "duration_ms": 290,
           "total_count": null,
           "records_returned": 298,
           "is_cached": false,
@@ -1161,10 +1215,10 @@
       "cached_at": null
     },
     "timing": {
-      "total_ms": 3922,
-      "plan_ms": 1783,
-      "resolve_ms": 197,
-      "fetch_ms": 1941,
+      "total_ms": 3665,
+      "plan_ms": 1363,
+      "resolve_ms": 623,
+      "fetch_ms": 1677,
       "build_ms": 0
     },
     "debug": {
@@ -1173,7 +1227,7 @@
           "index": 0,
           "type": "plan",
           "summary": "Count recruiting lung cancer trials by country.",
-          "duration_ms": 1783,
+          "duration_ms": 1363,
           "request_indexes": [],
           "detail": {}
         },
@@ -1181,11 +1235,16 @@
           "index": 1,
           "type": "resolve_entity",
           "summary": "1 entities",
-          "duration_ms": 197,
+          "duration_ms": 623,
           "request_indexes": [
             0,
             1,
-            2
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
           ],
           "detail": {}
         },
@@ -1193,11 +1252,11 @@
           "index": 2,
           "type": "execute",
           "summary": "3 requests",
-          "duration_ms": 1941,
+          "duration_ms": 1677,
           "request_indexes": [
-            3,
-            4,
-            5
+            8,
+            9,
+            10
           ],
           "detail": {}
         }
