@@ -6,7 +6,7 @@
 
 import time
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from datetime import date, datetime
 from typing import Final, Literal
 
@@ -22,6 +22,7 @@ from ctviz.contract.response import (
     Clarification,
     ClarificationReason,
     ClarificationResponse,
+    Conversation,
     Counts,
     Debug,
     EntityResolution,
@@ -85,6 +86,9 @@ class MetaContext:
     strategy: tuple[StrategyStep, ...] = ()
     source: Source | None = None
     trace: tuple[TraceStep, ...] | None = None  # None when options.include_trace is false
+    conversation: Conversation = field(
+        default_factory=lambda: Conversation(is_follow_up=False, carried_over=[], changed=[])
+    )
 
 
 def build_response(
@@ -225,6 +229,7 @@ def build_meta(
         plan=context.plan,
         options=context.options,
         planner=context.planner,
+        conversation=context.conversation,
         assumptions=assumptions,
         warnings=warnings,
         source=context.source,

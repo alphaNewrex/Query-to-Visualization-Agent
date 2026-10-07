@@ -6,7 +6,7 @@ check reads it through `Provenance`, so a citation can be proved against the rec
 
 import json
 import uuid
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 
 from ctviz.contract.response import TraceStep, UpstreamRequest
@@ -19,9 +19,13 @@ class RequestContext:
     requests: list[UpstreamRequest] = field(default_factory=list)
     trace: list[TraceStep] = field(default_factory=list)
     _studies: dict[str, Study] = field(default_factory=dict)
+    # Told after every upstream request is logged; the progress stream counts them.
+    on_request: Callable[[int], None] | None = None
 
     def log_request(self, entry: UpstreamRequest) -> None:
         self.requests.append(entry)
+        if self.on_request is not None:
+            self.on_request(len(self.requests))
 
     def note_studies(self, studies: Iterable[Study]) -> None:
         self._studies.update((study.nct_id, study) for study in studies)

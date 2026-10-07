@@ -9,6 +9,7 @@ import { FallbackView } from "@/components/viz/fallback";
 import { DataTable } from "@/components/viz/table-view";
 import { VisualizationView } from "@/components/viz/registry";
 import { dataTablesFor, rowName, rowValue } from "@/lib/data-tables";
+import type { ChatRequest } from "@/lib/conversation";
 import { classify } from "@/lib/guards";
 import type { AnalysisRequest, DatumSelection, QueryRequest, QueryResponse, Viz } from "@/lib/types";
 
@@ -65,14 +66,17 @@ export function ResultView({
   onRun,
   onRerun,
   busy,
+  hideFollowups = false,
 }: {
   response: QueryResponse;
   /** What was sent for this answer: a question, or a plan that ran without a model. */
-  request: QueryRequest | AnalysisRequest | null;
+  request: QueryRequest | ChatRequest | AnalysisRequest | null;
   onSelect: (selection: DatumSelection) => void;
-  onRun: (request: QueryRequest) => void;
+  onRun: (request: QueryRequest, label?: string) => void;
   onRerun?: () => void;
   busy?: boolean;
+  /** The caller shows the follow-ups under the answer, so the Chart tab leaves them out. */
+  hideFollowups?: boolean;
 }) {
   const outcome = classify(response);
 
@@ -111,7 +115,7 @@ export function ResultView({
           ) : (
             fallback()
           )}
-          <Notes meta={response.meta} onRun={onRun} />
+          <Notes meta={response.meta} onRun={onRun} showFollowups={!hideFollowups} />
         </TabsContent>
         <TabsContent value="data" className="pt-4">
           {visualization ? (

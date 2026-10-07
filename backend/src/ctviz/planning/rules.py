@@ -119,7 +119,8 @@ def fix_text_hygiene(plan: QueryPlan, facts: Facts, found: Findings) -> QueryPla
 
 def _is_unclean(text: str, facts: Facts) -> bool:
     digit_runs = {token for token in tokens(text) if token.isdigit()}
-    return len(text) > _MAX_TEXT_LENGTH or _NCT_ID.search(text) is not None or not digit_runs <= facts.known
+    known = facts.known | facts.carried_numbers
+    return len(text) > _MAX_TEXT_LENGTH or _NCT_ID.search(text) is not None or not digit_runs <= known
 
 
 # --- the fixes: rules 2 and 6 to 17 ---------------------------------------------------------------
@@ -328,7 +329,7 @@ def fix_limits(plan: QueryPlan, facts: Facts, found: Findings) -> QueryPlan:
     else:
         return plan
     path = f"/analysis/{attribute}"
-    if value is not None and facts.mode == "model" and not _number_is_grounded(value, facts):
+    if value is not None and facts.mode == "model" and not _number_is_grounded(value, attribute, facts):
         found.adjust(
             "ungrounded_number", path, f"{value} is not in the question; the default is used.", "defaulted"
         )
@@ -339,9 +340,10 @@ def fix_limits(plan: QueryPlan, facts: Facts, found: Findings) -> QueryPlan:
     return plan
 
 
-def _number_is_grounded(number: int, facts: Facts) -> bool:
+def _number_is_grounded(number: int, attribute: str, facts: Facts) -> bool:
     from_request = facts.request is not None and facts.request.top_n == number
-    return from_request or mentions_number(number, facts.question_tokens)
+    carried = facts.carries_number(attribute, number)
+    return from_request or carried or mentions_number(number, facts.question_tokens)
 
 
 _COMPARABLE_CHARTS: Final[dict[str, frozenset[ChartType]]] = {
@@ -360,7 +362,8 @@ def fix_unapplied(plan: QueryPlan, facts: Facts, found: Findings) -> QueryPlan:
     kept: list[str] = []
     for index, phrase in enumerate(plan.unapplied):
         words = " ".join(phrase.split())[:_MAX_UNAPPLIED_LENGTH]
-        if not words or (facts.mode == "model" and not _phrase_in_question(words, facts)):
+        is_stated = _phrase_in_question(words, facts) or facts.carries_phrase(words)
+        if not words or (facts.mode == "model" and not is_stated):
             found.adjust(
                 "unapplied_not_quoted", f"/unapplied/{index}", "Words not in the question.", "dropped"
             )
@@ -410,7 +413,11 @@ def fix_ungrounded_phases(plan: QueryPlan, facts: Facts, found: Findings) -> Que
     Without any phrase there is nothing to compare with; rule 20 then sends the plan back to the model.
     """
     phrases = [item.phrase for item in plan.filters.evidence if item.family == "phases"]
-    if "phases" in facts.request_families or not phrases:
+    if (
+        "phases" in facts.request_families
+        or facts.carries_filter("phases", plan.filters.phases)
+        or not phrases
+    ):
         return plan
     grounded = [phase for phase in plan.filters.phases if any(phase_is_grounded(phase, p) for p in phrases)]
     for phase in plan.filters.phases:
@@ -446,7 +453,7 @@ def find_blocking(plan: QueryPlan, facts: Facts, found: Findings) -> None:
 
 def _ungrounded_entities(plan: QueryPlan, facts: Facts, found: Findings) -> None:
     for index, entity in enumerate(plan.entities):
-        if not is_grounded(entity.value, facts.known):
+        if not is_grounded(entity.value, facts.known) and not facts.carries_entity(entity.kind, entity.value):
             found.block(
                 "ungrounded_entity",
                 f"/entities/{index}/value",
@@ -458,7 +465,7 @@ def _ungrounded_years(plan: QueryPlan, facts: Facts, found: Findings) -> None:
     relative = has_relative_time(facts.question)
     for attribute in ("year_from", "year_to"):
         year: int | None = getattr(plan.filters, attribute)
-        if year is None or str(year) in facts.known:
+        if year is None or str(year) in facts.known or facts.carries_year(attribute, year):
             continue
         in_reach = facts.today.year - _YEARS_BEFORE_TODAY <= year <= facts.today.year + _YEARS_AFTER_TODAY
         if relative and in_reach:
@@ -478,7 +485,8 @@ def _ungrounded_years(plan: QueryPlan, facts: Facts, found: Findings) -> None:
 
 def _ungrounded_filters(plan: QueryPlan, facts: Facts, found: Findings) -> None:
     for family in FAMILY_ENUMS:
-        if not getattr(plan.filters, family) or family in facts.request_families:
+        values = getattr(plan.filters, family)
+        if not values or family in facts.request_families or facts.carries_filter(family, values):
             continue
         phrases = [item.phrase for item in plan.filters.evidence if item.family == family]
         if not any(_phrase_in_question(phrase, facts) for phrase in phrases):

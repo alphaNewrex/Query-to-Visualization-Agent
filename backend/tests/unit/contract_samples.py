@@ -61,6 +61,7 @@ def meta(*, trials_cited: int, max_per_datum: int = 5, plan: dict[str, Any] | No
         "truncation": {"is_truncated": False, "items": []},
         "citations": {"is_enabled": True, "max_per_datum": max_per_datum, "selection": "most relevant",
                       "trials_cited": trials_cited},
+        "conversation": {"is_follow_up": False, "carried_over": [], "changed": []},
         "suggested_followups": [],
         "cache": {"is_plan_cached": False, "is_response_cached": False, "cached_at": None},
         "timing": {"total_ms": 1, "plan_ms": 1, "resolve_ms": 1, "fetch_ms": 1, "build_ms": 1},

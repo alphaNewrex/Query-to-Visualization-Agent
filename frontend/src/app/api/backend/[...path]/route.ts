@@ -16,10 +16,14 @@ const BACKEND_TIMEOUT_MS = 50_000;
 /** The method each reachable path accepts. A Map, so that no inherited object key passes for a path. */
 const ROUTE_METHODS = new Map<string, AllowedMethod>([
   ["v1/query", "POST"],
+  ["v1/query/stream", "POST"],
   ["v1/analyses", "POST"],
   ["v1/examples", "GET"],
   ["v1/capabilities", "GET"],
 ]);
+
+/** The progress stream: its body is passed on as it arrives, not read in full first. */
+const STREAM_PATH = "v1/query/stream";
 
 /** One example by slug. A slug holds no dot and no slash, so it cannot climb out of `v1/examples`. */
 const EXAMPLE_ROUTE = /^v1\/examples\/[A-Za-z0-9_-]+$/;
@@ -84,6 +88,19 @@ async function forward(request: Request, path: string, requestId: string): Promi
       // Next.js gives `fetch` a data cache of its own; a proxied answer must never come from it.
       cache: "no-store",
     });
+    // A progress stream is handed on as it comes. `no-transform` keeps a proxy or Next.js itself from
+    // compressing it, which would hold the events back until a buffer fills.
+    if (path === STREAM_PATH && upstream.ok && upstream.body && (upstream.headers.get("content-type") ?? "").includes("text/event-stream")) {
+      return new Response(upstream.body, {
+        status: upstream.status,
+        headers: {
+          "Content-Type": "text/event-stream; charset=utf-8",
+          "Cache-Control": "no-cache, no-transform",
+          "X-Accel-Buffering": "no",
+          "X-Request-ID": upstream.headers.get("x-request-id") ?? requestId,
+        },
+      });
+    }
     // Read in full inside the `try`, so that a connection lost midway is reported like any other.
     const body = await upstream.text();
     if (!isJson(body)) {

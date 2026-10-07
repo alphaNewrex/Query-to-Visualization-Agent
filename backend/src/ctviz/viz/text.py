@@ -437,6 +437,13 @@ def counts_not_reconciled(label: str | None, expected: int, counted: int) -> Not
     )
 
 
+def carried_over_assumption(scope: Sequence[str]) -> tuple[str, ...]:
+    """The one sentence a follow-up adds when it kept scope of the previous question."""
+    if not scope:
+        return ()
+    return (f"Kept from your previous question: {'; '.join(scope)}.",)
+
+
 def upstream_throttled() -> Note:
     return Note(
         code="upstream_throttled",

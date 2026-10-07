@@ -15,7 +15,7 @@ export function OutcomeCard({
   onRun,
 }: {
   response: ClarificationResponse | MessageResponse;
-  onRun: (request: QueryRequest) => void;
+  onRun: (request: QueryRequest, label?: string) => void;
 }) {
   const clarification = response.kind === "clarification" ? response.clarification : null;
   const Icon = clarification ? HelpCircleIcon : response.kind === "no_data" ? SearchXIcon : BanIcon;
@@ -30,7 +30,7 @@ export function OutcomeCard({
         {clarification && clarification.options.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {clarification.options.map((option, index) => (
-              <Button key={index} variant="outline" size="sm" onClick={() => onRun(option.request)}>
+              <Button key={index} variant="outline" size="sm" onClick={() => onRun(option.request, option.label)}>
                 {option.label}
               </Button>
             ))}
@@ -47,11 +47,11 @@ export function ErrorCard({ error, onRetry }: { error: ApiError | Error; onRetry
   return (
     <Alert variant="destructive" data-outcome="error">
       <AlertTriangleIcon aria-hidden />
-      <AlertTitle>{api ? "The request failed" : "Something went wrong"}</AlertTitle>
+      <AlertTitle>{api?.code === "stopped" ? "Stopped" : api ? "The request failed" : "Something went wrong"}</AlertTitle>
       <AlertDescription className="flex flex-col gap-2">
         <p>{error.message}</p>
         {api?.code === "planner_unavailable" ? (
-          <p>This server has no model, so it cannot read a typed question. The recorded examples above need none.</p>
+          <p>This server has no model, so it cannot read a typed question. The recorded examples need none: start a new conversation to pick one.</p>
         ) : null}
         <p className="font-mono text-xs">
           {api ? `${api.code}${api.status ? ` · HTTP ${api.status}` : ""}` : null}

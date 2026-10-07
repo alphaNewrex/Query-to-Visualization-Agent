@@ -101,6 +101,11 @@
         "cached_tokens": 7936
       }
     },
+    "conversation": {
+      "is_follow_up": false,
+      "carried_over": [],
+      "changed": []
+    },
     "assumptions": [],
     "warnings": [],
     "source": null,

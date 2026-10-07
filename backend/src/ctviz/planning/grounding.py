@@ -7,7 +7,15 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Final, Literal, Protocol
 
-from ctviz.contract.plan import FAMILY_FIELDS, EntityKind, Phase
+from ctviz.contract.plan import (
+    FAMILY_FIELDS,
+    Aggregate,
+    EntityKind,
+    FilterFamily,
+    Phase,
+    QueryPlan,
+    TrialList,
+)
 from ctviz.contract.request import QueryRequest
 
 Mode = Literal["model", "structured", "supplied"]
@@ -172,6 +180,53 @@ class Facts:
     @property
     def question(self) -> str:
         return self.request.query if self.request is not None else ""
+
+    @property
+    def previous(self) -> QueryPlan | None:
+        """The plan of the previous turn, when the request is a follow-up."""
+        previous = self.request.previous if self.request is not None else None
+        return previous.plan if previous is not None else None
+
+    def carries_entity(self, kind: str, value: str) -> bool:
+        """The previous plan names this entity (same kind and words): a value carried over, not invented."""
+        previous = self.previous
+        words = tokens(value)
+        return previous is not None and any(
+            entity.kind == kind and tokens(entity.value) == words for entity in previous.entities
+        )
+
+    def carries_year(self, attribute: str, year: int) -> bool:
+        previous = self.previous
+        return previous is not None and getattr(previous.filters, attribute) == year
+
+    def carries_filter(self, family: FilterFamily, values: Sequence[str]) -> bool:
+        """The previous plan restricts this family to exactly these values."""
+        previous = self.previous
+        return previous is not None and set(getattr(previous.filters, family)) == set(values)
+
+    def carries_number(self, attribute: str, number: int) -> bool:
+        """The previous plan has this `top_n` or `limit`."""
+        previous = self.previous
+        analysis = previous.analysis if previous is not None else None
+        return isinstance(analysis, Aggregate | TrialList) and getattr(analysis, attribute, None) == number
+
+    def carries_phrase(self, phrase: str) -> bool:
+        """The previous plan already lists this unapplied wording."""
+        previous = self.previous
+        return previous is not None and any(same_words(phrase, old) for old in previous.unapplied)
+
+    @property
+    def carried_numbers(self) -> frozenset[str]:
+        """Digit runs the previous plan holds (years, a count): an interpretation may repeat them."""
+        previous = self.previous
+        if previous is None:
+            return frozenset()
+        numbers: list[int | None] = [previous.filters.year_from, previous.filters.year_to]
+        if isinstance(previous.analysis, Aggregate | TrialList):
+            numbers.append(
+                getattr(previous.analysis, "top_n", None) or getattr(previous.analysis, "limit", None)
+            )
+        return frozenset(str(number) for number in numbers if number is not None)
 
     @property
     def request_families(self) -> frozenset[str]:

@@ -38,7 +38,7 @@ from ctviz.contract.plan import (
 from ctviz.contract.request import QueryRequest
 from ctviz.planning.structured import NO_FILTERS
 
-PROMPT_VERSION: Final = "plan-v5"
+PROMPT_VERSION: Final = "plan-v6"
 
 RULES: Final = """\
 You translate a question about clinical trials into a query plan for a service that counts
@@ -125,6 +125,27 @@ and you never write counts, trial names or identifiers.
     X": analysis aggregate with dimension X (the kind of thing ranked: sponsor, country, drug,
     condition) and top_n N. The service puts all other items into one "Other" bar. The ranked kind is
     the dimension, never an entity with role compare, and the question is not unsupported.
+17. Follow-ups. When the user message has "Previous question" and "Previous plan" lines, the
+    Question line is the user's new message in a conversation. Decide what it is:
+    a refinement of the previous question (it changes one or more parts of it: another drug,
+    condition or sponsor in place of or besides the one before; another grouping or split; a
+    different period, status, phase or other filter; a number to show; another chart form;
+    something to leave out) or a new question that has nothing to do with the previous one.
+    Either way return one complete plan that stands on its own.
+    - Refinement: start from the previous plan and change only what the message changes. Copy
+      everything else unchanged: entities with their roles, every filter list with its evidence,
+      years, dimension, series, time_unit, top_n and chart_preference. "Instead" replaces the
+      value of the same kind; "also" or "and" adds one; a request to drop or leave out a filter
+      removes it. An analysis that no longer fits (a single count asked to be split) changes
+      kind as the message requires.
+    - New question: ignore the previous plan completely and plan as for a first question.
+    - Previous plan of kind clarify: the user is answering it. Take what the previous question
+      wanted to know and complete it with the names or choices the message supplies.
+    A new name, year, number or filter must still be stated in the Question line. A value can
+    stay from the previous plan only when it is copied from it unchanged. Never take a value
+    from the previous interpretation text, and never invent one to fill a gap. Evidence for a
+    filter that the message newly states quotes the message; evidence for a carried filter
+    stays as in the previous plan.
 """
 
 _CLOSED: Final = frozenset(get_args(ClosedDimension))
@@ -451,10 +472,16 @@ EXAMPLES: Final = (
 
 
 def user_message(request: QueryRequest, today: date) -> str:
-    """The dynamic part of the prompt: today's date, the structured fields and the question."""
-    fields = request.model_dump(mode="json", exclude_none=True, exclude={"query", "options"})
+    """The dynamic part of the prompt: today's date, the fields, the previous turn and the question."""
+    fields = request.model_dump(mode="json", exclude_none=True, exclude={"query", "options", "previous"})
     structured = json.dumps(fields) if fields else "none"
-    return f"Today: {today.isoformat()}\nStructured fields: {structured}\nQuestion: {request.query}"
+    previous = request.previous
+    turn = (
+        f"Previous question: {previous.query or 'none'}\nPrevious plan: {previous.plan.model_dump_json()}\n"
+        if previous is not None
+        else ""
+    )
+    return f"Today: {today.isoformat()}\nStructured fields: {structured}\n{turn}Question: {request.query}"
 
 
 def render_examples() -> str:

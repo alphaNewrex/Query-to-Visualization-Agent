@@ -1433,6 +1433,11 @@
         "cached_tokens": 7936
       }
     },
+    "conversation": {
+      "is_follow_up": false,
+      "carried_over": [],
+      "changed": []
+    },
     "assumptions": [
       "Read 'pembrolizumab' as a drug: 2,567 trials have it in an intervention name and 15 in a condition. Matched 'pembrolizumab' with the registry's intervention search (names, other names, arm labels, titles, descriptions and MeSH terms, with synonyms): 2,971 trials. 2,567 of them name it as an intervention.",
       "Read 'nivolumab' as a drug: 1,672 trials have it in an intervention name and 9 in a condition. Matched 'nivolumab' with the registry's intervention search (names, other names, arm labels, titles, descriptions and MeSH terms, with synonyms): 2,029 trials. 1,672 of them name it as an intervention.",

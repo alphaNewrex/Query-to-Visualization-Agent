@@ -7481,6 +7481,11 @@
         "cached_tokens": 7936
       }
     },
+    "conversation": {
+      "is_follow_up": false,
+      "carried_over": [],
+      "changed": []
+    },
     "assumptions": [
       "Read 'Duchenne muscular dystrophy' as a condition: 12 trials have it in an intervention name and 462 in a condition. Matched 'Duchenne muscular dystrophy' with the registry's condition search (conditions, titles, keywords and MeSH terms, with synonyms): 499 trials.",
       "Enrollment counts, estimated and actual, are both used.",

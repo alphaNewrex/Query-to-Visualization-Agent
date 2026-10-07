@@ -70,6 +70,7 @@ afterEach(() => {
 describe("allow-listed routes", () => {
   it.each([
     ["POST", "v1/query", "http://backend.test:9000/v1/query"],
+    ["POST", "v1/query/stream", "http://backend.test:9000/v1/query/stream"],
     ["POST", "v1/analyses", "http://backend.test:9000/v1/analyses"],
     ["GET", "v1/examples", "http://backend.test:9000/v1/examples"],
     ["GET", "v1/examples/01-pembrolizumab-by-year", "http://backend.test:9000/v1/examples/01-pembrolizumab-by-year"],
@@ -188,6 +189,79 @@ describe("backend responses", () => {
     expect(response.headers.get("content-type")).toBe("application/json");
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(response.headers.get("content-encoding")).toBeNull();
+  });
+});
+
+describe("the progress stream", () => {
+  const events = (...text: string[]) => {
+    const encoder = new TextEncoder();
+    return new ReadableStream<Uint8Array>({
+      async start(controller) {
+        for (const piece of text) {
+          controller.enqueue(encoder.encode(piece));
+          await new Promise((resolve) => setTimeout(resolve, 5));
+        }
+        controller.close();
+      },
+    });
+  };
+
+  it("hands the body on as it arrives, with headers that forbid buffering and transforming", async () => {
+    const encoder = new TextEncoder();
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    // The upstream sends one event, then waits: the proxy must not wait for the end before answering.
+    const upstreamBody = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        controller.enqueue(encoder.encode('event: stage\ndata: {"step":"plan","status":"started","summary":"","detail":{}}\n\n'));
+        await gate;
+        controller.enqueue(encoder.encode('event: result\ndata: {}\n\n'));
+        controller.close();
+      },
+    });
+    backend.mockResolvedValue(new Response(upstreamBody, { headers: { "Content-Type": "text/event-stream", "X-Request-ID": "stream-id" } }));
+
+    const response = await request("POST", "v1/query/stream", { body: '{"query":"q"}', headers: { "Content-Type": "application/json" } });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toMatch(/^text\/event-stream/);
+    expect(response.headers.get("cache-control")).toBe("no-cache, no-transform");
+    expect(response.headers.get("x-request-id")).toBe("stream-id");
+    expect(forwarded().method).toBe("POST");
+    const reader = response.body!.getReader();
+    const first = await reader.read();
+    expect(new TextDecoder().decode(first.value)).toContain("event: stage");
+    release();
+    const rest = await reader.read();
+    expect(new TextDecoder().decode(rest.value)).toContain("event: result");
+    expect((await reader.read()).done).toBe(true);
+  });
+
+  it("passes every event through unchanged", async () => {
+    const text = 'event: stage\ndata: {"step":"plan"}\n\nevent: result\ndata: {"a":1}\n\n';
+    backend.mockResolvedValue(new Response(events(text.slice(0, 20), text.slice(20)), { headers: { "Content-Type": "text/event-stream" } }));
+
+    const response = await request("POST", "v1/query/stream", { body: "{}" });
+
+    await expect(response.text()).resolves.toBe(text);
+  });
+
+  it("answers an error of the backend as the buffered JSON envelope, not as a stream", async () => {
+    const envelope = '{"error":{"code":"invalid_request","message":"Bad.","details":{},"request_id":"r","is_retryable":false}}';
+    backendAnswers(envelope, { status: 422, headers: { "Content-Type": "application/json" } });
+
+    const response = await request("POST", "v1/query/stream", { body: "{}" });
+
+    expect(response.status).toBe(422);
+    expect(response.headers.get("content-type")).toBe("application/json");
+    await expect(response.text()).resolves.toBe(envelope);
+  });
+
+  it("accepts POST only", async () => {
+    const response = await request("GET", "v1/query/stream");
+
+    await expectErrorEnvelope(response, { status: 405, code: "method_not_allowed", isRetryable: false });
+    expect(response.headers.get("allow")).toBe("POST");
   });
 });
 

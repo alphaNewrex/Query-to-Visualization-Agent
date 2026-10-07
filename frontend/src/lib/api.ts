@@ -4,40 +4,40 @@
  * envelope of PLAN 5.7 and becomes an `ApiError`; so does a network failure or a body that is
  * not JSON, with a code of this file's own.
  */
+import { ApiError } from "./api-error";
 import { isErrorEnvelope, isQueryResponse, isRecord } from "./guards";
+import { type StageEvent, readQueryStream } from "./stream";
+import type { ChatRequest, Previous } from "./conversation";
 import type { AnalysisRequest, QueryPlan, QueryRequest, QueryResponse } from "./types";
+
+export { ApiError };
 
 const BASE = "/api/backend";
 
-export class ApiError extends Error {
-  /** A backend code (`invalid_request`, `planner_unavailable`, ...), the proxy's `backend_unreachable`, or `network_error`, `http_error`, `invalid_response`. */
-  readonly code: string;
-  /** The HTTP status; 0 when no answer arrived. */
-  readonly status: number;
-  readonly requestId: string | null;
-  readonly isRetryable: boolean;
-  readonly details: Record<string, unknown>;
-
-  constructor(init: {
-    code: string;
-    message: string;
-    status: number;
-    requestId?: string | null;
-    isRetryable?: boolean;
-    details?: Record<string, unknown>;
-  }) {
-    super(init.message);
-    this.name = "ApiError";
-    this.code = init.code;
-    this.status = init.status;
-    this.requestId = init.requestId ?? null;
-    this.isRetryable = init.isRetryable ?? false;
-    this.details = init.details ?? {};
-  }
-}
-
 export function isAbortError(error: unknown): boolean {
   return error instanceof DOMException && error.name === "AbortError";
+}
+
+/** The ApiError for a non-2xx answer: the backend's envelope when it sent one. */
+function errorFrom(response: Response, body: unknown): ApiError {
+  const headerId = response.headers.get("x-request-id");
+  if (isErrorEnvelope(body)) {
+    const { code, message, details, request_id: requestId, is_retryable: isRetryable } = body.error;
+    return new ApiError({
+      code,
+      message,
+      status: response.status,
+      requestId: requestId || headerId,
+      isRetryable: isRetryable === true,
+      details: isRecord(details) ? details : {},
+    });
+  }
+  return new ApiError({
+    code: "http_error",
+    message: `The server answered with HTTP ${response.status}.`,
+    status: response.status,
+    requestId: headerId,
+  });
 }
 
 async function call(path: string, init: RequestInit = {}): Promise<unknown> {
@@ -68,23 +68,7 @@ async function call(path: string, init: RequestInit = {}): Promise<unknown> {
   }
 
   if (!response.ok) {
-    if (isErrorEnvelope(body)) {
-      const { code, message, details, request_id: requestId, is_retryable: isRetryable } = body.error;
-      throw new ApiError({
-        code,
-        message,
-        status: response.status,
-        requestId: requestId || headerId,
-        isRetryable: isRetryable === true,
-        details: isRecord(details) ? details : {},
-      });
-    }
-    throw new ApiError({
-      code: "http_error",
-      message: `The server answered with HTTP ${response.status}.`,
-      status: response.status,
-      requestId: headerId,
-    });
+    throw errorFrom(response, body);
   }
   if (body === undefined) {
     throw new ApiError({
@@ -118,13 +102,116 @@ function asQueryResponse(body: unknown): QueryResponse {
 }
 
 /** POST /v1/query: a question, with optional structured fields. */
-export async function postQuery(request: QueryRequest, signal?: AbortSignal): Promise<QueryResponse> {
+export async function postQuery(request: QueryRequest | ChatRequest, signal?: AbortSignal): Promise<QueryResponse> {
   return asQueryResponse(await postJson("v1/query", request, signal));
 }
 
 /** POST /v1/analyses: a typed plan, answered without a model. */
 export async function postAnalysis(request: AnalysisRequest, signal?: AbortSignal): Promise<QueryResponse> {
   return asQueryResponse(await postJson("v1/analyses", request, signal));
+}
+
+// ---------------------------------------------------------------------------------------------
+// The conversation: a question that may carry the answer before it, and the progress stream.
+// ---------------------------------------------------------------------------------------------
+
+/** The stream endpoint is not there (404 or 405), is not a stream, or could not be reached: the caller falls back to POST /v1/query. */
+export class StreamUnavailableError extends Error {
+  constructor() {
+    super("The progress stream is not available.");
+    this.name = "StreamUnavailableError";
+  }
+}
+
+/** POST /v1/query/stream: stage events through `onStage`, then the answer. */
+export async function postQueryStream(request: QueryRequest | ChatRequest, onStage: (stage: StageEvent) => void, signal?: AbortSignal): Promise<QueryResponse> {
+  let response: Response;
+  try {
+    response = await fetch(`${BASE}/v1/query/stream`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
+      body: JSON.stringify(request),
+      signal,
+    });
+  } catch (error) {
+    if (isAbortError(error)) {
+      throw error;
+    }
+    throw new StreamUnavailableError();
+  }
+  if (response.status === 404 || response.status === 405) {
+    void response.body?.cancel().catch(() => undefined);
+    throw new StreamUnavailableError();
+  }
+  if (!response.ok) {
+    let body: unknown;
+    try {
+      body = await response.json();
+    } catch (error) {
+      if (isAbortError(error)) {
+        throw error;
+      }
+    }
+    throw errorFrom(response, body);
+  }
+  if (!response.body || !(response.headers.get("content-type") ?? "").includes("text/event-stream")) {
+    void response.body?.cancel().catch(() => undefined);
+    throw new StreamUnavailableError();
+  }
+  return readQueryStream(response.body, onStage);
+}
+
+/** Whether the backend turned a request down because it does not know the `previous` field yet. */
+function rejectsPrevious(error: unknown): boolean {
+  return (
+    error instanceof ApiError &&
+    (error.status === 400 || error.status === 422) &&
+    JSON.stringify([error.message, error.details]).toLowerCase().includes("previous")
+  );
+}
+
+export interface AskCallbacks {
+  signal?: AbortSignal;
+  onStage: (stage: StageEvent) => void;
+  /** The stream is not there: the answer comes from POST /v1/query, with no steps to show. */
+  onFallback: () => void;
+}
+
+/**
+ * One conversational question: streamed when the backend can, plain otherwise, and without the
+ * context when the backend does not know it. Returns the answer and what was finally sent.
+ */
+export async function askQuery(
+  request: QueryRequest,
+  previous: Previous | null,
+  { signal, onStage, onFallback }: AskCallbacks,
+): Promise<{ response: QueryResponse; sent: QueryRequest | ChatRequest }> {
+  let streaming = true;
+  const attempt = async (sent: QueryRequest | ChatRequest) => {
+    if (streaming) {
+      try {
+        return { response: await postQueryStream(sent, onStage, signal), sent };
+      } catch (error) {
+        if (!(error instanceof StreamUnavailableError)) {
+          throw error;
+        }
+        streaming = false;
+        onFallback();
+      }
+    }
+    return { response: await postQuery(sent, signal), sent };
+  };
+  if (!previous) {
+    return attempt(request);
+  }
+  try {
+    return await attempt({ ...request, previous });
+  } catch (error) {
+    if (!rejectsPrevious(error)) {
+      throw error;
+    }
+    return attempt(request);
+  }
 }
 
 // ---------------------------------------------------------------------------------------------

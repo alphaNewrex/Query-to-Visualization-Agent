@@ -9,8 +9,9 @@ for as long as those stay the same.
 
 import hashlib
 import json
+import math
 import time
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from datetime import datetime
 from typing import Final
@@ -40,15 +41,19 @@ from ctviz.contract.response import (
 from ctviz.ctgov.cache import SingleFlightCache
 from ctviz.ctgov.client import ApiVersion, CtGovClient
 from ctviz.ctgov.context import RequestContext
+from ctviz.ctgov.partition import SEQUENTIAL_PAGES
 from ctviz.engine.execute import execute_plan
+from ctviz.engine.fanout import fan_out_bill
 from ctviz.engine.handoff import present
-from ctviz.engine.lower import lower_plan
+from ctviz.engine.lower import EnginePlan, lower_plan
 from ctviz.engine.overlap import shared_trials
 from ctviz.engine.resolve import EntityResolver, resolve_entities
 from ctviz.engine.shape import shape
-from ctviz.engine.strategy import Limits, choose_strategy
+from ctviz.engine.strategy import ExecutionPlan, Limits, choose_strategy
 from ctviz.errors import InvariantViolation
+from ctviz.planning.conversation import describe
 from ctviz.planning.service import PlannedQuery, PlanService
+from ctviz.progress import Progress, StageEvent, Status, Step
 from ctviz.settings import Settings
 from ctviz.viz import text
 from ctviz.viz.meta import MetaContext, build_response, outcome_response
@@ -121,18 +126,69 @@ class _Stopwatch:
         )
 
 
-async def answer(request: QueryRequest, deps: Deps, ctx: RequestContext) -> QueryResponse:
-    """Stages 2 to 9: plan the question, then run the plan."""
+def _emit(progress: Progress | None, step: Step, status: Status, summary: str, **detail: object) -> None:
+    if progress is not None:
+        progress(StageEvent(step, status, summary, detail))
+
+
+async def answer(
+    request: QueryRequest, deps: Deps, ctx: RequestContext, progress: Progress | None = None
+) -> QueryResponse:
+    """Stages 2 to 9: plan the question, then run the plan.
+
+    `progress`, when given, is told as each stage starts and ends. The plan service checks the plan inside
+    its own call, so the `check` events follow the `plan` ones and report what that check found.
+    """
     started = time.perf_counter()
     first_request = len(ctx.requests)
+    _emit(progress, "plan", "started", "Reading the question")
     planned = await deps.plans.produce(request, deps.clock().date(), ctx)
     plan_ms = round((time.perf_counter() - started) * 1000)
     ctx.add_step("plan", planned.plan.interpretation, plan_ms, first_request)
-    return await execute(planned, deps, ctx, plan_ms=plan_ms)
+    _emit(
+        progress,
+        "plan",
+        "done",
+        planned.plan.interpretation,
+        mode=planned.info.mode,
+        attempts=planned.info.attempts,
+        is_cached=planned.is_cached,
+        is_follow_up=request.previous is not None,
+    )
+    _emit(progress, "check", "started", "Checking the plan against the question")
+    _emit(progress, "check", "done", _check_summary(planned), **_check_detail(planned))
+    return await execute(planned, deps, ctx, plan_ms=plan_ms, progress=progress)
+
+
+def _check_summary(planned: PlannedQuery) -> str:
+    parts = ["plan accepted" if planned.outcome is None else f"decided without data: {planned.outcome.kind}"]
+    if planned.info.is_repaired:
+        parts.append("after one repair turn")
+    if planned.adjustments:
+        count = len(planned.adjustments)
+        parts.append(f"{count} adjustment{'s' if count != 1 else ''}")
+    if planned.warnings:
+        count = len(planned.warnings)
+        parts.append(f"{count} warning{'s' if count != 1 else ''}")
+    return ", ".join(parts)
+
+
+def _check_detail(planned: PlannedQuery) -> dict[str, object]:
+    return {
+        "adjustments": [adjustment.code for adjustment in planned.adjustments],
+        "warnings": [note.code for note in planned.warnings],
+        "is_repaired": planned.info.is_repaired,
+        "outcome": planned.outcome.kind if planned.outcome is not None else None,
+    }
 
 
 async def execute(
-    planned: PlannedQuery, deps: Deps, ctx: RequestContext, *, plan_ms: int = 0
+    planned: PlannedQuery,
+    deps: Deps,
+    ctx: RequestContext,
+    *,
+    plan_ms: int = 0,
+    progress: Progress | None = None,
 ) -> QueryResponse:
     """Stages 4 to 9 for a plan that is already checked, or the answer already built for the same one.
 
@@ -144,19 +200,28 @@ async def execute(
         return outcome_response(_MetaBuilder(planned, ctx, deps, watch).build(), planned.outcome)
     version = await deps.ctgov.version()
     if not planned.options.use_cache:
-        return await _run(planned, deps, ctx, watch, version)
+        return await _run(planned, deps, ctx, watch, version, progress)
     built, is_shared = await deps.responses.get(
         _response_key(planned, version),
-        lambda: _build(planned, deps, ctx, watch, version),
+        lambda: _build(planned, deps, ctx, watch, version, progress),
         keep=lambda fresh: _is_cacheable(fresh.response),
     )
-    return _as_cached(built, planned, deps, ctx, watch) if is_shared else built.response
+    if not is_shared:
+        return built.response
+    _emit(progress, "build", "started", "Looking for the same answer already built")
+    _emit(progress, "build", "done", built.response.message, kind=built.response.kind, is_cached=True)
+    return _as_cached(built, planned, deps, ctx, watch)
 
 
 async def _build(
-    planned: PlannedQuery, deps: Deps, ctx: RequestContext, watch: _Stopwatch, version: ApiVersion
+    planned: PlannedQuery,
+    deps: Deps,
+    ctx: RequestContext,
+    watch: _Stopwatch,
+    version: ApiVersion,
+    progress: Progress | None,
 ) -> BuiltResponse:
-    response = await _run(planned, deps, ctx, watch, version)
+    response = await _run(planned, deps, ctx, watch, version, progress)
     return BuiltResponse(response, built_at=response.meta.generated_at)
 
 
@@ -210,19 +275,36 @@ def _as_cached(
 
 
 async def _run(
-    planned: PlannedQuery, deps: Deps, ctx: RequestContext, watch: _Stopwatch, version: ApiVersion
+    planned: PlannedQuery,
+    deps: Deps,
+    ctx: RequestContext,
+    watch: _Stopwatch,
+    version: ApiVersion,
+    progress: Progress | None = None,
 ) -> QueryResponse:
     """Stages 4 to 9 against the registry, for the data version `version`."""
     context = _MetaBuilder(planned, ctx, deps, watch)
     context.version = version
 
     first_request = len(ctx.requests)
+    _emit(progress, "resolve", "started", f"Looking up {_count_of(len(planned.plan.entities), 'name')}")
     resolved = await resolve_entities(planned, deps, ctx)
     watch.resolve_ms = watch.lap()
     if isinstance(resolved, Outcome):
         ctx.add_step("resolve_entity", resolved.message, watch.resolve_ms, first_request)
+        _emit(progress, "resolve", "done", resolved.message, outcome=resolved.kind)
         return outcome_response(context.build(), resolved)
     ctx.add_step("resolve_entity", f"{len(resolved.entities)} entities", watch.resolve_ms, first_request)
+    _emit(
+        progress,
+        "resolve",
+        "done",
+        _resolve_summary(resolved.entities),
+        entities=[
+            {"text": e.text, "kind": e.kind, "status": e.status, "trials_matched": e.trials_matched}
+            for e in resolved.entities
+        ],
+    )
     context.entities, context.assumptions = resolved.entities, resolved.assumptions
     context.warnings = resolved.warnings
     if resolved.plan is not None:
@@ -234,12 +316,31 @@ async def _run(
 
     plan = lower_plan(planned, resolved, deps.catalog, version)
     limits = Limits.from_settings(deps.settings, _walk_budget_s())
+    _emit(progress, "strategy", "started", "Choosing how to fetch the trials")
     xp = choose_strategy(plan, resolved.matched, limits, prefer_walk=deps.ctgov.is_throttled)
     if isinstance(xp, Outcome):
+        _emit(progress, "strategy", "done", xp.message, outcome=xp.kind)
         return outcome_response(context.build(), xp, plan=plan)
+    _emit(
+        progress,
+        "strategy",
+        "done",
+        _strategy_summary(xp),
+        strategies=[
+            {"series": run.scope.label, "name": run.strategy, "trials": run.matched} for run in xp.runs
+        ],
+    )
 
     first_request = len(ctx.requests)
-    result = await execute_plan(plan, xp, deps.ctgov, ctx)
+    expected = _expected_requests(plan, xp, limits)
+    _emit(progress, "execute", "started", f"Fetching from ClinicalTrials.gov (about {expected} requests)")
+    ctx.on_request = _request_counter(progress, first_request, expected)
+    try:
+        result = await execute_plan(plan, xp, deps.ctgov, ctx)
+    finally:
+        ctx.on_request = None
+    fetched = len(ctx.requests) - first_request
+    _emit(progress, "execute", "done", f"fetched {_count_of(fetched, 'request')}", fetched=fetched)
     watch.fetch_ms = watch.lap()
     ctx.add_step("execute", f"{len(ctx.requests) - first_request} requests", watch.fetch_ms, first_request)
     shaped = shape(result, plan)
@@ -251,11 +352,67 @@ async def _run(
     shown = present(shaped, plan)
     overlap = await shared_trials(plan, resolved.matched, deps.ctgov, ctx)
     drawn = replace(shown.shaped, trials_in_several_series=overlap)
+    _emit(progress, "build", "started", "Building the chart")
     response = build_response(context.build(), shown.plan, drawn, version, titles=ctx.titles)
     if isinstance(response, VisualizationResponse):
         _verify(response, ctx)
         response.meta.timing.total_ms = watch.timing().total_ms
+    _emit(progress, "build", "done", response.message, kind=response.kind)
     return response
+
+
+def _count_of(number: int, noun: str) -> str:
+    return f"{number} {noun}{'' if number == 1 else 's'}"
+
+
+def _resolve_summary(entities: Sequence[EntityResolution]) -> str:
+    if not entities:
+        return "no names to look up"
+    return "; ".join(f"{entity.text}: {entity.trials_matched:,} trials" for entity in entities)
+
+
+def _strategy_summary(xp: ExecutionPlan) -> str:
+    runs = xp.runs
+    if len(runs) == 1:
+        return runs[0].reason
+    return "; ".join(f"{run.scope.label or 'all trials'}: {run.strategy.replace('_', ' ')}" for run in runs)
+
+
+def _expected_requests(plan: EnginePlan, xp: ExecutionPlan, limits: Limits) -> int:
+    """About how many registry requests the execution makes, from the strategy's own figures."""
+    total = 0
+    for run in xp.runs:
+        if run.strategy == "none":
+            continue
+        if run.strategy == "count_fan_out":
+            total += fan_out_bill(plan, xp.window) or 1
+        elif run.strategy == "sorted_page":
+            total += 1
+        else:
+            pages = math.ceil(run.matched / limits.one_page_max)
+            total += 1 + pages * (2 if pages > SEQUENTIAL_PAGES else 1)
+    return max(total, 1)
+
+
+def _request_counter(
+    progress: Progress | None, first_request: int, expected: int
+) -> Callable[[int], None] | None:
+    if progress is None:
+        return None
+
+    def count(logged: int) -> None:
+        fetched = logged - first_request
+        shown = max(expected, fetched)
+        _emit(
+            progress,
+            "execute",
+            "started",
+            f"fetched {fetched} of {shown}",
+            fetched=fetched,
+            expected=shown,
+        )
+
+    return count
 
 
 def _walk_budget_s() -> float:
@@ -287,6 +444,8 @@ class _MetaBuilder:
         now = self._deps.clock()
         filters: AppliedFilters = applied_filters(planned.plan)
         request = planned.request
+        previous = request.previous if request is not None else None
+        talk = describe(previous.plan if previous is not None else None, planned.plan)
         return MetaContext(
             request_id=ctx.request_id,
             generated_at=now,
@@ -300,7 +459,8 @@ class _MetaBuilder:
             cache=CacheInfo(is_plan_cached=planned.is_cached, is_response_cached=False, cached_at=None),
             adjustments=planned.adjustments,
             warnings=(*planned.warnings, *self.warnings, *self._throttling()),
-            assumptions=self.assumptions,
+            assumptions=(*self.assumptions, *text.carried_over_assumption(talk.scope)),
+            conversation=talk.conversation,
             entities=self.entities,
             strategy=self.strategy,
             source=self._source(now),

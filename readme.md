@@ -215,6 +215,7 @@ The service matched 2,971 trials with 36 requests to ClinicalTrials.gov and answ
     "plan": "...",
     "options": "...",
     "planner": "...",
+    "conversation": {"is_follow_up": false, "carried_over": [], "changed": []},
     "assumptions": [
       "Read 'Pembrolizumab' as a drug: 2,567 trials have it in an intervention name and 15 in a conditio...",
       "Trials are placed by start date; estimated dates are included, and withdrawn trials keep their pl...",
@@ -273,6 +274,7 @@ Questions go to `POST /v1/query` as a `QueryRequest`. `query` is required. Every
 | `GET /healthz` | Liveness: the process is up |
 | `GET /readyz` | Readiness: the registry answers, and the configured models are listed by the key |
 | `POST /v1/query` | Answer a question with a visualization specification |
+| `POST /v1/query/stream` | Answer a question, reporting progress as server-sent events |
 | `POST /v1/analyses` | Run a typed plan, with no model call |
 | `GET /v1/capabilities` | Dimensions, limits and planner state |
 | `GET /v1/schema/{name}` | A JSON Schema of the contract |
@@ -299,7 +301,10 @@ Strings are trimmed and unknown keys are rejected. Rules across fields:
 4. `group_by`, `time_unit`, `top_n` and `chart_type` replace the planner's choices.
 5. Every structured field is shown to the model, so "this drug" in the question resolves to
    `drug_name`.
-6. `meta.filters` in every response repeats the filter fields in canonical form (arrays for list
+6. With `previous`, the message may be a follow-up: the planner edits the previous plan, or ignores it
+   when the message is unrelated. A name, year or filter may then come from the message or be carried
+   over unchanged from the previous plan; one that is in neither is rejected.
+7. `meta.filters` in every response repeats the filter fields in canonical form (arrays for list
    fields, every key present), so it can be sent back as request fields. For that reason every list
    field accepts an empty array as "no filter", the same as null.
 
@@ -332,6 +337,7 @@ Strings are trimmed and unknown keys are rejected. Rules across fields:
 | `time_unit` | `year` \| `quarter` \| `month` \| null | no | `null` |  | Analysis hint: bucket width for a date dimension. |
 | `top_n` | integer \| null | no | `null` | 1 to 50 | How many categories or rows to keep. Default 15, or 10 for the rows of a trial list. Network sizes are fixed in v1. |
 | `chart_type` | `bar_chart` \| `time_series` \| `histogram` \| `scatter_plot` \| `network_graph` \| `table` \| `metric` \| null | no | `null` |  | A preference. Honoured when valid for the data shape, otherwise ignored with a warning. |
+| `previous` | [`PreviousTurn`](docs/SCHEMA.md#previousturn) \| null | no | `null` |  | The previous turn, for a follow-up such as 'now split that by phase'. Null (the default) is a new conversation. Part of the plan cache key. |
 | `options` | [`RequestOptions`](docs/SCHEMA.md#requestoptions) | no | *(see type)* |  | Behaviour switches of one request; `meta.options` echoes the effective values. |
 
 #### RequestOptions

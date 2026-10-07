@@ -147,6 +147,22 @@ class RequestOptions(BaseModel):
     )
 
 
+class PreviousTurn(BaseModel):
+    """The previous turn of a conversation: what was asked and the plan that answered it.
+
+    The service keeps no session. The client sends back the question and `meta.plan` of the answer it
+    shows, and the planner reads the new message as a follow-up to them.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=True)
+
+    query: str | None = Field(
+        description="The previous question as sent (`meta.query`); null when the previous turn had none.",
+        max_length=1000,
+    )
+    plan: QueryPlan = Field(description="`meta.plan` of the previous answer.")
+
+
 class QueryRequest(BaseModel):
     """A question about clinical trials, with optional structured fields.
 
@@ -162,7 +178,10 @@ class QueryRequest(BaseModel):
     4. `group_by`, `time_unit`, `top_n` and `chart_type` replace the planner's choices.
     5. Every structured field is shown to the model, so "this drug" in the question resolves to
        `drug_name`.
-    6. `meta.filters` in every response repeats the filter fields in canonical form (arrays for list
+    6. With `previous`, the message may be a follow-up: the planner edits the previous plan, or ignores it
+       when the message is unrelated. A name, year or filter may then come from the message or be carried
+       over unchanged from the previous plan; one that is in neither is rejected.
+    7. `meta.filters` in every response repeats the filter fields in canonical form (arrays for list
        fields, every key present), so it can be sent back as request fields. For that reason every list
        field accepts an empty array as "no filter", the same as null.
     """
@@ -281,6 +300,11 @@ class QueryRequest(BaseModel):
     chart_type: ChartType | None = Field(
         None,
         description="A preference. Honoured when valid for the data shape, otherwise ignored with a warning.",
+    )
+    previous: PreviousTurn | None = Field(
+        None,
+        description="The previous turn, for a follow-up such as 'now split that by phase'. Null (the "
+        "default) is a new conversation. Part of the plan cache key.",
     )
     options: RequestOptions = Field(default_factory=RequestOptions)
 

@@ -41,11 +41,14 @@ function backend({
   planner,
   failExampleOnce = false,
   liveSlug = ASSIGNMENT,
+  stream = false,
 }: {
   planner: boolean;
   failExampleOnce?: boolean;
   /** The recording that a live question is answered with. */
   liveSlug?: string;
+  /** Whether POST /v1/query/stream exists; without it, the page falls back to POST /v1/query. */
+  stream?: boolean;
 }): Call[] {
   const calls: Call[] = [];
   let failed = false;
@@ -79,6 +82,26 @@ function backend({
       const slug = path.slice("v1/examples/".length);
       return json({ slug, request: requestOf(slug), plan: examples[slug].meta.plan, response: examples[slug] });
     }
+    if (path === "v1/query/stream" && stream) {
+      const encoder = new TextEncoder();
+      const stage = (step: string, status: string, summary: string) =>
+        `event: stage\ndata: ${JSON.stringify({ step, status, summary, detail: {} })}\n\n`;
+      const body = new ReadableStream<Uint8Array>({
+        async start(controller) {
+          for (const text of [
+            stage("plan", "started", "Understanding the question"),
+            stage("plan", "done", "Understanding the question"),
+            stage("execute", "started", "Fetching 12 of 18"),
+            `event: result\ndata: ${JSON.stringify(live(examples[liveSlug], "A streamed answer.", "llm"))}\n\n`,
+          ]) {
+            controller.enqueue(encoder.encode(text));
+            await new Promise((resolve) => setTimeout(resolve, 5));
+          }
+          controller.close();
+        },
+      });
+      return new Response(body, { headers: { "content-type": "text/event-stream" } });
+    }
     if (path === "v1/query") {
       return json(live(examples[liveSlug], "A live answer.", "llm"));
     }
@@ -91,7 +114,7 @@ function backend({
   return calls;
 }
 
-const posts = (calls: Call[]) => calls.filter((call) => call.method === "POST");
+const posts = (calls: Call[]) => calls.filter((call) => call.method === "POST" && call.path !== "v1/query/stream");
 const chip = (label: RegExp) => screen.findByRole("button", { name: label });
 
 describe("the chips", () => {
@@ -102,7 +125,7 @@ describe("the chips", () => {
     const last = await chip(/^No drug named/);
     // The same question text, told apart by the label alone.
     expect(first.getAttribute("title")).toBe(last.getAttribute("title"));
-    const labels = screen.getAllByRole("button", { pressed: false }).map((button) => button.textContent);
+    const labels = screen.getAllByRole("button").filter((button) => button.hasAttribute("title")).map((button) => button.textContent);
     expect(labels).toHaveLength(Object.keys(examples).length);
     expect(new Set(labels).size).toBe(labels.length);
   });
@@ -140,27 +163,17 @@ describe("selecting a chip", () => {
     expect(screen.getByRole("heading", { name: viz?.title })).toBeTruthy();
     expect(posts(calls)).toEqual([]);
     expect(calls.map((call) => call.path)).toContain(`v1/examples/${ASSIGNMENT}`);
-    // The chip stays marked while its answer is on show.
-    expect(screen.getByRole("button", { name: /^Assignment request/ }).getAttribute("aria-pressed")).toBe("true");
+    // The question is the user's message of the first turn.
+    expect(screen.getByText(examples[ASSIGNMENT].meta.query ?? "")).toBeTruthy();
   });
 
-  it("puts the example's own request into the form, structured field included", async () => {
+  it("shows the recorded clarification and leaves the composer alone", async () => {
     backend({ planner: true });
     render(<QueryPage />);
-    await userEvent.click(await chip(/^Assignment request/));
-    await screen.findByTestId("source-bar");
-    expect((screen.getByRole("textbox", { name: /question about clinical trials/ }) as HTMLTextAreaElement).value).toBe(examples[ASSIGNMENT].meta.query);
-    expect((screen.getByLabelText("Drug") as HTMLInputElement).value).toBe("Pembrolizumab");
-  });
-
-  it("shows the recorded clarification without moving the focus off the chip", async () => {
-    backend({ planner: true });
-    render(<QueryPage />);
-    const button = await chip(/^No drug named/);
-    await userEvent.click(button);
+    await userEvent.click(await chip(/^No drug named/));
     await screen.findByTestId("source-bar");
     expect(document.querySelector('[data-outcome="clarification"]')).not.toBeNull();
-    expect(document.activeElement).toBe(button);
+    expect(document.activeElement).not.toBe(screen.getByRole("textbox", { name: /question about clinical trials/ }));
   });
 
   it("offers a retry when the recording cannot be fetched", async () => {
@@ -224,16 +237,19 @@ describe("a typed question", () => {
 
     expect(await screen.findByText("A live answer.")).toBeTruthy();
     expect(posts(calls)).toEqual([{ method: "POST", path: "v1/query", body: { query: "How many trials for pembrolizumab?" } }]);
-    expect(within(screen.getByTestId("source-bar")).getByText("Live")).toBeTruthy();
+    // A typed question needs no badge: every answer in the thread is live unless it says otherwise.
+    expect(screen.queryByTestId("source-bar")).toBeNull();
+    // The stream was tried first and was not there.
+    expect(calls.map((call) => call.path)).toContain("v1/query/stream");
   });
 
-  it("sends the reader to the field that a live clarification names as missing", async () => {
+  it("moves the focus back to the composer for the answer to a live clarification", async () => {
     backend({ planner: true, liveSlug: "10-no-drug-named" });
     render(<QueryPage />);
     await userEvent.type(screen.getByRole("textbox", { name: /question about clinical trials/ }), "How many trials for this drug?");
     await userEvent.click(screen.getByRole("button", { name: "Ask" }));
     await screen.findByText("A live answer.");
-    await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText("Drug")));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("textbox", { name: /question about clinical trials/ })));
   });
 
   it("points to the recorded examples when the server has no model", async () => {
@@ -248,7 +264,7 @@ describe("a typed question", () => {
     render(<QueryPage />);
     await userEvent.type(screen.getByRole("textbox", { name: /question about clinical trials/ }), "How many trials?");
     await userEvent.click(screen.getByRole("button", { name: "Ask" }));
-    expect(await screen.findByText(/The recorded examples above need none/)).toBeTruthy();
+    expect(await screen.findByText(/The recorded examples need none/)).toBeTruthy();
     expect(screen.getByText(/planner_unavailable/)).toBeTruthy();
   });
 });

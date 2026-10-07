@@ -2,10 +2,12 @@
 
 from typing import Annotated
 
+import anyio
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 
 from ctviz.api.readiness import Readiness, check_readiness
+from ctviz.api.stream import ProgressStream
 from ctviz.contract.request import AnalysisRequest, QueryRequest
 from ctviz.contract.response import QueryResponse
 from ctviz.ctgov.context import RequestContext
@@ -56,6 +58,43 @@ async def query(
 ) -> JSONResponse:
     """Plan the question, run it against ClinicalTrials.gov, answer with a chart, a question or a message."""
     return _json(await answer(body, deps, ctx))
+
+
+_STREAM_DOCUMENTATION = """\
+`text/event-stream`. Zero or more `event: stage` events, each with data \
+`{"step": "plan"|"check"|"resolve"|"strategy"|"execute"|"build", "status": "started"|"done", \
+"summary": string, "detail": object}`, then exactly one `event: result` (the body of `/v1/query`) or one \
+`event: error` (the error envelope). Errors found after the stream began are events, not statuses."""
+
+
+@router.post(
+    "/v1/query/stream",
+    summary="Answer a question, reporting progress as server-sent events",
+    description=_STREAM_DOCUMENTATION,
+    response_class=ProgressStream,
+    status_code=200,
+    responses={
+        200: {
+            "description": "A stream of `stage` events and one `result` or `error` event.",
+            "content": {"text/event-stream": {"schema": {"type": "string"}}},
+        }
+    },
+)
+async def query_stream(
+    body: QueryRequest,
+    deps: Annotated[Deps, Depends(get_deps)],
+    ctx: Annotated[RequestContext, Depends(get_context)],
+) -> ProgressStream:
+    """The same request and answer as `/v1/query`, with the stages as they happen.
+
+    The request deadline is captured here, because the middleware stops enforcing it once the stream has
+    begun; the stream enforces it itself and ends with an `error` event.
+    """
+    return ProgressStream(
+        lambda progress: answer(body, deps, ctx, progress),
+        request_id=ctx.request_id,
+        deadline=anyio.current_effective_deadline(),
+    )
 
 
 @router.post(

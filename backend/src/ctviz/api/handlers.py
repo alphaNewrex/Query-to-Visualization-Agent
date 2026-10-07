@@ -36,6 +36,22 @@ def install_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(Exception, handle_unexpected_error)
 
 
+def error_envelope(error: AppError, request_id: str) -> dict[str, object]:
+    """The error body of a classified failure, as the data of an `error` event of the progress stream."""
+    return _envelope(
+        request_id,
+        code=error.code,
+        message=error.message,
+        is_retryable=error.is_retryable,
+        details=error.details,
+    )
+
+
+def internal_error_envelope(request_id: str) -> dict[str, object]:
+    """The error body of anything unclassified."""
+    return error_envelope(AppError(_INTERNAL_ERROR_MESSAGE), request_id)
+
+
 def app_error_response(error: AppError, request_id: str) -> JSONResponse:
     """The error body for a classified failure."""
     return _error_response(
@@ -101,7 +117,22 @@ def _error_response(
     details: Mapping[str, object] | None = None,
     headers: Mapping[str, str] | None = None,
 ) -> JSONResponse:
-    """Assemble the error body. This is the only place that knows its shape."""
+    """Assemble the error response around the body of `_envelope`."""
+    body = _envelope(request_id, code=code, message=message, is_retryable=is_retryable, details=details)
+    # The middleware sets this header on every response that passes through it;
+    # the response to an unexpected exception does not, so it is set here as well.
+    return JSONResponse(body, status_code=status, headers={**(headers or {}), REQUEST_ID_HEADER: request_id})
+
+
+def _envelope(
+    request_id: str,
+    *,
+    code: ErrorCode,
+    message: str,
+    is_retryable: bool,
+    details: Mapping[str, object] | None,
+) -> dict[str, object]:
+    """The error body. This is the only place that knows its shape."""
     error = {
         "code": code.value,
         "message": message,
@@ -109,11 +140,7 @@ def _error_response(
         "request_id": request_id,
         "is_retryable": is_retryable,
     }
-    # The middleware sets this header on every response that passes through it;
-    # the response to an unexpected exception does not, so it is set here as well.
-    return JSONResponse(
-        {"error": error}, status_code=status, headers={**(headers or {}), REQUEST_ID_HEADER: request_id}
-    )
+    return {"error": error}
 
 
 def _request_id(request: Request) -> str:

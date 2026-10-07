@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronDownIcon, SendIcon } from "lucide-react";
+import { ArrowUpIcon, ChevronDownIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,69 +12,57 @@ import {
   inputId,
   PHASES,
   STATUSES,
-  STRUCTURED_FIELDS,
   statusLabel,
   TEXT_FIELDS,
   validate,
 } from "@/lib/request-form";
 import { cn } from "@/lib/utils";
 
-export interface FocusRequest {
-  fields: string[];
-  nonce: number;
-}
+import { WaveLoader } from "./wave-loader";
 
 export function QueryForm({
   values,
   onChange,
   onSubmit,
+  onStop,
   busy,
-  focus,
-  reveal,
+  focusKey,
+  placeholder,
 }: {
   values: FormValues;
   onChange: (values: FormValues) => void;
   onSubmit: () => void;
+  /** Stops the turn that is running; the send button becomes a stop button while `busy`. */
+  onStop: () => void;
   busy: boolean;
-  focus: FocusRequest | null;
-  /** Changes whenever a request that fills a structured field is put into the form: the block opens to show it. */
-  reveal: number;
+  /** Changes whenever the composer should take the focus, for instance after a clarification. */
+  focusKey: number;
+  placeholder: string;
 }) {
   const [open, setOpen] = React.useState(false);
   const [errors, setErrors] = React.useState<FormErrors>({});
-  const [lastNonce, setLastNonce] = React.useState(0);
-  const [lastReveal, setLastReveal] = React.useState(0);
+  const textarea = React.useRef<HTMLTextAreaElement>(null);
 
-  if (reveal !== lastReveal) {
-    setLastReveal(reveal);
-    setOpen(true);
-  }
-
-  // A clarification names the missing fields: open the block when one is in it, then focus the first.
-  if (focus && focus.nonce !== lastNonce) {
-    setLastNonce(focus.nonce);
-    if (focus.fields.some((field) => STRUCTURED_FIELDS.has(field))) {
-      setOpen(true);
-    }
-  }
   React.useEffect(() => {
-    if (!focus || focus.fields.length === 0) {
-      return;
+    if (focusKey > 0) {
+      textarea.current?.focus();
     }
-    const target = focus.fields.map((field) => document.getElementById(inputId(field))).find(Boolean);
-    target?.focus();
-  }, [focus, open]);
+  }, [focusKey]);
 
   const set = <K extends keyof FormValues>(key: K, value: FormValues[K]) => onChange({ ...values, [key]: value });
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
+    if (busy) {
+      return;
+    }
     const found = validate(values);
     setErrors(found);
     if (found.start_year || found.end_year) {
       setOpen(true);
     }
     if (Object.keys(found).length === 0) {
+      setErrors({});
       onSubmit();
     }
   };
@@ -83,39 +71,53 @@ export function QueryForm({
     "h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-3" noValidate>
-      <label htmlFor="field-query" className="sr-only">
-        Your question about clinical trials
-      </label>
-      <Textarea
-        id="field-query"
-        value={values.query}
-        onChange={(event) => set("query", event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
-            event.currentTarget.form?.requestSubmit();
-          }
-        }}
-        placeholder="Ask about clinical trials, for example: How has the number of trials for pembrolizumab changed per year since 2015?"
-        rows={3}
-        aria-invalid={errors.query ? true : undefined}
-        className="min-h-20 resize-y text-base md:text-sm"
-      />
+    <form onSubmit={submit} className="flex flex-col gap-2" noValidate aria-label="Ask a question">
+      <div className="flex items-end gap-2">
+        <label htmlFor="field-query" className="sr-only">
+          Your question about clinical trials
+        </label>
+        <Textarea
+          ref={textarea}
+          id="field-query"
+          value={values.query}
+          onChange={(event) => set("query", event.target.value)}
+          onKeyDown={(event) => {
+            // Enter sends, Shift+Enter breaks the line; Enter that confirms an IME composition does neither.
+            if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+              event.preventDefault();
+              event.currentTarget.form?.requestSubmit();
+            }
+          }}
+          placeholder={placeholder}
+          rows={1}
+          aria-invalid={errors.query ? true : undefined}
+          aria-describedby="composer-hint"
+          className="max-h-40 min-h-10 resize-none text-base md:text-sm"
+        />
+        {busy ? (
+          <Button type="button" size="icon-lg" variant="outline" onClick={onStop} aria-label="Stop">
+            <WaveLoader size={16} decorative />
+          </Button>
+        ) : (
+          <Button type="submit" size="icon-lg" aria-label="Ask">
+            <ArrowUpIcon aria-hidden />
+          </Button>
+        )}
+      </div>
       {errors.query ? <p className="text-xs text-destructive">{errors.query}</p> : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Button type="button" variant="ghost" size="sm" aria-expanded={open} onClick={() => setOpen(!open)}>
+      <div className="flex flex-wrap items-center justify-between gap-x-3">
+        <Button type="button" variant="ghost" size="xs" aria-expanded={open} onClick={() => setOpen(!open)}>
           <ChevronDownIcon className={cn("transition-transform", open && "rotate-180")} aria-hidden />
           Structured fields
         </Button>
-        <Button type="submit" disabled={busy}>
-          <SendIcon aria-hidden />
-          {busy ? "Running" : "Ask"}
-        </Button>
+        <span id="composer-hint" className="hidden text-xs text-muted-foreground sm:inline">
+          Enter to send, Shift+Enter for a new line
+        </span>
       </div>
 
       {open ? (
-        <fieldset className="grid gap-3 rounded-lg border p-3 sm:grid-cols-2">
+        <fieldset className="grid max-h-[40dvh] gap-3 overflow-y-auto rounded-lg border p-3 sm:grid-cols-2">
           <legend className="px-1 text-xs text-muted-foreground">Optional: fix a value instead of leaving it to the question</legend>
           {TEXT_FIELDS.map((field) => (
             <label key={field.name} className="flex flex-col gap-1 text-xs font-medium">

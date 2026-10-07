@@ -1099,6 +1099,11 @@
         "cached_tokens": 7936
       }
     },
+    "conversation": {
+      "is_follow_up": false,
+      "carried_over": [],
+      "changed": []
+    },
     "assumptions": [
       "Read 'Pembrolizumab' as a drug: 2,567 trials have it in an intervention name and 15 in a condition. Matched 'Pembrolizumab' with the registry's intervention search (names, other names, arm labels, titles, descriptions and MeSH terms, with synonyms): 2,971 trials. 2,567 of them name it as an intervention.",
       "Trials are placed by start date; estimated dates are included, and withdrawn trials keep their planned start date.",

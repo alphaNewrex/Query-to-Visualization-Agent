@@ -10,7 +10,7 @@ export function Followups({
   onRun,
 }: {
   items: Meta["suggested_followups"];
-  onRun: (request: QueryRequest) => void;
+  onRun: (request: QueryRequest, label?: string) => void;
 }) {
   if (items.length === 0) {
     return null;
@@ -18,7 +18,7 @@ export function Followups({
   return (
     <div className="flex flex-wrap gap-2" aria-label="Suggested follow-ups">
       {items.map((item, index) => (
-        <Button key={index} variant="outline" size="sm" onClick={() => onRun(item.request)}>
+        <Button key={index} variant="outline" size="sm" onClick={() => onRun(item.request, item.label)}>
           {item.label}
         </Button>
       ))}
@@ -27,12 +27,22 @@ export function Followups({
 }
 
 /** Compact list under the chart: the assumptions and warnings; the Trace tab keeps the detail. */
-export function Notes({ meta, onRun }: { meta: Meta; onRun: (request: QueryRequest) => void }) {
+export function Notes({
+  meta,
+  onRun,
+  showFollowups = true,
+}: {
+  meta: Meta;
+  onRun: (request: QueryRequest, label?: string) => void;
+  /** False when the follow-ups are shown elsewhere, under the whole answer. */
+  showFollowups?: boolean;
+}) {
   // The backend can state one thing as both a warning and an assumption: it is listed once, as the warning.
   const warned = new Set(meta.warnings.map((warning) => warning.message));
   const assumptions = meta.assumptions.filter((assumption) => !warned.has(assumption));
   const hasNotes = assumptions.length > 0 || meta.warnings.length > 0;
-  if (!hasNotes && meta.suggested_followups.length === 0) {
+  const followups = showFollowups ? meta.suggested_followups : [];
+  if (!hasNotes && followups.length === 0) {
     return null;
   }
   return (
@@ -53,7 +63,7 @@ export function Notes({ meta, onRun }: { meta: Meta; onRun: (request: QueryReque
           ))}
         </ul>
       ) : null}
-      <Followups items={meta.suggested_followups} onRun={onRun} />
+      <Followups items={followups} onRun={onRun} />
     </div>
   );
 }

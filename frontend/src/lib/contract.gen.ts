@@ -31,7 +31,10 @@ export interface Contract {
  * 4. `group_by`, `time_unit`, `top_n` and `chart_type` replace the planner's choices.
  * 5. Every structured field is shown to the model, so "this drug" in the question resolves to
  *    `drug_name`.
- * 6. `meta.filters` in every response repeats the filter fields in canonical form (arrays for list
+ * 6. With `previous`, the message may be a follow-up: the planner edits the previous plan, or ignores it
+ *    when the message is unrelated. A name, year or filter may then come from the message or be carried
+ *    over unchanged from the previous plan; one that is in neither is rejected.
+ * 7. `meta.filters` in every response repeats the filter fields in canonical form (arrays for list
  *    fields, every key present), so it can be sent back as request fields. For that reason every list
  *    field accepts an empty array as "no filter", the same as null.
  */
@@ -300,6 +303,10 @@ export interface QueryRequest {
    */
   chart_type?:
     ("bar_chart" | "time_series" | "histogram" | "scatter_plot" | "network_graph" | "table" | "metric") | null;
+  /**
+   * The previous turn, for a follow-up such as 'now split that by phase'. Null (the default) is a new conversation. Part of the plan cache key.
+   */
+  previous?: PreviousTurn | null;
   options?: RequestOptions;
 }
 /**
@@ -399,40 +406,17 @@ export interface ExcludeSpec {
     | null;
 }
 /**
- * Behaviour switches of one request; `meta.options` echoes the effective values.
- */
-export interface RequestOptions {
-  /**
-   * 'llm': the model writes the plan (503 `planner_unavailable` when no model is configured). 'structured': never call a model; the plan is built from the request fields and `group_by` is required. The question text is then not interpreted, and the response says so. Ignored by `POST /v1/analyses`.
-   */
-  planner?: "llm" | "structured";
-  /**
-   * Trials cited for each datum; 0 disables citations.
-   */
-  citations_per_datum?: number;
-  /**
-   * 'broad': the registry's intervention search (names, other names, titles, descriptions, synonyms). 'name_only': intervention names and their synonyms only. The two give different counts, so the definition used is always stated in the response.
-   */
-  drug_match?: "broad" | "name_only";
-  /**
-   * Include the step list in `meta.debug.trace`.
-   */
-  include_trace?: boolean;
-  /**
-   * false bypasses the plan cache and the response cache for this request; the registry-call cache stays.
-   */
-  use_cache?: boolean;
-}
-/**
- * A typed plan to answer without a model: the body of `POST /v1/analyses`.
+ * The previous turn of a conversation: what was asked and the plan that answered it.
  *
- * Nothing is checked against a question; the plan is validated for shape and limits only. Posting
- * `{"plan": meta.plan, "options": meta.options}` from an earlier response reproduces its visualization
- * for the same data timestamp.
+ * The service keeps no session. The client sends back the question and `meta.plan` of the answer it
+ * shows, and the planner reads the new message as a follow-up to them.
  */
-export interface AnalysisRequest {
+export interface PreviousTurn {
+  /**
+   * The previous question as sent (`meta.query`); null when the previous turn had none.
+   */
+  query: string | null;
   plan: QueryPlan;
-  options?: RequestOptions;
 }
 export interface QueryPlan {
   /**
@@ -766,6 +750,42 @@ export interface Unsupported {
    * One sentence. No figures other than those in the question.
    */
   reason: string;
+}
+/**
+ * Behaviour switches of one request; `meta.options` echoes the effective values.
+ */
+export interface RequestOptions {
+  /**
+   * 'llm': the model writes the plan (503 `planner_unavailable` when no model is configured). 'structured': never call a model; the plan is built from the request fields and `group_by` is required. The question text is then not interpreted, and the response says so. Ignored by `POST /v1/analyses`.
+   */
+  planner?: "llm" | "structured";
+  /**
+   * Trials cited for each datum; 0 disables citations.
+   */
+  citations_per_datum?: number;
+  /**
+   * 'broad': the registry's intervention search (names, other names, titles, descriptions, synonyms). 'name_only': intervention names and their synonyms only. The two give different counts, so the definition used is always stated in the response.
+   */
+  drug_match?: "broad" | "name_only";
+  /**
+   * Include the step list in `meta.debug.trace`.
+   */
+  include_trace?: boolean;
+  /**
+   * false bypasses the plan cache and the response cache for this request; the registry-call cache stays.
+   */
+  use_cache?: boolean;
+}
+/**
+ * A typed plan to answer without a model: the body of `POST /v1/analyses`.
+ *
+ * Nothing is checked against a question; the plan is validated for shape and limits only. Posting
+ * `{"plan": meta.plan, "options": meta.options}` from an earlier response reproduces its visualization
+ * for the same data timestamp.
+ */
+export interface AnalysisRequest {
+  plan: QueryPlan;
+  options?: RequestOptions;
 }
 /**
  * An answer drawn as a chart, a number or a table.
@@ -1145,6 +1165,7 @@ export interface Meta {
   plan: QueryPlan | null;
   options: RequestOptions;
   planner: PlannerInfo;
+  conversation: Conversation;
   /**
    * Plain-language choices made where the question was open.
    */
@@ -1410,6 +1431,23 @@ export interface Usage {
   output_tokens: number;
   reasoning_tokens: number;
   cached_tokens: number;
+}
+/**
+ * How the answer relates to the previous turn, written by code from the two plans.
+ */
+export interface Conversation {
+  /**
+   * True when the request carried a previous turn and the answer kept something of it or completed a clarification; false for a new question and when there was no previous turn.
+   */
+  is_follow_up: boolean;
+  /**
+   * What the new plan kept unchanged, e.g. 'drug: pembrolizumab'.
+   */
+  carried_over: string[];
+  /**
+   * What the new plan added, removed or replaced, e.g. 'split by phase'.
+   */
+  changed: string[];
 }
 /**
  * A data-quality or completeness caveat; `code` is one of the stable warning codes.

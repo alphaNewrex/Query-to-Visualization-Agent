@@ -618,6 +618,21 @@ class Debug(Model):
     trace: list[TraceStep]
 
 
+class Conversation(Model):
+    """How the answer relates to the previous turn, written by code from the two plans."""
+
+    is_follow_up: bool = Field(
+        description="True when the request carried a previous turn and the answer kept something of it "
+        "or completed a clarification; false for a new question and when there was no previous turn."
+    )
+    carried_over: list[str] = Field(
+        description="What the new plan kept unchanged, e.g. 'drug: pembrolizumab'."
+    )
+    changed: list[str] = Field(
+        description="What the new plan added, removed or replaced, e.g. 'split by phase'."
+    )
+
+
 class Meta(Model):
     """Everything about the answer other than what is drawn. A renderer needs nothing from it."""
 
@@ -633,6 +648,7 @@ class Meta(Model):
         description="The effective options; `{plan, options}` posted to `/v1/analyses` replays the answer."
     )
     planner: PlannerInfo
+    conversation: Conversation
     assumptions: list[str] = Field(description="Plain-language choices made where the question was open.")
     warnings: list[Note]
     source: Source | None = Field(description="Null when no upstream request was made.")

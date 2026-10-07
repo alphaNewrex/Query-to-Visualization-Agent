@@ -946,6 +946,37 @@
       "title": "CompareSpec",
       "type": "object"
     },
+    "Conversation": {
+      "additionalProperties": false,
+      "description": "How the answer relates to the previous turn, written by code from the two plans.",
+      "properties": {
+        "is_follow_up": {
+          "description": "True when the request carried a previous turn and the answer kept something of it or completed a clarification; false for a new question and when there was no previous turn.",
+          "type": "boolean"
+        },
+        "carried_over": {
+          "description": "What the new plan kept unchanged, e.g. 'drug: pembrolizumab'.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "changed": {
+          "description": "What the new plan added, removed or replaced, e.g. 'split by phase'.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "is_follow_up",
+        "carried_over",
+        "changed"
+      ],
+      "title": "Conversation",
+      "type": "object"
+    },
     "Counts": {
       "additionalProperties": false,
       "properties": {
@@ -1938,6 +1969,9 @@
         "planner": {
           "$ref": "#/$defs/PlannerInfo"
         },
+        "conversation": {
+          "$ref": "#/$defs/Conversation"
+        },
         "assumptions": {
           "description": "Plain-language choices made where the question was open.",
           "items": {
@@ -2011,6 +2045,7 @@
         "plan",
         "options",
         "planner",
+        "conversation",
         "assumptions",
         "warnings",
         "source",
@@ -2755,6 +2790,34 @@
       "title": "PlannerInfo",
       "type": "object"
     },
+    "PreviousTurn": {
+      "additionalProperties": false,
+      "description": "The previous turn of a conversation: what was asked and the plan that answered it.\n\nThe service keeps no session. The client sends back the question and `meta.plan` of the answer it\nshows, and the planner reads the new message as a follow-up to them.",
+      "properties": {
+        "query": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The previous question as sent (`meta.query`); null when the previous turn had none."
+        },
+        "plan": {
+          "$ref": "#/$defs/QueryPlan",
+          "description": "`meta.plan` of the previous answer."
+        }
+      },
+      "required": [
+        "query",
+        "plan"
+      ],
+      "title": "PreviousTurn",
+      "type": "object"
+    },
     "QuantitativeChannel": {
       "additionalProperties": false,
       "description": "A numeric channel.",
@@ -2901,7 +2964,7 @@
     },
     "QueryRequest": {
       "additionalProperties": false,
-      "description": "A question about clinical trials, with optional structured fields.\n\nStrings are trimmed and unknown keys are rejected. Rules across fields:\n\n1. Structured filter fields are ANDed with what the question says. Where they conflict, the field\n   wins: it replaces the planner's value for the same entity kind or filter family, and the\n   override is recorded in `meta.interpretation.adjustments`.\n2. A structured entity field whose value is one of the compared values does not become an extra\n   filter; the comparison is kept.\n3. Entity arrays mean \"all of\"; enum arrays mean \"any of\". A comparison is always explicit:\n   `compare` in the request or an \"A vs B\" in the question.\n4. `group_by`, `time_unit`, `top_n` and `chart_type` replace the planner's choices.\n5. Every structured field is shown to the model, so \"this drug\" in the question resolves to\n   `drug_name`.\n6. `meta.filters` in every response repeats the filter fields in canonical form (arrays for list\n   fields, every key present), so it can be sent back as request fields. For that reason every list\n   field accepts an empty array as \"no filter\", the same as null.",
+      "description": "A question about clinical trials, with optional structured fields.\n\nStrings are trimmed and unknown keys are rejected. Rules across fields:\n\n1. Structured filter fields are ANDed with what the question says. Where they conflict, the field\n   wins: it replaces the planner's value for the same entity kind or filter family, and the\n   override is recorded in `meta.interpretation.adjustments`.\n2. A structured entity field whose value is one of the compared values does not become an extra\n   filter; the comparison is kept.\n3. Entity arrays mean \"all of\"; enum arrays mean \"any of\". A comparison is always explicit:\n   `compare` in the request or an \"A vs B\" in the question.\n4. `group_by`, `time_unit`, `top_n` and `chart_type` replace the planner's choices.\n5. Every structured field is shown to the model, so \"this drug\" in the question resolves to\n   `drug_name`.\n6. With `previous`, the message may be a follow-up: the planner edits the previous plan, or ignores it\n   when the message is unrelated. A name, year or filter may then come from the message or be carried\n   over unchanged from the previous plan; one that is in neither is rejected.\n7. `meta.filters` in every response repeats the filter fields in canonical form (arrays for list\n   fields, every key present), so it can be sent back as request fields. For that reason every list\n   field accepts an empty array as \"no filter\", the same as null.",
       "examples": [
         {
           "drug_name": "Pembrolizumab",
@@ -3445,6 +3508,18 @@
           ],
           "default": null,
           "description": "A preference. Honoured when valid for the data shape, otherwise ignored with a warning."
+        },
+        "previous": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PreviousTurn"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The previous turn, for a follow-up such as 'now split that by phase'. Null (the default) is a new conversation. Part of the plan cache key."
         },
         "options": {
           "$ref": "#/$defs/RequestOptions"

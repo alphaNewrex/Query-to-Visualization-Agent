@@ -1012,6 +1012,11 @@
         "cached_tokens": 7936
       }
     },
+    "conversation": {
+      "is_follow_up": false,
+      "carried_over": [],
+      "changed": []
+    },
     "assumptions": [
       "Read 'lung cancer' as a condition: 122 trials have it in an intervention name and 10,634 in a condition. Matched 'lung cancer' with the registry's condition search (conditions, titles, keywords and MeSH terms, with synonyms): 14,604 trials.",
       "A trial counts once for each country with a site, so the bars can overlap. Trials whose locations were removed after completion are not attributed to a country."

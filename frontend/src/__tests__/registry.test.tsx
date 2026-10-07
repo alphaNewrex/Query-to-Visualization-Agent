@@ -64,7 +64,7 @@ describe("registry", () => {
     const onRun = vi.fn();
     render(<ResultView response={timeSeries} request={null} onSelect={() => undefined} onRun={onRun} />);
     await userEvent.click(screen.getByRole("button", { name: "Split by phase" }));
-    expect(onRun).toHaveBeenCalledWith({ query: "Pembrolizumab trials per year by phase", drug_name: ["pembrolizumab"] });
+    expect(onRun).toHaveBeenCalledWith({ query: "Pembrolizumab trials per year by phase", drug_name: ["pembrolizumab"] }, "Split by phase");
   });
 });
 

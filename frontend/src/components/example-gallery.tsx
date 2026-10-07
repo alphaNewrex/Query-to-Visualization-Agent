@@ -41,7 +41,7 @@ const ICONS: Record<string, LucideIcon> = {
  * The recorded runs of GET /v1/examples as chips (PLAN 6.2). A chip is only a choice: the page
  * fetches the recording and shows it.
  */
-export function ExampleGallery({ selected, onSelect }: { selected: string | null; onSelect: (slug: string) => void }) {
+export function ExampleGallery({ onSelect }: { onSelect: (slug: string, query: string) => void }) {
   const [chips, setChips] = React.useState<ExampleChip[] | "loading" | "failed">("loading");
 
   React.useEffect(() => {
@@ -59,7 +59,7 @@ export function ExampleGallery({ selected, onSelect }: { selected: string | null
   return (
     <div className="flex flex-col gap-2" role="group" aria-labelledby="gallery-title">
       <span id="gallery-title" className="text-xs font-medium text-muted-foreground">
-        Recorded examples: each answers at once, without a model
+        Example questions: each answers at once from a recording, without a model
       </span>
       {chips === "loading" ? (
         <div className="flex flex-wrap gap-1.5" aria-hidden>
@@ -76,16 +76,14 @@ export function ExampleGallery({ selected, onSelect }: { selected: string | null
         <div className="flex flex-wrap gap-1.5">
           {chips.map((chip) => {
             const Icon = chip.outcome ? ICONS[chip.outcome] : undefined;
-            const isSelected = chip.slug === selected;
             return (
               <Button
                 key={chip.slug}
-                variant={isSelected ? "secondary" : "outline"}
+                variant="outline"
                 size="sm"
-                aria-pressed={isSelected}
                 title={chip.query}
                 className="max-w-full"
-                onClick={() => onSelect(chip.slug)}
+                onClick={() => onSelect(chip.slug, chip.query)}
               >
                 {Icon ? <Icon aria-hidden /> : null}
                 <span className="truncate">{chip.label}</span>
