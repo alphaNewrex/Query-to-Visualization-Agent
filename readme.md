@@ -42,7 +42,7 @@ The backend alone runs on stock Python 3.12 or newer: `cd backend && python3 -m 
 
 **With no key** (or the placeholder key of `.example.env`) the service still serves the ten recorded examples (`GET /v1/examples`, and the UI's example chips, which also work offline), the schemas, `POST /v1/analyses` (a typed plan run against the live registry, no model) and `POST /v1/query` with `"options": {"planner": "structured"}` plus `group_by`. A free-text question without a key is answered `503 planner_unavailable` and names these alternatives.
 
-**Tests.** `make test` runs 1,153 backend tests (about 10 s) and 186 frontend tests, with no key and no network. `make check` adds ruff, `mypy --strict`, a drift check on every generated document, and the frontend's type check, lint and build. `make zip` builds the submission archive and checks it (`backend/scripts/check_submission.py`). There is no automated browser test of the UI.
+**Tests.** `make test` runs 1,156 backend tests (about 10 s) and 196 frontend tests, with no key and no network. `make check` adds ruff, `mypy --strict`, a drift check on every generated document, and the frontend's type check, lint and build. `make zip` builds the submission archive and checks it (`backend/scripts/check_submission.py`). There is no automated browser test of the UI.
 
 ## How it works
 
