@@ -143,6 +143,8 @@ curl -s -X POST http://127.0.0.1:8000/v1/query -H 'Content-Type: application/jso
 
 ## API reference
 
+**Full schema.** Every endpoint, request and response is described in full by the OpenAPI document that FastAPI generates and Swagger UI displays. With the service running, browse it at [http://localhost:8000/docs](http://localhost:8000/docs) (raw document: [http://localhost:8000/openapi.json](http://localhost:8000/openapi.json)). Without running anything, read the saved copy, [`docs/schema/openapi.json`](docs/schema/openapi.json), which `make check` keeps identical to what the service serves; it opens in any OpenAPI viewer, for example [editor.swagger.io](https://editor.swagger.io). The same types as plain JSON Schema are in [`docs/schema/contract.v1.schema.json`](docs/schema/contract.v1.schema.json), and as tables in [`docs/SCHEMA.md`](docs/SCHEMA.md).
+
 | Endpoint | Purpose | Request | Response |
 | --- | --- | --- | --- |
 | `POST /v1/query` | Answer a question | JSON [`QueryRequest`](docs/SCHEMA.md#requests) | [`QueryResponse`](docs/SCHEMA.md#queryresponse) |
@@ -160,7 +162,7 @@ Every non-2xx body is one shape, [`ErrorResponse`](docs/SCHEMA.md#errorresponse)
 
 ## Request schema
 
-`POST /v1/query` takes a `QueryRequest`. Only `query` is required. Strings are trimmed, an unknown key is a 422, and a structured field wins over the model's reading of the question. Entity fields take one string or up to five, each 1 to 200 characters, and mean "all of"; enum fields mean "any of". Full constraints: [`docs/SCHEMA.md`](docs/SCHEMA.md#requests).
+`POST /v1/query` takes a `QueryRequest`. Only `query` is required. Strings are trimmed, an unknown key is a 422, and a structured field wins over the model's reading of the question. Entity fields take one string or up to five, each 1 to 200 characters, and mean "all of"; enum fields mean "any of". Full constraints: [`docs/SCHEMA.md`](docs/SCHEMA.md#requests). Full generated schema: `QueryRequest` in [`docs/schema/openapi.json`](docs/schema/openapi.json), or under Schemas in Swagger UI.
 
 | Field | Type | Meaning |
 | --- | --- | --- |
@@ -178,7 +180,7 @@ Every non-2xx body is one shape, [`ErrorResponse`](docs/SCHEMA.md#errorresponse)
 
 ## Response schema
 
-Every 200 body has the same seven keys, always present (`null` means not applicable, arrays are never null): `spec_version`, `kind`, `message`, `visualization`, `clarification`, `references`, `meta`.
+Every 200 body has the same seven keys, always present (`null` means not applicable, arrays are never null): `spec_version`, `kind`, `message`, `visualization`, `clarification`, `references`, `meta`. Full generated schema: `QueryResponse` in [`docs/schema/openapi.json`](docs/schema/openapi.json), or under Schemas in Swagger UI; as tables in [`docs/SCHEMA.md`](docs/SCHEMA.md#queryresponse).
 
 | `kind` | When | `visualization` |
 | --- | --- | --- |
