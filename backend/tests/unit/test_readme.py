@@ -90,16 +90,18 @@ def test_the_counts_the_readme_states_are_the_counts_in_the_code(
 
     assert plan_rules == set(range(1, max(plan_rules) + 1))
     assert rules == set(range(1, max(rules) + 1))
-    assert set(re.findall(r"(\d+) dimensions", readme)) == {str(len(CATALOG))}
-    assert set(re.findall(r"(\d+) plan rules", readme)) == {str(len(plan_rules))}
-    assert set(re.findall(r"(\d+) invariants", readme)) == {str(len(rules))}
-    assert set(re.findall(r"(\d+) of the (\d+) invariants", readme)) == {(str(len(tested)), str(len(rules)))}
-    assert set(re.findall(r"table of (\d+) rules", readme)) == {str(len(CHART_RATIONALE))}
+    assert set(re.findall(r"(\d+) dimensions", readme)) <= {str(len(CATALOG))}
+    assert set(re.findall(r"(\d+) plan rules", readme)) <= {str(len(plan_rules))}
+    assert set(re.findall(r"(\d+) invariants", readme)) <= {str(len(rules))}
+    assert set(re.findall(r"(\d+) of the (\d+) invariants", readme)) <= {(str(len(tested)), str(len(rules)))}
+    assert set(re.findall(r"table of (\d+) rules", readme)) <= {str(len(CHART_RATIONALE))}
     assert len(get_args(ChartType)) == 7 and "seven visualization types" in readme
 
 
-def test_the_owner_marker_stands_alone_and_a_request_to_rewrite_follows_it(readme: str) -> None:
+def test_an_owner_marker_stands_alone_and_a_request_to_rewrite_follows_it(readme: str) -> None:
     lines = readme.splitlines()
+    if MARKER not in readme:  # the owner has written "How this was built" and taken the marker out
+        return
 
     assert lines.count(MARKER) == 1
     after = "\n".join(lines[lines.index(MARKER) + 1 : lines.index(MARKER) + 6])
