@@ -266,9 +266,9 @@ async def test_a_walk_says_when_the_registry_changed_under_it(
 ) -> None:
     registry.respond = lambda request: httpx2.Response(200, json=studies_body([1, 2], total=3))
 
-    result = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"], limit=10)
+    result = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"])
 
-    assert (len(result.studies), result.total, result.is_truncated) == (2, 3, False)
+    assert (len(result.studies), result.total) == (2, 3)
     assert not result.is_consistent
 
 
@@ -277,7 +277,7 @@ async def test_a_walk_that_read_everything_it_counted_is_consistent(
 ) -> None:
     registry.respond = lambda request: httpx2.Response(200, json=studies_body([1, 2, 3], total=3))
 
-    result = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"], limit=10)
+    result = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"])
 
     assert result.is_consistent
 
@@ -297,9 +297,7 @@ async def test_a_record_without_an_nct_id_is_an_unreadable_answer(
     assert len(registry.requests) == 1  # a malformed record is not a transient failure
 
 
-async def test_a_walk_and_a_page_have_bounds(client: CtGovClient, ctx: FakeContext) -> None:
-    with pytest.raises(ValueError, match="at least one trial"):
-        await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"], limit=0)
+async def test_a_page_has_bounds(client: CtGovClient, ctx: FakeContext) -> None:
     with pytest.raises(ValueError, match="page holds"):
         await client.sample(PEMBROLIZUMAB, ctx, fields=["Phase"], page_size=0, sort=None, origin="probe")
 

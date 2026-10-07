@@ -160,23 +160,13 @@ class Replay:
             params, ctx, fields=fields, page_size=page_size, sort=sort, origin="execution"
         )
 
-    async def walk(
-        self, params: Params, ctx: RequestLog, *, fields: Sequence[str], limit: int, sort: str | None = None
-    ) -> WalkResult:
-        chosen = self._select(params, sort)
-        kept = tuple(chosen[:limit])
+    async def walk(self, params: Params, ctx: RequestLog, *, fields: Sequence[str]) -> WalkResult:
+        chosen = self._select(params, None)
         self._log(
-            ctx,
-            params,
-            "execution",
-            len(chosen),
-            len(kept),
-            page_size=min(limit, 1000),
-            fields=fields,
-            sort=sort,
+            ctx, params, "execution", len(chosen), len(chosen), page_size=1000, fields=fields, sort=None
         )
-        ctx.note_studies(kept)
-        return WalkResult(kept, len(chosen), len(kept) >= limit and len(chosen) > len(kept))
+        ctx.note_studies(chosen)
+        return WalkResult(tuple(chosen), len(chosen))
 
 
 def _ordered(studies: list[Study], sort: str | None) -> list[Study]:

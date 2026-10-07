@@ -15,6 +15,7 @@ from dataclasses import dataclass, field, replace
 from datetime import datetime
 from typing import Final
 
+import anyio
 import structlog
 from pydantic_core import to_jsonable_python
 from structlog.typing import FilteringBoundLogger
@@ -60,6 +61,9 @@ DEFAULT_RESPONSE_CACHE_SIZE: Final = 256
 _UNCACHEABLE_WARNINGS: Final = frozenset(
     {"upstream_throttled", "walk_count_mismatch", "counts_not_reconciled"}
 )
+
+# Seconds of the request deadline kept for grouping what a walk read and building the response.
+_BUILD_RESERVE_S: Final = 6.0
 
 _log: FilteringBoundLogger = structlog.get_logger()
 _INVARIANT_MESSAGE = "The answer failed an internal consistency check and was withheld. Quote the request id."
@@ -229,7 +233,7 @@ async def _run(
         context.planned = planned
 
     plan = lower_plan(planned, resolved, deps.catalog, version)
-    limits = Limits.from_settings(deps.settings)
+    limits = Limits.from_settings(deps.settings, _walk_budget_s())
     xp = choose_strategy(plan, resolved.matched, limits, prefer_walk=deps.ctgov.is_throttled)
     if isinstance(xp, Outcome):
         return outcome_response(context.build(), xp, plan=plan)
@@ -252,6 +256,12 @@ async def _run(
         _verify(response, ctx)
         response.meta.timing.total_ms = watch.timing().total_ms
     return response
+
+
+def _walk_budget_s() -> float:
+    """Seconds a walk may take: what is left of the request's deadline, less the time to build the answer."""
+    left = anyio.current_effective_deadline() - anyio.current_time()
+    return max(0.0, left - _BUILD_RESERVE_S)
 
 
 def _verify(response: VisualizationResponse, ctx: RequestContext) -> None:

@@ -840,7 +840,7 @@ How the trials of one series were fetched.
 | Field | Type | Description |
 | --- | --- | --- |
 | `series` | string \| null |  |
-| `name` | `sorted_page` \| `walk` \| `count_fan_out` \| `sample_then_recount` \| `capped_walk` \| `none` |  |
+| `name` | `sorted_page` \| `walk` \| `count_fan_out` \| `sample_then_recount` \| `none` |  |
 | `reason` | string |  |
 | `upstream_requests` | integer |  |
 
@@ -961,7 +961,7 @@ Trials of a series that were not drawn, and why.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `scope` | `trials` \| `categories` \| `series` \| `periods` \| `nodes` \| `edges` \| `points` \| `rows` |  |
+| `scope` | `categories` \| `series` \| `periods` \| `nodes` \| `edges` \| `points` \| `rows` |  |
 | `shown` | integer |  |
 | `total` | integer |  |
 | `rule` | string |  |

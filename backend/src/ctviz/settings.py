@@ -47,17 +47,17 @@ class Settings(BaseSettings):
         frozenset(), validation_alias="ALLOWED_MODELS"
     )
 
-    # Optional, read as CTVIZ_PLANNER_MODEL, CTVIZ_WALK_CAP, ...
+    # Optional, read as CTVIZ_PLANNER_MODEL, CTVIZ_WALK_PAGES_PER_S, ...
     planner_model: str = "gpt-5.4-mini"
     planner_effort: Effort | None = "low"
     planner_fallback_model: str | None = "gpt-4.1-mini"
     planner_timeout_s: float = 20.0
     ctgov_base_url: str = "https://clinicaltrials.gov/api/v2"
-    ctgov_concurrency: int = 4
+    ctgov_concurrency: int = 6
     ctgov_burst: int = 10
-    ctgov_rate_per_s: float = 5.0
+    ctgov_rate_per_s: float = 8.0
     one_page_max: int = 1000
-    walk_cap: int = 5000
+    walk_pages_per_s: float = 5.0
     max_fanout_requests: int = 60
     low_match_threshold: int = 10
     request_deadline_s: float = 45.0

@@ -5,7 +5,6 @@ bucket. Only the types are declared here, so one builder per chart type serves b
 """
 
 from dataclasses import dataclass, field
-from datetime import date
 
 from ctviz.catalog.fields import BoundDimension, Evidence
 from ctviz.contract.response import Note, StrategyName
@@ -57,15 +56,6 @@ class Exclusion:
     count: int = 0
 
 
-@dataclass(frozen=True)
-class SubsetInfo:
-    """The trials a capped walk read: the most recently first-posted ones, which a sentence can describe."""
-
-    size: int
-    first_posted_from: date
-    first_posted_to: date
-
-
 @dataclass
 class Frame:
     """The cells of one scope, with the counters that make its counts reconcile."""
@@ -76,11 +66,10 @@ class Frame:
     cells: dict[tuple[str, ...], Cell] = field(default_factory=dict)
     marginals: tuple[dict[str, Cell], ...] = ()  # one table per dimension: node sizes, share denominators
     matched: int = 0  # totalCount of the scope
-    seen: int = 0  # trials actually read; differs from matched in a capped walk
+    seen: int = 0  # trials actually read; differs from matched when the registry changed during a walk
     analyzed: int = 0
     excluded: dict[str, Exclusion] = field(default_factory=dict)  # by reason
     strategy: StrategyName = "walk"
-    subset: SubsetInfo | None = None  # for a capped walk
     warnings: list[Note] = field(default_factory=list)  # what the executor found out about this scope
 
     def __post_init__(self) -> None:

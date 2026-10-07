@@ -81,7 +81,6 @@ def _rows_frame(rows: RowsResult) -> Frame:
         analyzed=len(rows.rows),
         excluded=rows.excluded,
         strategy=rows.strategy,
-        subset=rows.subset,
     )
 
 

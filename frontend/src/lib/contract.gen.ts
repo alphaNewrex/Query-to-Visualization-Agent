@@ -1382,7 +1382,7 @@ export interface Adjustment {
  */
 export interface StrategyStep {
   series: string | null;
-  name: "sorted_page" | "walk" | "count_fan_out" | "sample_then_recount" | "capped_walk" | "none";
+  name: "sorted_page" | "walk" | "count_fan_out" | "sample_then_recount" | "none";
   reason: string;
   upstream_requests: number;
 }
@@ -1487,7 +1487,7 @@ export interface Truncation {
   items: TruncationItem[];
 }
 export interface TruncationItem {
-  scope: "trials" | "categories" | "series" | "periods" | "nodes" | "edges" | "points" | "rows";
+  scope: "categories" | "series" | "periods" | "nodes" | "edges" | "points" | "rows";
   shown: number;
   total: number;
   rule: string;

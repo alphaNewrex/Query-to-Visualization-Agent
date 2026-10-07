@@ -220,7 +220,7 @@ def limits_from(batches: Sequence[Batch]) -> Limits:
             burst=max(1, last_clean // 2),
             rate_per_s=2.0,
             # Walks are preferred when fan-outs are slow.
-            one_page_max=DEFAULTS.walk_cap,
+            one_page_max=DEFAULTS.one_page_max,
             reason=f"throttled at batch {throttled_at + 1} ({batches[throttled_at].size} calls)",
         )
     if all(batch.is_clean for batch in batches):

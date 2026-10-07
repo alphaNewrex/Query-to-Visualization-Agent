@@ -201,11 +201,11 @@ async def test_a_replayed_plan_has_its_own_answer_and_is_cached_on_its_own() -> 
         assert reply.json()["visualization"] == asked["visualization"]
 
 
-async def test_a_clarification_is_planned_once_and_asks_the_registry_nothing() -> None:
+async def test_a_clarification_is_planned_again_and_asks_the_registry_nothing() -> None:
     asking = plan(
         entities=[], analysis={"kind": "clarify", "reason": "missing_entity", "missing": ["drug_name"]}
     )
-    planner, registry = FakePlanner([asking]), Registry()
+    planner, registry = FakePlanner([asking, asking]), Registry()
     question = {"query": "How has the number of trials for this drug changed?"}
     async with serving(application(registry, planner)) as http:
         first = await http.post("/v1/query", json=question)
@@ -213,8 +213,8 @@ async def test_a_clarification_is_planned_once_and_asks_the_registry_nothing() -
 
     assert [r.json()["kind"] for r in (first, second)] == ["clarification", "clarification"]
     assert cache_of(first) == FRESH
-    assert cache_of(second) == {"is_plan_cached": True, "is_response_cached": False, "cached_at": None}
-    assert len(planner.calls) == 1 and registry.searches == []
+    assert cache_of(second) == FRESH
+    assert len(planner.calls) == 2 and registry.searches == []
 
 
 # --- a new data version --------------------------------------------------------------------------------

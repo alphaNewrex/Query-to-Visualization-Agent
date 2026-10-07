@@ -21,7 +21,7 @@ def capabilities(catalog: Mapping[str, FieldSpec], settings: Settings) -> Docume
         "node_kinds": list(get_args(NodeKind)),
         "visualization_types": list(get_args(ChartType)),
         "limits": {
-            "walk_cap": settings.walk_cap,
+            "walk_pages_per_s": settings.walk_pages_per_s,
             "one_page_max": settings.one_page_max,
             "max_fanout_requests": settings.max_fanout_requests,
             "default_top_n": DEFAULT_TOP_N,

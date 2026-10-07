@@ -158,8 +158,7 @@ class _Axis:
 def _shape_grids(result: EngineResult, plan: EnginePlan) -> ShapedResult:
     if not plan.dimensions:
         frames = tuple(ShapedFrame(frame, (_only_cell(frame),)) for frame in result.frames)
-        capped = tuple(_subset_truncation(result.frames, plan))
-        return ShapedResult(frames, (), result.window, result.warnings, (), capped, result.steps, None)
+        return ShapedResult(frames, (), result.window, result.warnings, (), (), result.steps, None)
 
     truncation: list[TruncationItem] = []
     window = result.window
@@ -175,26 +174,7 @@ def _shape_grids(result: EngineResult, plan: EnginePlan) -> ShapedResult:
     frames = tuple(
         ShapedFrame(frame, _grid(frame, axis, series, plan.citations_per_datum)) for frame in result.frames
     )
-    truncation.extend(_subset_truncation(result.frames, plan))
     return ShapedResult(frames, (), window, result.warnings, (), tuple(truncation), result.steps, None)
-
-
-def _subset_truncation(frames: Sequence[Frame], plan: EnginePlan) -> list[TruncationItem]:
-    """A statistic read from a capped walk covers only the recent trials: say how many of how many."""
-    if plan.measure is None:
-        return []
-    return [
-        TruncationItem(
-            scope="trials",
-            shown=frame.subset.size,
-            total=frame.matched,
-            rule=f"The {frame.subset.size:,} most recently first-posted trials"
-            + (f" of {frame.scope.label}" if frame.scope.label else "")
-            + "; older trials are not in the statistic.",
-        )
-        for frame in frames
-        if frame.subset is not None
-    ]
 
 
 def _axis(

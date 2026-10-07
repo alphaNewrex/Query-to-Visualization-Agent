@@ -372,21 +372,11 @@ def _trials_phrase(i: _Inputs) -> str:
     return text.trials_phrase(parts, "trials measured" if i.plan.measure is not None else "trials")
 
 
-def _subset_phrase(i: _Inputs) -> str | None:
-    subset = next((f.subset for f in i.shaped.frames if f.subset is not None), None)
-    if subset is None:
-        return None
-    return text.subset_phrase(
-        subset.size, subset.first_posted_from.isoformat(), subset.first_posted_to.isoformat()
-    )
-
-
 def _subtitle(i: _Inputs, lead: str | None = None) -> str:
     return text.subtitle(
         lead,
         "; ".join(i.filters) or None,
         _trials_phrase(i),
-        _subset_phrase(i),
         data_date=_data_date(i.version),
     )
 

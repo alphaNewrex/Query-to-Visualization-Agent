@@ -170,45 +170,21 @@ def pages_of(total: int, size: int = 1000) -> Callable[[httpx2.Request], httpx2.
     return respond
 
 
-async def test_a_walk_follows_tokens_with_the_same_parameters(
-    client: CtGovClient, registry: Registry, ctx: FakeContext
-) -> None:
-    registry.respond = pages_of(2500)
-
-    result = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase", "StartDate"], limit=5000)
-
-    assert len(result.studies) == 2500
-    assert (result.total, result.is_truncated) == (2500, False)
-    assert [query_of(request).get("pageToken") for request in registry.requests] == [None, "1000", "2000"]
-    shared = query_of(registry.requests[0])
-    assert shared["pageSize"] == "1000"
-    for request in registry.requests[1:]:
-        assert {k: v for k, v in query_of(request).items() if k != "pageToken"} == shared
-    assert [call.total_count for call in ctx.requests] == [2500, None, None]
-
-
-async def test_a_walk_with_every_counted_trial_does_not_ask_for_the_empty_page(
+async def test_a_short_walk_counts_then_follows_tokens_with_the_same_parameters(
     client: CtGovClient, registry: Registry, ctx: FakeContext
 ) -> None:
     registry.respond = pages_of(2000)
 
-    result = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"], limit=5000)
+    result = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase", "StartDate"])
 
-    assert (len(result.studies), result.is_truncated) == (2000, False)
-    assert len(registry.requests) == 2  # the full last page carries a token to an empty page; not followed
-
-
-async def test_a_walk_stops_at_the_limit_and_says_it_is_truncated(
-    client: CtGovClient, registry: Registry, ctx: FakeContext
-) -> None:
-    registry.respond = pages_of(9, size=4)
-
-    result = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"], limit=4, sort="StudyFirstPostDate:desc")
-
-    assert [study.nct_id[-1] for study in result.studies] == ["1", "2", "3", "4"]
-    assert (result.total, result.is_truncated) == (9, True)
-    assert query_of(registry.requests[0])["pageSize"] == "4"
-    assert len(registry.requests) == 1
+    assert len(result.studies) == 2000 and result.total == 2000 and result.is_consistent
+    tokens = [query_of(request).get("pageToken") for request in registry.requests]
+    assert tokens == [None, None, "1000"]  # the count, then one chain of two pages
+    assert query_of(registry.requests[0])["pageSize"] == "1"
+    shared = query_of(registry.requests[1])
+    assert shared["pageSize"] == "1000"
+    assert {k: v for k, v in query_of(registry.requests[2]).items() if k != "pageToken"} == shared
+    assert [call.total_count for call in ctx.requests] == [2000, 2000, None]
 
 
 async def test_a_trial_that_shows_on_two_pages_counts_once(
@@ -216,13 +192,14 @@ async def test_a_trial_that_shows_on_two_pages_counts_once(
 ) -> None:
     pages = iter(
         [
+            httpx2.Response(200, json=studies_body([1], total=1001)),
             httpx2.Response(200, json=studies_body(range(1, 1001), total=1001, token="T1")),
             httpx2.Response(200, json=studies_body([1000, 1001])),
         ]
     )
     registry.respond = lambda request: next(pages)
 
-    result = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"], limit=5000)
+    result = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"])
 
     assert len(result.studies) == 1001
     assert len({study.nct_id for study in result.studies}) == 1001
@@ -233,12 +210,12 @@ async def test_a_repeated_walk_is_served_from_the_cache(
 ) -> None:
     registry.respond = pages_of(1500)
 
-    await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"], limit=5000)
-    again = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"], limit=5000)
+    await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"])
+    again = await client.walk(PEMBROLIZUMAB, ctx, fields=["Phase"])
 
-    assert len(registry.requests) == 2
+    assert len(registry.requests) == 3
     assert len(again.studies) == 1500
-    assert [call.is_cached for call in ctx.requests] == [False, False, True]
+    assert [call.is_cached for call in ctx.requests] == [False, False, False, True]
 
 
 # --- failures ----------------------------------------------------------------------------------------

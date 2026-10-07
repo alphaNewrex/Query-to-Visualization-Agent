@@ -49,7 +49,7 @@ MatchDefinition = Literal[
     "country_exact",
     "term_search",
 ]
-StrategyName = Literal["sorted_page", "walk", "count_fan_out", "sample_then_recount", "capped_walk", "none"]
+StrategyName = Literal["sorted_page", "walk", "count_fan_out", "sample_then_recount", "none"]
 ClarificationReason = Literal[
     "missing_entity", "unknown_value", "ambiguous_request", "could_not_interpret", "too_broad"
 ]
@@ -562,7 +562,7 @@ class Counts(Model):
 
 
 class TruncationItem(Model):
-    scope: Literal["trials", "categories", "series", "periods", "nodes", "edges", "points", "rows"]
+    scope: Literal["categories", "series", "periods", "nodes", "edges", "points", "rows"]
     shown: int
     total: int
     rule: str

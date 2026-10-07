@@ -222,7 +222,7 @@ def test_the_capabilities_tables_list_every_dimension_and_the_limits() -> None:
     keys = [cells(row)[0].strip("`") for row in tables.splitlines()[2 : 2 + len(CATALOG)]]
 
     assert keys == list(CATALOG)
-    assert "at most 5,000" in tables and "`network_graph`" in tables
+    assert "reads every matching trial" in tables and "`network_graph`" in tables
 
 
 # --- The recorded examples ------------------------------------------------------------------------------

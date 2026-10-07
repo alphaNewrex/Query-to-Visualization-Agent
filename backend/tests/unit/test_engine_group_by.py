@@ -115,17 +115,26 @@ async def test_partition_checksum_warns_and_reconciles_when_the_counts_do_not_ad
     assert frame.analyzed == 11
 
 
-async def test_the_walk_counts_trials_beyond_a_cap_as_outside_the_recent_subset() -> None:
+async def test_a_walk_reads_every_trial_and_leaves_none_outside() -> None:
     many = [study(number, posted=f"2024-01-{number:02d}") for number in range(1, 13)]
     plan = engine_plan(bound(PHASE))
-    run = ScopeRun(plan.scopes[0], 12, "capped_walk", "", ("NCTId",), 5, "StudyFirstPostDate:desc")
+    run = ScopeRun(plan.scopes[0], 12, "walk", "", ("NCTId",))
 
     frame = await walk_frame(run, plan, None, FakeClient(many), FakeContext())
 
-    assert frame.analyzed == 5 and frame.matched == 12
-    assert frame.excluded["outside_recent_subset"].count == 7
-    assert frame.subset is not None
-    assert (frame.subset.size, frame.subset.first_posted_from.isoformat()) == (5, "2024-01-08")
+    assert (frame.analyzed, frame.matched, frame.excluded) == (12, 12, {})
+    assert frame.warnings == []
+
+
+async def test_a_walk_that_reads_fewer_trials_than_counted_says_so() -> None:
+    many = [study(number) for number in range(1, 13)]
+    plan = engine_plan(bound(PHASE))
+    run = ScopeRun(plan.scopes[0], 12, "walk", "", ("NCTId",))
+
+    frame = await walk_frame(run, plan, None, FakeClient(many, miscount={"": 3}), FakeContext())
+
+    assert [note.code for note in frame.warnings] == ["walk_count_mismatch"]
+    assert frame.analyzed == frame.matched == 12  # matched is what was read: the identity still holds
 
 
 async def test_a_full_walk_composes_the_url_a_fan_out_would_have_called() -> None:

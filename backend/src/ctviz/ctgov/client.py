@@ -6,10 +6,12 @@ at the same time share one run. What the registry answers with is turned into th
 (section 4.14 of the plan), and every request is written to the log of the request it was made for.
 """
 
+import itertools
 import math
 import time
 from collections.abc import Awaitable, Callable, Iterable, Sequence
 from dataclasses import dataclass
+from datetime import date
 from typing import Final, Protocol
 
 import anyio
@@ -22,6 +24,7 @@ from ctviz.contract.response import Origin, UpstreamRequest
 from ctviz.ctgov import answers
 from ctviz.ctgov.cache import SingleFlightCache
 from ctviz.ctgov.params import Params, canonical_url
+from ctviz.ctgov.partition import PIECE, SEQUENTIAL_PAGES, Partition, as_day, partition
 from ctviz.ctgov.ratelimit import TokenBucket
 from ctviz.ctgov.study import JsonObject, Study
 from ctviz.errors import AppError
@@ -34,7 +37,10 @@ _ATTEMPTS: Final = 3
 _MAX_PAGE_SIZE: Final = 1000  # a larger `pageSize` is silently clamped by the registry
 _VERSION_TTL_S: Final = 300.0
 _PAGE_CACHE_SIZE: Final = 1024
-_WALK_CACHE_SIZE: Final = 8
+# The walk cache is bounded by the trials it holds, not by the walks: one walk can be tens of thousands.
+_WALK_CACHE_TRIALS: Final = 60_000
+# How many ranges per concurrent request a split aims at, so that a long range does not end the walk alone.
+_RANGES_PER_SLOT: Final = 3
 _THROTTLE_MEMORY_S: Final = 600.0  # how long after a 429 or 403 the registry is treated as touchy
 
 _log: FilteringBoundLogger = structlog.get_logger()
@@ -59,20 +65,19 @@ class Page:
 
 @dataclass(frozen=True)
 class WalkResult:
-    """The trials of a paged walk, each once, in the order the registry sent them."""
+    """Every trial of a paged walk, each once."""
 
     studies: tuple[Study, ...]
-    total: int  # `totalCount` of the first page
-    is_truncated: bool  # the walk stopped at its limit with trials left
+    total: int  # the registry's exact count of the search, taken before the first page was read
 
     @property
     def is_consistent(self) -> bool:
-        """Every counted trial was read, which a truncated walk is not expected to have done.
+        """Every counted trial was read, and no other.
 
         A registry refresh during the walk breaks it: pages shift, and the trials read are no longer
         the trials counted. The caller says so in the response (`walk_count_mismatch`).
         """
-        return self.is_truncated or len(self.studies) == self.total
+        return len(self.studies) == self.total
 
 
 class RequestLog(Protocol):
@@ -115,7 +120,9 @@ class CtGovClient:
             attempts=_ATTEMPTS, timeout=None, wait_initial=0.25, wait_max=4.0, wait_jitter=0.25
         )
         self._pages = SingleFlightCache[Page](_PAGE_CACHE_SIZE, settings.cache_ttl_s, clock)
-        self._walks = SingleFlightCache[WalkResult](_WALK_CACHE_SIZE, settings.cache_ttl_s, clock)
+        self._walks = SingleFlightCache[WalkResult](
+            _WALK_CACHE_TRIALS, settings.cache_ttl_s, clock, getsizeof=lambda walk: max(1, len(walk.studies))
+        )
         self._version: ApiVersion | None = None
         self._version_expires = 0.0
         self._version_lock = anyio.Lock()
@@ -169,21 +176,20 @@ class CtGovClient:
         """One page in a date or numeric order, such as `EnrollmentCount:desc`."""
         return await self._logged_page(params, ctx, fields, page_size, sort, "execution", keeps_studies=True)
 
-    async def walk(
-        self, params: Params, ctx: RequestLog, *, fields: Sequence[str], limit: int, sort: str | None = None
-    ) -> WalkResult:
-        """Every matching trial up to `limit`, read page by page.
+    async def walk(self, params: Params, ctx: RequestLog, *, fields: Sequence[str]) -> WalkResult:
+        """Every matching trial, read page by page.
 
-        Every page is requested with the parameters of the first and the token of the page before it:
-        the registry answers a token used with other parameters with HTTP 200 and the wrong data.
+        A search of more than a few pages is split into disjoint ranges of first-posted date, and the
+        ranges are walked at the same time, each with the token chain of its own. Every page is requested
+        with the parameters of the first and the token of the page before it: the registry answers a token
+        used with other parameters with HTTP 200 and the wrong data.
         """
-        if limit < 1:
-            raise ValueError("A walk reads at least one trial.")
-        page_size = min(limit, _MAX_PAGE_SIZE)
-        first_url = self._url(params, fields, page_size, sort)
-        key = ((await self.version()).data_timestamp, first_url, limit)
+        first_url = self._url(params, fields, _MAX_PAGE_SIZE, None)
+        key = ((await self.version()).data_timestamp, first_url)
         result, is_shared = await self._walks.get(
-            key, lambda: self._read_pages(params, ctx, fields, page_size, limit, sort)
+            key,
+            lambda: self._read_all(params, ctx, fields),
+            keep=lambda walk: len(walk.studies) <= _WALK_CACHE_TRIALS,
         )
         if is_shared:
             entry = _issue(ctx, first_url, "execution")
@@ -243,22 +249,79 @@ class CtGovClient:
         body = await self._get_json(url)
         return Page(total=answers.total_count(body), studies=answers.studies(body), url=url)
 
-    async def _read_pages(
-        self,
-        params: Params,
-        ctx: RequestLog,
-        fields: Sequence[str],
-        page_size: int,
-        limit: int,
-        sort: str | None,
-    ) -> WalkResult:
+    async def _read_all(self, params: Params, ctx: RequestLog, fields: Sequence[str]) -> WalkResult:
+        started = self._clock()
+        total = await self.count(params, ctx, origin="execution")
+        ranges = await self._ranges(params, total, ctx)
+        chains: list[dict[str, Study]] = [{} for _ in ranges]
+
+        async def read(position: int, part: Partition) -> None:
+            chains[position] = await self._read_chain(part.params, ctx, fields)
+
+        try:
+            async with anyio.create_task_group() as group:
+                for position, part in enumerate(ranges):
+                    group.start_soon(read, position, part)
+        except ExceptionGroup as failures:
+            raise _first_failure(failures) from failures
         # Keyed by NCT ID: a data refresh during a walk can show a trial on two pages, and it counts once.
+        trials: dict[str, Study] = {}
+        for chain in chains:
+            for nct_id, study in chain.items():
+                trials.setdefault(nct_id, study)
+        _log.info(
+            "walk_finished",
+            total=total,
+            read=len(trials),
+            ranges=len(ranges),
+            seconds=round(self._clock() - started, 2),
+        )
+        return WalkResult(studies=tuple(trials.values()), total=total)
+
+    async def _ranges(self, params: Params, total: int, ctx: RequestLog) -> list[Partition]:
+        """The searches to walk: the whole search when it is short, otherwise disjoint date ranges."""
+        whole = [Partition(params, total)]
+        if total <= SEQUENTIAL_PAGES * _MAX_PAGE_SIZE:
+            return whole
+        # The oldest and the newest first-posted trial, which bound the days that are worth cutting.
+        oldest, newest = await self._ends(params, ctx)
+        if oldest is None or newest is None:
+            return whole
+        slots = max(1, self._concurrency) * _RANGES_PER_SLOT
+        pages_per_range = max(1, math.ceil(total / slots / _MAX_PAGE_SIZE))
+
+        async def count(narrowed: Params) -> int:
+            return await self.count(narrowed, ctx, origin="execution")
+
+        return await partition(
+            params, total, oldest, newest, leaf_max=pages_per_range * _MAX_PAGE_SIZE, count=count
+        )
+
+    async def _ends(self, params: Params, ctx: RequestLog) -> tuple[date | None, date | None]:
+        ends: dict[str, date | None] = {}
+
+        async def one(order: str) -> None:
+            page = await self._logged_page(
+                params, ctx, (PIECE,), 1, f"{PIECE}:{order}", "execution", keeps_studies=False
+            )
+            posted = page.studies[0].first_post_date if page.studies else None
+            ends[order] = None if posted is None else as_day(posted.date)
+
+        try:
+            async with anyio.create_task_group() as group:
+                group.start_soon(one, "asc")
+                group.start_soon(one, "desc")
+        except ExceptionGroup as failures:
+            raise _first_failure(failures) from failures
+        return ends["asc"], ends["desc"]
+
+    async def _read_chain(self, params: Params, ctx: RequestLog, fields: Sequence[str]) -> dict[str, Study]:
+        """The trials of one search, by NCT ID, read as one chain of pages."""
         trials: dict[str, Study] = {}
         total = 0
         token: str | None = None
-        # One page more than the limit needs, for a full last page whose token leads to an empty one.
-        for page_number in range(math.ceil(limit / page_size) + 1):
-            entry = _issue(ctx, self._url(params, fields, page_size, sort, token), "execution")
+        for page_number in itertools.count():
+            entry = _issue(ctx, self._url(params, fields, _MAX_PAGE_SIZE, None, token), "execution")
             started = self._clock()
             body = await self._get_json(entry.url)
             page = answers.studies(body)
@@ -270,10 +333,9 @@ class CtGovClient:
                 trials.setdefault(study.nct_id, study)
             token = answers.next_token(body)
             # Every counted trial is read: a full last page's token would only lead to an empty page.
-            if token is None or not page or len(trials) >= min(limit, total):
+            if token is None or not page or len(trials) >= total:
                 break
-        kept = tuple(trials.values())[:limit]
-        return WalkResult(studies=kept, total=total, is_truncated=len(kept) >= limit and total > len(kept))
+        return trials
 
     def _complete(
         self,
@@ -346,6 +408,12 @@ class CtGovClient:
             self._throttled_until = None
             self._concurrency = self._max_concurrency
             self._slots.total_tokens = self._concurrency
+
+
+def _first_failure(failures: ExceptionGroup[Exception]) -> Exception:
+    """The first plain exception inside a group, so a registry error keeps its type and its HTTP status."""
+    first = failures.exceptions[0]
+    return _first_failure(first) if isinstance(first, ExceptionGroup) else first
 
 
 def _issue(ctx: RequestLog, url: str, origin: Origin) -> UpstreamRequest:

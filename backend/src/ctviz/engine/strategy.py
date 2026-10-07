@@ -2,20 +2,25 @@
 
 The rows of the table in section 4.9 are applied in order, and the first that matches wins. Every scope of
 one question is fetched the same way, so that compared groups are counted alike. Sample-then-recount (a
-walk for candidates, then exact counts of the leaders) is not implemented: a plan that would use it takes
-the capped walk instead, which says plainly that it read a recent subset.
+walk for candidates, then exact counts of the leaders) is not implemented.
+
+A walk reads every trial of a scope; there is no cap on the number. What bounds it is time: a walk whose
+estimated duration does not fit what is left of the request's deadline is not started. Nothing is read from
+a recent subset in its place. The question is answered by exact counts when the groups are countable, and
+otherwise with a `too_broad` clarification that states how many trials match.
 """
 
 import dataclasses
-from collections.abc import Mapping
+import math
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Final
 
 from ctviz.catalog.fields import Window
 from ctviz.contract.response import Clarification, Note, Outcome, StrategyName
-from ctviz.ctgov import essie
 from ctviz.ctgov.essie import Expr
 from ctviz.ctgov.params import Scope
+from ctviz.ctgov.partition import SEQUENTIAL_PAGES
 from ctviz.engine import windows
 from ctviz.engine.evidence import SORT_PIECES, projection
 from ctviz.engine.fanout import fan_out_bill
@@ -24,22 +29,32 @@ from ctviz.settings import Settings
 
 MAX_WALK_PERIODS: Final = 60
 MIN_FAN_OUT_PERIODS: Final = 5
-_NEWEST_FIRST: Final = "StudyFirstPostDate:desc"
-# A drug and drug network reads only trials that list at least two interventions when it is capped.
-_AT_LEAST_TWO_INTERVENTIONS: Final = essie.range_("Intervention:size", 2, None)
+# A split walk makes about one count request for every page it reads, on top of the pages.
+_COUNTS_PER_PAGE: Final = 1.0
 
 
 @dataclass(frozen=True)
 class Limits:
-    """The caps of section 4.9."""
+    """The limits of section 4.9: the sizes of a request and of a fan-out, and the time a walk may take."""
 
     one_page_max: int
-    walk_cap: int
     max_fanout_requests: int
+    walk_pages_per_s: float = 5.0  # registry requests a walk makes per second, measured with split walks
+    walk_budget_s: float = math.inf  # seconds left for reading trials; unbounded when there is no deadline
 
     @classmethod
-    def from_settings(cls, settings: Settings) -> "Limits":
-        return cls(settings.one_page_max, settings.walk_cap, settings.max_fanout_requests)
+    def from_settings(cls, settings: Settings, walk_budget_s: float = math.inf) -> "Limits":
+        return cls(
+            settings.one_page_max, settings.max_fanout_requests, settings.walk_pages_per_s, walk_budget_s
+        )
+
+    def walk_seconds(self, scopes: Iterable[int]) -> float:
+        """How long reading scopes of these sizes takes: every page, and the counts that split a long walk."""
+        requests = 0.0
+        for trials in scopes:
+            pages = math.ceil(trials / self.one_page_max)
+            requests += pages * (1 + (_COUNTS_PER_PAGE if pages > SEQUENTIAL_PAGES else 0))
+        return requests / self.walk_pages_per_s
 
 
 @dataclass(frozen=True)
@@ -51,7 +66,7 @@ class ScopeRun:
     strategy: StrategyName
     reason: str  # said in `meta.interpretation.strategy`
     fields: tuple[str, ...] = ()  # the projection of a walk or a sorted page
-    limit: int = 0  # trials a walk reads, rows a sorted page returns
+    limit: int = 0  # rows a sorted page returns
     sort: str | None = None
     # The scope with the presence push-down added, for a walk over a field that not every trial has.
     walk_scope: Scope | None = None
@@ -79,7 +94,8 @@ def choose_strategy(
     if not any(matched[scope.id] for scope in plan.scopes):
         return Outcome(kind="no_data", reason="no_trials_matched", message="No trials match this question.")
     window, warnings = _window(plan.window)
-    choice = _choose(plan, max(matched[scope.id] for scope in plan.scopes), window, limits, prefer_walk)
+    counts = [matched[scope.id] for scope in plan.scopes]
+    choice = _choose(plan, counts, window, limits, prefer_walk)
     if isinstance(choice, Outcome):
         return choice
     if choice.window != window and choice.window is not None:
@@ -101,8 +117,9 @@ def choose_strategy(
 
 
 def _choose(
-    plan: EnginePlan, biggest: int, window: Window | None, limits: Limits, prefer_walk: bool
+    plan: EnginePlan, counts: Sequence[int], window: Window | None, limits: Limits, prefer_walk: bool
 ) -> _Choice | Outcome:
+    biggest = max(counts)
     if isinstance(plan.rows, ListRows):
         return _Choice("sorted_page", "A list of trials is one page in the requested order.", plan.top_n)
     if not plan.dimensions and plan.rows is None and plan.measure is None:
@@ -116,42 +133,54 @@ def _choose(
         f"{biggest:,} trials is more than one page; the registry counted each group with {bill} requests.",
         window=window,
     )
-    walk = _Choice("walk", f"All {biggest:,} trials were read and grouped here.", limits.walk_cap)
+    walk = _Choice("walk", f"All {biggest:,} trials were read and grouped here.", window=window)
     if biggest <= limits.one_page_max:
-        return dataclasses.replace(walk, limit=limits.one_page_max, window=window)
+        return walk
     if fits and not prefer_walk:
         return fan_out
-    if biggest <= limits.walk_cap:
-        return dataclasses.replace(walk, window=window)
+    seconds = limits.walk_seconds(counts)
+    if seconds <= limits.walk_budget_s:
+        return walk
     if fits:
         return fan_out
     if plan.dimensions and plan.dimensions[0].spec.kind == "date":
-        return _shortened(plan, biggest, window, limits)
-    return _Choice(
-        "capped_walk",
-        f"More than {limits.walk_cap:,} trials match, so the {limits.walk_cap:,} most recently "
-        "first-posted were read.",
-        limits.walk_cap,
-        window,
+        return _shortened(plan, counts, seconds, window, limits)
+    return _too_broad(counts, seconds, limits)
+
+
+def _too_broad(counts: Sequence[int], seconds: float, limits: Limits) -> Outcome:
+    """A scope too large to read in the time left: say how large, and what would make it smaller."""
+    size = f"{max(counts):,} trials match" + (" the largest group" if len(counts) > 1 else "")
+    spent = f"reading all {sum(counts):,} would take about {math.ceil(seconds)} s"
+    left = (
+        ""
+        if math.isinf(limits.walk_budget_s)
+        else f", and about {max(0, int(limits.walk_budget_s))} s are left"
+    )
+    return Outcome(
+        kind="clarification",
+        reason="too_broad",
+        message=f"{size}, and {spent}{left}. Nothing was read, because a partial read would not be "
+        "a true answer. Narrow the question to a drug, a condition, a sponsor, a country or a date range, "
+        "or group by a closed list such as phase or status, which is counted exactly at any size.",
+        clarification=Clarification(reason="too_broad", missing_fields=[], options=[]),
     )
 
 
-def _shortened(plan: EnginePlan, biggest: int, window: Window | None, limits: Limits) -> _Choice | Outcome:
-    """Row 7: a time axis cannot come from a recent subset, so count the latest periods that fit the bill."""
+def _shortened(
+    plan: EnginePlan, counts: Sequence[int], seconds: float, window: Window | None, limits: Limits
+) -> _Choice | Outcome:
+    """A time axis cannot come from a part of the trials, so count the latest periods that fit the bill."""
     if window is not None and plan.rows is None and plan.relation != "network":
         for count in range(windows.length(window), MIN_FAN_OUT_PERIODS - 1, -1):
             candidate = windows.latest(window, count)
             bill = fan_out_bill(plan, candidate)
             if bill is not None and bill <= limits.max_fanout_requests:
-                reason = f"{biggest:,} trials is too many to read; the latest {count} periods were counted."
+                reason = (
+                    f"{max(counts):,} trials is too many to read; the latest {count} periods were counted."
+                )
                 return _Choice("count_fan_out", reason, window=candidate)
-    return Outcome(
-        kind="clarification",
-        reason="too_broad",
-        message=f"{biggest:,} trials match, too many to show by period. "
-        "Narrow the question to a drug, a condition, a sponsor or a country.",
-        clarification=Clarification(reason="too_broad", missing_fields=[], options=[]),
-    )
+    return _too_broad(counts, seconds, limits)
 
 
 def _window(window: Window | None) -> tuple[Window | None, list[Note]]:
@@ -185,8 +214,7 @@ def _run(plan: EnginePlan, scope: Scope, matched: int, choice: _Choice, limits: 
         )
     if choice.strategy == "count_fan_out":
         return ScopeRun(scope, matched, choice.strategy, choice.reason)
-    is_capped = choice.strategy == "capped_walk"
-    exprs = _presence(plan, is_capped) if is_capped or matched > limits.one_page_max else ()
+    exprs = _presence(plan) if matched > limits.one_page_max else ()
     return ScopeRun(
         scope,
         matched,
@@ -194,15 +222,11 @@ def _run(plan: EnginePlan, scope: Scope, matched: int, choice: _Choice, limits: 
         choice.reason,
         projection(plan, scope),
         choice.limit,
-        _NEWEST_FIRST if is_capped else None,
         walk_scope=dataclasses.replace(scope, extra=(*scope.extra, *exprs)) if exprs else None,
     )
 
 
-def _presence(plan: EnginePlan, is_capped: bool) -> tuple[Expr, ...]:
+def _presence(plan: EnginePlan) -> tuple[Expr, ...]:
     """Restrict a large walk to the trials that have the fields it groups by."""
     exprs = [dimension.spec.presence for dimension in plan.dimensions if dimension.spec.presence is not None]
-    keys = {dimension.spec.key for dimension in plan.dimensions}
-    if is_capped and plan.relation == "network" and keys == {"drug"}:
-        exprs.append(_AT_LEAST_TWO_INTERVENTIONS)
     return tuple(dict.fromkeys(exprs))

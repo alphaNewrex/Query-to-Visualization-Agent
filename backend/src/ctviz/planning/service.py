@@ -79,6 +79,15 @@ class _Attempt:
     is_checked: bool  # the plan passed its checks, as written or after the repair turn
 
 
+def _is_worth_keeping(attempt: _Attempt) -> bool:
+    """A checked plan that answers the question is remembered; a refusal or a clarification is asked again.
+
+    Declining is the model's least repeatable choice, so caching it would turn one unlucky reading into
+    the answer for the rest of the day.
+    """
+    return attempt.is_checked and attempt.planned.plan.analysis.kind not in ("unsupported", "clarify")
+
+
 @dataclass(frozen=True)
 class _Draft:
     """One plan from one model."""
@@ -161,7 +170,7 @@ class PlanService:
         attempt, is_shared = await self._plans.get(
             self._key(request, today),
             lambda: self._from_model(request, today),
-            keep=lambda fresh: fresh.is_checked,
+            keep=_is_worth_keeping,
         )
         # The key holds the question and every field, so the plan fits any request that differs from the
         # first only in its options, which neither the model nor the checks read.

@@ -81,7 +81,7 @@ def ctx() -> FakeContext:
 @pytest.fixture
 def settings() -> Settings:
     # A burst larger than any test needs keeps the rate gate out of the way, except where a test is about it.
-    return Settings(ctgov_base_url=BASE, ctgov_burst=1000, ctgov_rate_per_s=1000.0)
+    return Settings(ctgov_base_url=BASE, ctgov_burst=1000, ctgov_rate_per_s=1000.0, ctgov_concurrency=4)
 
 
 @pytest.fixture

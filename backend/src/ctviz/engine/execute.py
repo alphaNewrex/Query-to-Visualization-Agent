@@ -48,18 +48,7 @@ async def execute_plan(
         for run, counter in zip(xp.runs, counters, strict=True)
     )
     found = [note for output in outputs for note in output.warnings]
-    subsets = [
-        output.subset for output in outputs if output.strategy == "capped_walk" and output.subset is not None
-    ]
-    recent = [
-        Note(
-            code="recent_subset",
-            message=f"Only the {subset.size:,} most recently first-posted trials were read "
-            f"(first posted {subset.first_posted_from.isoformat()} to {subset.first_posted_to.isoformat()}).",
-        )
-        for subset in subsets
-    ]
-    return EngineResult(frames, rows, xp.window, _unique([*xp.warnings, *found, *recent]), steps)
+    return EngineResult(frames, rows, xp.window, _unique([*xp.warnings, *found]), steps)
 
 
 def _runner(
@@ -95,7 +84,6 @@ async def _rows(run: ScopeRun, plan: EnginePlan, client: Registry, ctx: RequestL
         read = await read_scope(run, plan, client, ctx)
         result = trial_rows(read.studies, plan, run.scope)
         result.matched = read.matched
-        result.subset = read.subset
         result.warnings.extend(read.warnings)
         for reason, message, count in read.unread:
             result.exclude(reason, message, count)

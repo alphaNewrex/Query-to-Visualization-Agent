@@ -208,11 +208,6 @@ def build_meta(
     if shaped is not None:
         warnings.extend(shaped.warnings)
         warnings.extend(note for frame in shaped.frames for note in frame.warnings)
-        subset = next((f.subset for f in shaped.frames if f.subset is not None), None)
-        if subset is not None:
-            matched = max(frame.matched for frame in shaped.frames)
-            warnings.append(text.recent_subset(subset.size, matched))
-            assumptions.append(text.subset_assumption(subset.size))
     if plan is not None and version is not None and choice is not None:
         partial = _partial_period(plan, choice, version)
         if partial is not None:
@@ -271,18 +266,10 @@ def _counts(shaped: ShapedResult, built: Built | None) -> tuple[Counts, list[Not
 
 
 def _exclusions(frame: Frame) -> list[ExclusionCount]:
-    items = [
+    return [
         ExclusionCount(reason=reason, count=item.count, message=item.message)
         for reason, item in frame.excluded.items()
     ]
-    outside = frame.matched - frame.seen
-    if frame.strategy == "capped_walk" and outside > 0 and text.OUTSIDE_SUBSET_REASON not in frame.excluded:
-        items.append(
-            ExclusionCount(
-                reason=text.OUTSIDE_SUBSET_REASON, count=outside, message=text.OUTSIDE_SUBSET_MESSAGE
-            )
-        )
-    return items
 
 
 def _interpretation(context: MetaContext, plan: EnginePlan, choice: ChartChoice | None) -> Interpretation:

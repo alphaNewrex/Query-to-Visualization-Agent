@@ -3888,7 +3888,6 @@
             "walk",
             "count_fan_out",
             "sample_then_recount",
-            "capped_walk",
             "none"
           ],
           "type": "string"
@@ -4316,7 +4315,6 @@
       "properties": {
         "scope": {
           "enum": [
-            "trials",
             "categories",
             "series",
             "periods",

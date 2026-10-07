@@ -18,7 +18,7 @@ Terms used throughout: a **trial** is one ClinicalTrials.gov study record. A **s
 | Role of the model | One strict structured-output call writes a small typed query plan; code does everything after that | The model never writes a number, a row, an NCT ID, a title or an API parameter |
 | Shape of the plan | A tagged union of seven analysis shapes (`aggregate`, `total`, `relate`, `network`, `trial_list`, `clarify`, `unsupported`) with a list of entities and enum filters | It is the shape closest to the one measured live (7 of 7 correct plans at about 1.3 s) |
 | Engine | One field catalogue and one group-by function behind every aggregated chart, both network questions included | One mechanism for many question classes; a 214-line prototype of the function reproduced the reference numbers for all nine appendix queries |
-| Data access | Exact per-bucket count calls for enumerable dimensions; a paged walk up to 5,000 trials otherwise; never a recent-only sample under a time axis | Both primitives are exact and agree with each other; the registry has no group-by |
+| Data access | Exact per-bucket count calls for enumerable dimensions; a paged walk of every matching trial otherwise (split into date ranges read at once; refused as `too_broad` when it cannot finish inside the request deadline); never a recent-only sample | Both primitives are exact and agree with each other; the registry has no group-by |
 | Entities | The model copies the user's words; the registry resolves them; code checks every entity with counts and reports what it found | The registry already resolves brand and code names; a five-trial result for a misspelling is flagged instead of drawn silently |
 | Tools for the model | None in the first version. Typed registry operations are run by code. A model-callable `resolve_entity` tool is a stretch item with a pre-declared adoption rule | The appendix queries need no tool turn; the multi-turn loop has not been run live |
 | Response contract | A custom v1 envelope in the assignment's own shape: seven visualization types, tidy rows, explicit domains, `is_exclusive` on category channels | A renderer needs no guessing; Vega-Lite cannot lay out a network and its schema is 47 times larger |
@@ -80,7 +80,7 @@ With no key, the demo opens on a gallery of recorded runs (chart, data rows, cit
    4 RESOLVE    resolve_entities(): exact counts per entity and per reading;
                 scopes; one count probe per scope                                   200 no_data | clarification
    5 STRATEGY   choose_strategy(): sorted_page | walk | count_fan_out |
-                sample_then_recount | capped_walk                                   200 clarification (too broad)
+                sample_then_recount                                               200 clarification (too broad)
    6 EXECUTE    CtGovClient (pooled, rate-limited, retried, cached by data
                 timestamp) ─▶ aggregate() or trial_rows() ─▶ Frame                  502 / 503 / 504 upstream_*
    7 SHAPE      time window, top-N, order, zero-fill, shares, network pruning
@@ -132,7 +132,7 @@ The assignment's rubric asks for "sensible planning and reasoning steps, along w
 | Model calls per request | 1 on the normal path; at most 3 (for example first attempt, one fallback after a failure, one repair) |
 | Planner call | 20 s timeout, SDK `max_retries=0` (the failure policy of 4.5 is the only retry), `max_output_tokens=1500` |
 | Upstream requests in a count fan-out | at most 60 |
-| Trials walked per scope | at most 5,000 (five pages) |
+| Trials walked per scope | all of them; bounded by the request deadline, not by a count |
 | Request deadline | 45 s, then 504 `deadline_exceeded` |
 
 Measured inputs: one plan call takes about 1.3 s (median on a 1,330-token prompt; outliers of 4 to 8 s were seen); a count call takes 0.05 to 0.1 s on a kept-alive connection (0.17 s with a new connection per call), whatever the result size; a page of up to 1,000 studies takes 0.5 to 1.0 s whatever the projection. Expected end-to-end times are arithmetic from those figures, not measurements: with the starting limiter (burst 10, refill 5 per second) a fan-out of n requests needs at least (n − 10) / 5 seconds, so 18 requests take about 2 s, 32 about 5 s and 60 about 10 s; a one-page walk takes about 1 s and a five-page walk about 5 s. If the hour-one burst test is clean the limiter is raised and fan-out times roughly halve (section 4.9).
@@ -1048,23 +1048,23 @@ A count per bucket through `filter.advanced` equals client-side aggregation of a
 | 3 | `trial_list` | `sorted_page` | 1 per scope | exact; truncation item "N of M" |
 | 4 | Every scope has at most 1,000 trials | `walk`, one page per scope | 1 per scope | exact |
 | 5 | Every dimension has a closed bucket list with a server expression per bucket (closed categories, dates, enrollment bins), and the request bill is at most `max_fanout_requests` | `count_fan_out` | buckets times series or scopes, plus exclusion counts | exact at any size |
-| 6 | Every scope has at most `walk_cap` trials | `walk` | up to 5 per scope | exact |
-| 7 | Above the cap, with a date axis | `count_fan_out` with the window shortened to the most recent periods that fit the bill | at most 60 | warning `window_clamped` and a follow-up with a narrower scope. If fewer than five periods fit: `clarification`, reason `too_broad`, with ready-made narrower requests |
-| 8 | Above the cap, one scope, and a single open dimension whose values can be counted exactly (`country`) | `sample_then_recount`: walk the newest 5,000 for candidates, then re-count the top N + 5 exactly with `AREA[LocationCountry]"name"` | 5 + N + 5 | counts are exact; the warning `ranked_from_sample` says where the candidates came from |
-| 9 | Anything else above the cap: networks, open vocabularies, scatter plots | `capped_walk`: the 5,000 most recently first-posted trials | 5 | exact for that stated subset: named in the subtitle with its first-posted date range, a truncation item, a `trials_excluded` item with reason `outside_recent_subset` for the trials not read, the warning `recent_subset` |
+| 6 | Every scope can be read inside the time left of the deadline (pages and counts at `walk_pages_per_s`) | `walk`: every trial, split into disjoint first-posted date ranges read at once | one count and page per range | exact; the trials read must equal `totalCount`, else `walk_count_mismatch` |
+| 7 | Too large to read in time, with a date axis | `count_fan_out` with the window shortened to the most recent periods that fit the bill | at most 60 | warning `window_clamped` and a follow-up with a narrower scope. If fewer than five periods fit: `clarification`, reason `too_broad`, with ready-made narrower requests |
+| 8 | (not built) Too large to read, one scope, and a single open dimension whose values can be counted exactly (`country`) | `sample_then_recount`: walk the newest 5,000 for candidates, then re-count the top N + 5 exactly with `AREA[LocationCountry]"name"` | 5 + N + 5 | counts are exact; the warning `ranked_from_sample` says where the candidates came from |
+| 9 | Anything else too large to read in time: networks, open vocabularies, scatter plots, statistics | none: `clarification`, reason `too_broad`, stating the number of trials and the estimated time | 0 | nothing is read from a recent subset; there is no `capped_walk` |
 
 Reasons for the order:
 
 - **One page first.** A full page costs about as much as five or six count calls and yields exclusive buckets, exclusions and rich citations for every dimension at once. A small scope is therefore walked.
 - **Fan-out above one page.** Beyond one page, fan-out is faster and lighter and each bar's `source_url` is the request that produced it: 12 year buckets against 3 pages for pembrolizumab; 9 phase buckets against 15 pages and 26 MB for lung cancer.
-- **A time axis never comes from a recent-only subset.** The newest 1,000 lung-cancer registrations span only December 2025 to October 2026, so a trend drawn from the newest 5,000 would misstate history. Row 7 shortens the window or asks instead.
-- **The capped walk is sorted.** The registry's default order is stable but arbitrary. Sorted by first-posted date, the subset is one a sentence can describe. A 1,000-study page with `sort=StudyFirstPostDate:desc` took 0.67 s and was monotonically descending, so sorting costs nothing extra.
+- **A time axis never comes from a recent-only subset** (and since the walk cap was removed no answer does). The newest 1,000 lung-cancer registrations span only December 2025 to October 2026, so a trend drawn from the newest 5,000 would misstate history. Row 7 shortens the window or asks instead.
+- **(Historical: the capped walk was sorted; it no longer exists.)** The registry's default order is stable but arbitrary. Sorted by first-posted date, the subset is one a sentence can describe. A 1,000-study page with `sort=StudyFirstPostDate:desc` took 0.67 s and was monotonically descending, so sorting costs nothing extra.
 
 **The request bill of a fan-out** is `scopes × (x buckets × series buckets + extras)`. Extras are at most 4 for a date axis (before the window, after the window, no date, estimated dates): each of the first three is skipped when the scope's own date range on that field already rules it out, and the last two for `first_posted_date`, which is never missing and whose catalogue entry projects no date type. They are 1 for a dimension that has no missing bucket but can lack a value (`intervention_type`, `age_group`, `enrollment`), and 0 otherwise. For a date axis the largest window is `(max_fanout_requests − 4 × scopes) // (scopes × series buckets)` periods: 56 for one series, 26 per group for two compared groups, 11 for four, and 6 years when split by the nine phase buckets. A single-valued closed series dimension contributes only the values the scope's own filter allows.
 
 **Presence push-down.** When a dimension declares a `presence` expression, a walk is restricted to trials that have the field, and one extra count gives the number left out, which is reported as an exclusion. For `drug`: `AREA[InterventionType](DRUG OR BIOLOGICAL OR GENETIC OR COMBINATION_PRODUCT)` (measured: 281 of the 499 Duchenne trials; 240,770 registry-wide). For a drug and drug network that has to use the capped walk (row 9), additionally `AREA[Intervention:size]RANGE[2,MAX]`, and the subset is described as trials that list at least two interventions (measured: 175 of the 499 Duchenne trials have at least two interventions; 127 pass both clauses). A full walk never uses this clause: one intervention row can name a combination (`Pembrolizumab+Lenvatinib` in NCT05389527), which the normaliser splits into drugs that share its arm labels. Measured on the pembrolizumab scope: the clause removes 523 of the 2,877 trials that pass the type clause, 75 of them carrying same-arm links, and leaves 6,007 links among 1,738 drugs with pembrolizumab in 86% of the analysed trials, against the 6,036, 1,889 and 81% of the full walk. For `country`: `NOT AREA[LocationCountry]MISSING`.
 
-**The unscoped network question.** "Which drugs frequently co-occur in combination studies?" names no scope. Registry-wide, 156,071 trials have a drug-type intervention and at least two interventions, so row 9 applies. The 5,000 most recently first-posted of them reach back about six months (measured: 5,485 were first posted since 2026-04-01 and 2,837 since 2026-07-01). The graph is still meaningful (a check on the 3,000 newest drug trials gave 38 same-arm links among 19 drugs at a minimum weight of 2, led by capecitabine with oxaliplatin, 13, and cisplatin with gemcitabine, 11), but it describes recent registrations, not the registry. The subtitle, the assumptions and the warning say exactly that, with the date range, and follow-ups offer a condition, drug or sponsor scope, under which the graph is usually exact.
+(Superseded by the removal of the walk cap: this question now reads all 156,071 trials if they fit the deadline, else answers `too_broad`.) **The unscoped network question.** "Which drugs frequently co-occur in combination studies?" names no scope. Registry-wide, 156,071 trials have a drug-type intervention and at least two interventions, so row 9 applies. The 5,000 most recently first-posted of them reach back about six months (measured: 5,485 were first posted since 2026-04-01 and 2,837 since 2026-07-01). The graph is still meaningful (a check on the 3,000 newest drug trials gave 38 same-arm links among 19 drugs at a minimum weight of 2, led by capecitabine with oxaliplatin, 13, and cisplatin with gemcitabine, 11), but it describes recent registrations, not the registry. The subtitle, the assumptions and the warning say exactly that, with the date range, and follow-ups offer a condition, drug or sponsor scope, under which the graph is usually exact.
 
 #### Walk and fan-out details
 
@@ -1074,12 +1074,12 @@ Reasons for the order:
 
 #### Limits and client behaviour (all reported by `GET /v1/capabilities`)
 
-`one_page_max`, `walk_cap`, `max_fanout_requests`, the concurrency and rate values and the planner and request timeouts are `Settings` fields (4.15); the other rows are constants.
+`one_page_max`, `walk_pages_per_s`, `max_fanout_requests`, the concurrency and rate values and the planner and request timeouts are `Settings` fields (4.15); the other rows are constants.
 
 | Setting | Default | Basis |
 | --- | --- | --- |
 | `one_page_max` | 1,000 trials | One request; about five to six counts' worth of time |
-| `walk_cap` | 5,000 trials per scope | Five pages, about 4 to 5 s |
+| `walk_pages_per_s` | 5 requests a second | Measured: 9.5 pages a second at 6 concurrent, 6.5 at 4, 2.9 at 2; the estimate is deliberately lower |
 | `max_fanout_requests` | 60 | About 10 s at the starting limiter; less after a clean burst test |
 | Default time window | The 25 most recent periods ending with the period that contains the data timestamp; leading empty periods trimmed; an explicit range is honoured up to 60 periods in a walk | Lung cancer start years run from 1971 with single-digit early years |
 | `top_n` | 15, at most 50 | 77 countries in the recruiting lung-cancer set; 15 is readable |
@@ -1299,7 +1299,7 @@ class Settings(BaseSettings):
     planner_timeout_s: float = 20.0
     ctgov_base_url: str = "https://clinicaltrials.gov/api/v2"
     ctgov_concurrency: int = 4;  ctgov_burst: int = 10;  ctgov_rate_per_s: float = 5.0
-    one_page_max: int = 1000;  walk_cap: int = 5000;  max_fanout_requests: int = 60
+    one_page_max: int = 1000;  walk_pages_per_s: float = 5.0;  max_fanout_requests: int = 60
     low_match_threshold: int = 10
     request_deadline_s: float = 45.0;  cache_ttl_s: int = 900
     plan_cache_size: int = 512;  response_cache_size: int = 256
@@ -1655,7 +1655,7 @@ interface Interpretation {
   adjustments: { code: string; path: string; message: string
                  action: "dropped" | "replaced" | "clamped" | "defaulted" | "repaired" | "kept" }[]
   strategy: { series: string | null
-              name: "sorted_page" | "walk" | "count_fan_out" | "sample_then_recount" | "capped_walk" | "none"
+              name: "sorted_page" | "walk" | "count_fan_out" | "sample_then_recount" | "none"
               reason: string; upstream_requests: number }[]
   chart_rationale: string                       // the rule of 4.12 that fired
 }
@@ -1696,7 +1696,7 @@ interface TraceStep { index: number
                       detail: { [key: string]: unknown } }          // arguments and results; not part of the stable interface
 ```
 
-Per series, `trials_matched = trials_analyzed + Σ trials_excluded.count` always holds, and three cases need a rule to keep it true. Under `capped_walk`, the trials that were not read are one `trials_excluded` item with reason `outside_recent_subset`, beside the truncation item. For per-trial rows (a trial list or a scatter plot), rows or points left out by a display cap are a truncation item and never an exclusion: `trials_analyzed` counts every trial that was ranked or had both values, which for a trial list is the `totalCount` of the sorted request. When a fan-out checksum or a walk count does not reconcile, `trials_matched` is set to the number actually counted, and the warning (`counts_not_reconciled` or `walk_count_mismatch`) states the probe count and the difference, so the response goes out with its warning instead of failing invariant 12 or 17. `meta.debug.trace[].detail` is documented as outside the stability promise: a change to a step's detail is not a contract change.
+(Superseded: `capped_walk` was removed with the walk cap; a walk reads every trial, and a scope too large to read in time is a `too_broad` clarification.) Per series, `trials_matched = trials_analyzed + Σ trials_excluded.count` always holds, and three cases need a rule to keep it true. Under `capped_walk`, the trials that were not read are one `trials_excluded` item with reason `outside_recent_subset`, beside the truncation item. For per-trial rows (a trial list or a scatter plot), rows or points left out by a display cap are a truncation item and never an exclusion: `trials_analyzed` counts every trial that was ranked or had both values, which for a trial list is the `totalCount` of the sorted request. When a fan-out checksum or a walk count does not reconcile, `trials_matched` is set to the number actually counted, and the warning (`counts_not_reconciled` or `walk_count_mismatch`) states the probe count and the difference, so the response goes out with its warning instead of failing invariant 12 or 17. `meta.debug.trace[].detail` is documented as outside the stability promise: a change to a step's detail is not a contract change.
 
 Stable warning codes: `partial_period`, `estimated_dates`, `window_clamped`, `recent_subset`, `ranked_from_sample`, `low_match_count`, `sponsor_text_match`, `other_reading_larger`, `plan_not_repaired`, `series_matched_nothing`, `compare_truncated`, `filter_dropped`, `names_partly_normalised`, `free_text_categories`, `anchor_omitted`, `insufficient_cooccurrence`, `chart_preference_ignored`, `question_not_interpreted`, `counts_not_reconciled`, `walk_count_mismatch`, `upstream_throttled`.
 
@@ -1930,7 +1930,7 @@ Every row goes through the same code path: plan, check, resolve, strategy, engin
 | 7 | Which countries have the most recruiting trials for lung cancer? | condition filter; `statuses = [RECRUITING]` with evidence "recruiting"; `aggregate(country)` | Scope 2,298: walk of 3 pages with `LocationCountry`. About 7 requests | `bar_chart`, horizontal, top 15 of 77 countries (China 903, United States 876, France 245, …), `iso_alpha3` per row, `is_exclusive: false`, truncation of categories recorded; each bar's `source_url` returns its count |
 | 8 | Show a network of sponsors and drugs for Duchenne muscular dystrophy trials. | condition filter; `network(sponsor, drug)` | Scope 499; presence push-down leaves 281; one page. 5 requests | `network_graph`, bipartite. 114 sponsors, 187 drugs and 224 links before pruning; 24 nodes and 15 links after (top 15 per side, weight at least 2). Heaviest link PTC Therapeutics and ataluren, 13 trials (14 once the alias PTC124 is merged) |
 | 9a | Which drugs frequently co-occur in combination studies with pembrolizumab? | drug filter; `network(drug, drug, same_arm)` | Scope 2,971; presence push-down; walk of at most 3 pages with arm labels | `network_graph`, force. Pembrolizumab itself is in 81% of the trials and is left out as the anchor; carboplatin and paclitaxel share an arm in 145 trials |
-| 9b | Which drugs frequently co-occur in combination studies (drug ↔ drug network)? As printed, with no scope | no entities; `network(drug, drug, same_arm)` | 156,071 candidate trials: capped walk of the 5,000 most recently first-posted. 7 requests | `network_graph`, force; the subtitle names the subset and its date range (about April to October 2026); `truncation`, warning `recent_subset`, follow-ups that add a scope |
+| 9b | Which drugs frequently co-occur in combination studies (drug ↔ drug network)? As printed, with no scope | no entities; `network(drug, drug, same_arm)` | 156,071 candidate trials: capped walk of the 5,000 most recently first-posted. 7 requests | `network_graph`, force; the subtitle names the subset and its date range (about April to October 2026); `truncation`, warning `recent_subset`, follow-ups that add a scope | (Superseded: no capped walk exists any more; see row 9 of 4.9.)
 
 **Further classes through the same path.**
 
@@ -2248,7 +2248,7 @@ Each has a recommended default, so work is not blocked.
 | 2 | **`.example.env`.** Keep it byte-identical, or append commented optional overrides? | Keep it byte-identical; document the optional `CTVIZ_*` variables in the README only |
 | 3 | **FHIR.** Is a link, a precedent and a README paragraph enough, or is the pass-through endpoint wanted? | The link, the precedent and the paragraph. The pass-through is stretch S5 |
 | 4 | **Default drug match.** The registry's broad intervention search, or intervention names only? | Broad (what the registry's website does; it resolves brand names), with the strict count disclosed in every response and `options.drug_match` as the switch |
-| 5 | **Network questions with no scope.** Answer on the 5,000 most recently registered candidate trials with the limitation in the subtitle, or ask for a scope? | Answer on the stated subset: the assignment asks for a visualization, and the limitation is in the chart itself |
+| 5 | **Network questions with no scope.** Answer on the 5,000 most recently registered candidate trials with the limitation in the subtitle, or ask for a scope? | Answer on the stated subset: the assignment asks for a visualization, and the limitation is in the chart itself | (Superseded: the walk cap is gone; such a question reads every trial or is refused as `too_broad`.)
 | 6 | **"Recruiting trials by country".** Study-level status with any site in the country, or a recruiting site in that country? | Study-level status: each bar equals a server count (903 for China in lung cancer; the stricter reading gives 890), and site-level status is stale on studies of unknown status |
 | 7 | **Sponsor filter.** Lead sponsor only, or lead sponsor and collaborators? | Lead sponsor only (`query.lead`), stated in the assumptions |
 | 8 | **Time series defaults.** Start date as the date; estimated dates and withdrawn trials included and disclosed; future periods excluded and counted; a 25-period default window | As listed |

@@ -1,11 +1,9 @@
 """Numeric measures: the median, mean or sum of a field per cell, read by a walk and drawn with its unit."""
 
 import dataclasses
-from datetime import date
 
 from ctviz.catalog.fields import Window
 from ctviz.engine.aggregate import aggregate
-from ctviz.engine.frame import SubsetInfo
 from ctviz.engine.lower import MeasureSpec
 from ctviz.engine.shape import shape
 from ctviz.viz import measure as measures
@@ -14,7 +12,7 @@ from tests.unit.plan_samples import aggregate as aggregate_of
 from tests.unit.plan_samples import plan, request
 from tests.unit.test_check_plan import check
 from tests.unit.test_engine_shape import result_of
-from tests.unit.test_engine_strategy import LIMITS, chosen
+from tests.unit.test_engine_strategy import chosen
 from tests.unit.test_viz_build import (
     PHASE as PHASE_BARS,
 )
@@ -35,7 +33,7 @@ DURATION = MeasureSpec("median", "duration_months")
 def test_a_statistic_is_always_read_by_a_walk_even_where_a_count_would_fan_out() -> None:
     xp = chosen(engine_plan(bound(PHASE), measure=DURATION), {"s0": 3000})
 
-    assert xp.runs[0].strategy == "walk" and xp.runs[0].limit == LIMITS.walk_cap
+    assert xp.runs[0].strategy == "walk"
     assert "StartDate" in xp.runs[0].fields and "CompletionDate" in xp.runs[0].fields
 
 
@@ -45,10 +43,10 @@ def test_a_single_statistic_is_a_walk_and_not_a_sample_call() -> None:
     assert xp.runs[0].strategy == "walk"
 
 
-def test_above_the_walk_cap_a_statistic_reads_the_recent_subset() -> None:
+def test_a_statistic_of_a_large_scope_reads_every_trial() -> None:
     xp = chosen(engine_plan(bound(PHASE), measure=DURATION), {"s0": 80_000})
 
-    assert xp.runs[0].strategy == "capped_walk" and xp.runs[0].limit == LIMITS.walk_cap
+    assert xp.runs[0].strategy == "walk"
 
 
 def test_the_median_is_taken_over_the_trials_that_have_a_value_and_the_rest_is_counted() -> None:
@@ -89,17 +87,6 @@ def test_the_values_of_the_categories_that_a_top_n_merges_are_pooled() -> None:
     shaped = shape(result_of(plan_, trials), plan_)
 
     assert sum(cell_.trials for cell_ in shaped.frames[0].cells) == 4
-
-
-def test_a_capped_walk_reports_how_many_trials_the_statistic_covers() -> None:
-    plan_ = engine_plan(bound(PHASE), measure=DURATION)
-    result = result_of(plan_, [study(1, start="2020-01", completion="2021-01")])
-    result.frames[0].subset = SubsetInfo(5000, date(2024, 1, 1), date(2026, 1, 1))
-    result.frames[0].matched = 80_000
-
-    shaped = shape(result, plan_)
-
-    assert [(t.scope, t.shown, t.total) for t in shaped.truncation] == [("trials", 5000, 80_000)]
 
 
 def test_a_bar_chart_of_a_statistic_names_the_measure_and_the_unit_everywhere() -> None:

@@ -82,7 +82,7 @@ def test_a_frame_made_from_a_scope_and_its_dimensions_has_empty_tables_and_zero_
 
     assert len(frame.marginals) == 2
     assert frame.marginals[0] is not frame.marginals[1]
-    assert (frame.cells, frame.excluded, frame.subset) == ({}, {}, None)
+    assert (frame.cells, frame.excluded) == ({}, {})
     assert (frame.matched, frame.seen, frame.analyzed) == (0, 0, 0)
 
 

@@ -23,8 +23,18 @@ class _Flight[V]:
 class SingleFlightCache[V]:
     """Values by key for `ttl_s` seconds, at most `maxsize` of them. A value is never None."""
 
-    def __init__(self, maxsize: int, ttl_s: float, clock: Callable[[], float]) -> None:
-        self._values: TTLCache[Hashable, V] = TTLCache(maxsize=maxsize, ttl=ttl_s, timer=clock)
+    def __init__(
+        self,
+        maxsize: int,
+        ttl_s: float,
+        clock: Callable[[], float],
+        *,
+        getsizeof: Callable[[V], int] | None = None,
+    ) -> None:
+        """`maxsize` counts values, or the sum of `getsizeof` of them; a value larger than it is not kept."""
+        self._values: TTLCache[Hashable, V] = TTLCache(
+            maxsize=maxsize, ttl=ttl_s, timer=clock, getsizeof=getsizeof
+        )
         self._flights: dict[Hashable, _Flight[V]] = {}
 
     async def get(

@@ -4478,7 +4478,6 @@
               "walk",
               "count_fan_out",
               "sample_then_recount",
-              "capped_walk",
               "none"
             ],
             "title": "Name"
@@ -4949,7 +4948,6 @@
           "scope": {
             "type": "string",
             "enum": [
-              "trials",
               "categories",
               "series",
               "periods",

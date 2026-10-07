@@ -615,7 +615,8 @@ _SETTING_NOTES: Final[Mapping[str, str]] = {
     "ctgov_burst": "Registry requests let through at once.",
     "ctgov_rate_per_s": "Registry requests per second after the burst.",
     "one_page_max": "The most trials one registry request returns (its page-size limit).",
-    "walk_cap": "The most trials a paged walk reads.",
+    "walk_pages_per_s": "Registry requests per second that a paged walk is assumed to make, used to "
+    "estimate whether a walk fits the request deadline. A walk has no limit on trials.",
     "max_fanout_requests": "The most count requests one question may make.",
     "low_match_threshold": "A name that matches fewer trials gets the `low_match_count` warning.",
     "request_deadline_s": "Seconds before a request is answered 504 `deadline_exceeded`.",
@@ -707,7 +708,9 @@ def capabilities_tables() -> str:
         f"Visualization types: {_codes(document['visualization_types'])}.",
         "",
         f"Limits: a request to ClinicalTrials.gov returns at most {limits['one_page_max']:,} trials; a "
-        f"paged walk reads at most {limits['walk_cap']:,}; a count fan-out makes at most "
+        "paged walk reads every matching trial, in date ranges read at once, and is refused as too broad "
+        f"when it is estimated not to fit the deadline at {limits['walk_pages_per_s']:g} requests a "
+        "second; a count fan-out makes at most "
         f"{limits['max_fanout_requests']} requests; {limits['default_top_n']} categories by default and "
         f"at most {limits['max_top_n']}; at most {limits['max_series']} series; at most "
         f"{limits['max_links']} links in a network; a request is cut off after "

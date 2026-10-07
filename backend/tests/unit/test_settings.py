@@ -88,8 +88,8 @@ def test_owner_variables_are_read_unprefixed_and_the_rest_only_with_the_prefix(
         OPENAI_API_BASE="https://gateway.example/v1",
         ALLOWED_MODELS="gpt-4.1-mini,gpt-5.4-mini",
         CTVIZ_OPENAI_API_BASE="https://prefixed.example/v1",
-        CTVIZ_WALK_CAP="1234",
-        WALK_CAP="9999",
+        CTVIZ_WALK_PAGES_PER_S="1234",
+        WALK_PAGES_PER_S="9999",
     )
 
     settings = Settings()
@@ -98,7 +98,7 @@ def test_owner_variables_are_read_unprefixed_and_the_rest_only_with_the_prefix(
     assert PLACEHOLDER_KEY not in repr(settings)
     assert settings.openai_api_base == "https://gateway.example/v1"
     assert settings.allowed_models == TWO_MODELS
-    assert settings.walk_cap == 1234
+    assert settings.walk_pages_per_s == 1234
 
 
 def test_the_sdk_variable_openai_base_url_does_not_move_the_base_url(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -124,7 +124,7 @@ def test_a_variable_left_blank_counts_as_not_set(repository_root: Path) -> None:
         "ALLOWED_MODELS=",
         "CTVIZ_PLANNER_FALLBACK_MODEL=",
         "CTVIZ_PLANNER_EFFORT=",
-        "CTVIZ_WALK_CAP=",
+        "CTVIZ_WALK_PAGES_PER_S=",
         "CTVIZ_EXAMPLES_DIR=",
     )
 
@@ -242,10 +242,13 @@ def test_the_process_environment_beats_the_env_file(
 
 def test_other_variables_in_the_env_file_are_ignored(repository_root: Path) -> None:
     write_env(
-        repository_root / ".env", "DATABASE_URL=postgres://example", "WALK_CAP=9", "CTVIZ_WALK_CAP=1234"
+        repository_root / ".env",
+        "DATABASE_URL=postgres://example",
+        "WALK_PAGES_PER_S=9",
+        "CTVIZ_WALK_PAGES_PER_S=1234",
     )
 
-    assert load_settings().walk_cap == 1234
+    assert load_settings().walk_pages_per_s == 1234
 
 
 # --- start-up checks ---------------------------------------------------------------------------
@@ -352,7 +355,7 @@ def test_accepted_efforts_follow_the_measured_model_families(model: str, efforts
 @pytest.mark.parametrize(
     ("variable", "bad_value", "named"),
     [
-        ("CTVIZ_WALK_CAP", "not-a-number", "walk_cap"),  # a field error
+        ("CTVIZ_WALK_PAGES_PER_S", "not-a-number", "walk_pages_per_s"),  # a field error
         ("ALLOWED_MODELS", "only-this-model", "CTVIZ_PLANNER_MODEL"),  # the whole-model check
     ],
 )

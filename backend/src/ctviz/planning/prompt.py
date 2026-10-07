@@ -38,7 +38,7 @@ from ctviz.contract.plan import (
 from ctviz.contract.request import QueryRequest
 from ctviz.planning.structured import NO_FILTERS
 
-PROMPT_VERSION: Final = "plan-v4"
+PROMPT_VERSION: Final = "plan-v5"
 
 RULES: Final = """\
 You translate a question about clinical trials into a query plan for a service that counts
@@ -79,7 +79,9 @@ and you never write counts, trial names or identifiers.
                 (efficacy, prices, predictions, opinions); asks about one trial by NCT ID; or
                 needs a grouping that is not in the glossary. Never use it for an extra that
                 only concerns how the chart looks (rule 15) or for a "top N versus the rest"
-                split (rule 16): plan the part of the question that can be counted.
+                split (rule 16): plan the part of the question that can be counted. Never
+                use it because the question asks for a share, percentage or proportion: the
+                service adds shares to every count it draws.
 8. top_n, limit, time_unit and chart_preference are null unless the question asks for them.
 9. interpretation is one sentence restating what will be counted and how it is grouped. It
    contains no figures other than those in the question.

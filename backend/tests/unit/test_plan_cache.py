@@ -113,27 +113,27 @@ async def test_a_plan_the_repair_turn_fixed_is_remembered_with_its_record() -> N
     assert [a.action for a in again.adjustments] == ["repaired"] and len(primary.calls) == 2
 
 
-async def test_a_clarification_is_remembered() -> None:
+async def test_a_clarification_is_asked_again() -> None:
     asking = plan(
         entities=[], analysis={"kind": "clarify", "reason": "missing_entity", "missing": ["drug_name"]}
     )
-    primary = FakePlanner([asking])
+    primary = FakePlanner([asking, asking])
     subject = service(primary)
     question = request("How has the number of trials for this drug changed?")
 
     first = await produce(subject, question)
     again = await produce(subject, question)
 
-    assert first.outcome is not None and again.is_cached and again.outcome == first.outcome
-    assert len(primary.calls) == 1
+    assert first.outcome is not None and not again.is_cached and again.outcome == first.outcome
+    assert len(primary.calls) == 2
 
 
-async def test_an_unsupported_plan_the_model_wrote_is_remembered() -> None:
+async def test_an_unsupported_plan_the_model_wrote_is_asked_again() -> None:
     declined = plan(
         entities=[],
         analysis={"kind": "unsupported", "category": "other", "reason": "Not about registered trials."},
     )
-    primary = FakePlanner([declined])
+    primary = FakePlanner([declined, declined])
     subject = service(primary)
     question = request("What is the capital of France?")
 
@@ -141,7 +141,7 @@ async def test_an_unsupported_plan_the_model_wrote_is_remembered() -> None:
     again = await produce(subject, question)
 
     assert first.outcome is not None and first.outcome.kind == "unsupported"
-    assert again.is_cached and again.outcome == first.outcome and len(primary.calls) == 1
+    assert not again.is_cached and again.outcome == first.outcome and len(primary.calls) == 2
 
 
 # --- what makes a new plan ---------------------------------------------------------------------------

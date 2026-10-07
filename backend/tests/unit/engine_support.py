@@ -303,12 +303,10 @@ class FakeClient:
             params, ctx, fields=fields, page_size=page_size, sort=sort, origin="execution"
         )
 
-    async def walk(
-        self, params: Params, ctx: RequestLog, *, fields: Sequence[str], limit: int, sort: str | None = None
-    ) -> WalkResult:
-        matching = _sorted(self._matching(params), sort)
-        self._log(ctx, params, "execution", len(matching), min(limit, 1000), fields, sort)
-        return WalkResult(tuple(matching[:limit]), len(matching), len(matching) > limit)
+    async def walk(self, params: Params, ctx: RequestLog, *, fields: Sequence[str]) -> WalkResult:
+        matching = self._matching(params)
+        self._log(ctx, params, "execution", len(matching), 1000, fields)
+        return WalkResult(tuple(matching), self._total(params))
 
 
 def _holds(study: Study, piece: str, argument: str) -> bool:

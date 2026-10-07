@@ -294,13 +294,6 @@ def subtitle(*parts: str | None, data_date: str) -> str:
     return " · ".join([*(p for p in parts if p), f"ClinicalTrials.gov, data as of {data_date}"])
 
 
-def subset_phrase(size: int, first_posted_from: str, first_posted_to: str) -> str:
-    return (
-        f"limited to the {count(size)} most recently first-posted trials "
-        f"({first_posted_from} to {first_posted_to})"
-    )
-
-
 def node_size_title() -> str:
     return "Trials (all analysed trials of this node)"
 
@@ -435,14 +428,6 @@ def chart_preference_ignored(preference: str, chosen: str) -> Note:
     )
 
 
-def recent_subset(size: int, matched: int) -> Note:
-    return Note(
-        code="recent_subset",
-        message=f"{count(matched)} trials match, more than can be read exactly; only the {count(size)} most "
-        "recently first-posted were counted.",
-    )
-
-
 def counts_not_reconciled(label: str | None, expected: int, counted: int) -> Note:
     scope = f" for {label}" if label else ""
     return Note(
@@ -540,14 +525,6 @@ def link_note(source: str, target: str, pairing: str) -> str:
             "agents lists both, so some links are alternatives."
         )
     return f"Two {kind} are linked when one trial lists both."
-
-
-OUTSIDE_SUBSET_REASON: Final = "outside_recent_subset"
-OUTSIDE_SUBSET_MESSAGE: Final = "Not read: older than the most recent trials that were counted."
-
-
-def subset_assumption(size: int) -> str:
-    return f"Counted the {count(size)} most recently first-posted trials of a larger set."
 
 
 def citation_selection(strategies: Sequence[str]) -> str:

@@ -13,7 +13,7 @@ from ctviz.contract.plan import NumericField, SortField
 from ctviz.contract.response import Note, StrategyName
 from ctviz.ctgov.params import Scope
 from ctviz.ctgov.study import Study, StudyDate
-from ctviz.engine.frame import Exclusion, SubsetInfo
+from ctviz.engine.frame import Exclusion
 from ctviz.engine.lower import EnginePlan, ListRows, PointRows
 
 _STATUS: Final = "protocolSection.statusModule"
@@ -47,7 +47,6 @@ class RowsResult:
     matched: int  # totalCount of the scope
     excluded: dict[str, Exclusion] = field(default_factory=dict)  # by reason
     strategy: StrategyName = "walk"
-    subset: SubsetInfo | None = None
     warnings: list[Note] = field(default_factory=list)
 
     def exclude(self, reason: str, message: str, count: int = 1) -> None:
