@@ -68,13 +68,10 @@ class Contract(BaseModel):
     error_response: ErrorResponse
 
 
-# File name to the type it documents. The combined file comes first.
+# File name to the type it documents. One combined file holds the request, the plan, the response and
+# the error body; the OpenAPI document beside it describes the same types per endpoint.
 _SCHEMA_FILES: Final[Mapping[str, Any]] = {
     "contract.v1.schema.json": Contract,
-    "query-request.v1.schema.json": QueryRequest,
-    "query-plan.v1.schema.json": QueryPlan,
-    "query-response.v1.schema.json": QueryResponse,
-    "error-response.v1.schema.json": ErrorResponse,
 }
 
 

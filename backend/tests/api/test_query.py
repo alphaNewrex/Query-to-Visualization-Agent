@@ -171,7 +171,7 @@ async def test_the_capabilities_list_every_dimension_of_the_catalogue(structured
 async def test_a_schema_is_served_by_name_and_an_unknown_name_is_a_404(
     structured: httpx2.AsyncClient,
 ) -> None:
-    found = await structured.get("/v1/schema/query-plan")
+    found = await structured.get("/v1/schema/contract")
     missing = await structured.get("/v1/schema/nothing")
 
     assert found.status_code == 200

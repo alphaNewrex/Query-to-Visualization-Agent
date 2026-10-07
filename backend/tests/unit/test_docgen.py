@@ -117,6 +117,6 @@ def test_written_files_are_fresh_and_a_changed_file_is_stale(tmp_path: Path) -> 
     assert stale_schema_files(tmp_path) == []
 
     (tmp_path / OPENAPI_FILE).write_text("{}\n", encoding="utf-8")
-    (tmp_path / "error-response.v1.schema.json").unlink()
+    (tmp_path / "contract.v1.schema.json").unlink()
 
-    assert sorted(stale_schema_files(tmp_path)) == ["error-response.v1.schema.json", OPENAPI_FILE]
+    assert sorted(stale_schema_files(tmp_path)) == ["contract.v1.schema.json", OPENAPI_FILE]

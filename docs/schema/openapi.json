@@ -195,7 +195,7 @@
     "/v1/schema/{name}": {
       "get": {
         "summary": "A JSON Schema of the contract",
-        "description": "`contract`, `query-request`, `query-plan`, `query-response` or `error-response`.",
+        "description": "`contract`: the request, the plan, the response and the error body in one JSON Schema.",
         "operationId": "get_schema_v1_schema__name__get",
         "parameters": [
           {

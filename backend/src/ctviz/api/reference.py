@@ -29,7 +29,7 @@ async def get_capabilities(deps: Annotated[Deps, Depends(get_deps)]) -> Document
 
 @router.get("/v1/schema/{name}", summary="A JSON Schema of the contract")
 async def get_schema(name: str) -> Response:
-    """`contract`, `query-request`, `query-plan`, `query-response` or `error-response`."""
+    """`contract`: the request, the plan, the response and the error body in one JSON Schema."""
     text = _schemas().get(f"{name}{_SCHEMA_SUFFIX}")
     if text is None:
         raise HTTPException(status_code=404, detail=f"There is no schema named '{name}'.")

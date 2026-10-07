@@ -391,7 +391,7 @@ Messages, titles, assumptions and warnings are written by code from templates. N
 | `metric` | none | `value` | A single number, with citations and `source_url` like any datum. |
 <!-- gen:response-types:end -->
 
-Row keys are predictable (`trial_count`, `share`, `group`, `bin_start`, `start_year`, and for a network `id`, `source`, `target`); the rules, the channel types and every field are in [`docs/SCHEMA.md`](docs/SCHEMA.md), and the JSON Schema of a response is [`docs/schema/query-response.v1.schema.json`](docs/schema/query-response.v1.schema.json). No colours are sent: colour `i` belongs to `domain[i]`. A period is a label (`2015`, `2024-Q2`) to treat as an ordered category and never parse as a date. A category channel says `is_exclusive: false` when a trial can fall under several values (countries, drugs, intervention types), and then its values must not be drawn as parts of a whole.
+Row keys are predictable (`trial_count`, `share`, `group`, `bin_start`, `start_year`, and for a network `id`, `source`, `target`); the rules, the channel types and every field are in [`docs/SCHEMA.md`](docs/SCHEMA.md), and the JSON Schema of the whole contract (request, plan, response and error body) is [`docs/schema/contract.v1.schema.json`](docs/schema/contract.v1.schema.json). No colours are sent: colour `i` belongs to `domain[i]`. A period is a label (`2015`, `2024-Q2`) to treat as an ordered category and never parse as a date. A category channel says `is_exclusive: false` when a trial can fall under several values (countries, drugs, intervention types), and then its values must not be drawn as parts of a whole.
 
 ### Where the assignment's items live
 
