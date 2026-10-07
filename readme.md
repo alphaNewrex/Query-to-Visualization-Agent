@@ -2,6 +2,8 @@
 
 Ask a question about clinical trials in plain English and get back a visualization specification (a chart, a number or a table) as JSON, with the trial records that support every value. One model call turns the question into a small typed plan; plain code then runs the plan against the live [ClinicalTrials.gov](https://clinicaltrials.gov) API, counts the trials, chooses one of seven visualization types by rule and writes the citations. The backend is FastAPI; a Next.js chat UI renders the answers.
 
+**Demo video:** [a short walkthrough of the service and its UI](https://drive.google.com/file/d/1SDQznpA6DpLR_ksyTSkuI1vzYERXm6uG/view?usp=share_link) (Google Drive).
+
 ![A follow-up that keeps the drug and the start year and changes the split](docs/screenshots/conversation-follow-up.png)
 *"How has the number of pembrolizumab trials changed per year since 2015?", then "now split that by phase". The chips say what the follow-up kept and what it changed.*
 
