@@ -23,7 +23,7 @@ const WAVES_MAX = 10;
  * of the Durves dot patterns (matrix, dot radius, amplitude, waves). The wave count rolls from -10 to 10
  * and back, which makes the pattern shimmer. It takes the current text colour.
  */
-export function WaveLoader({ size = 16, matrix, period = 6, className, label = "Working", decorative = false }: WaveLoaderProps) {
+export function WaveLoader({ size = 16, matrix, period = 9, className, label = "Working", decorative = false }: WaveLoaderProps) {
   const dots = matrix ?? (size >= 16 ? 4 : 3);
   const cell = size / dots;
   const maxRadius = cell * 0.46;
@@ -58,11 +58,11 @@ export function WaveLoader({ size = 16, matrix, period = 6, className, label = "
     let frame = 0;
     const started = performance.now();
     const tick = (now: number) => {
-      // A cosine sweep of the wave count: -10 at the start, 10 half a period later, and back.
-      const phase = ((now - started) / 1000 / period) * 2 * Math.PI;
-      const middle = (WAVES_MIN + WAVES_MAX) / 2;
-      const span = (WAVES_MAX - WAVES_MIN) / 2;
-      draw(middle - span * Math.cos(phase));
+      // A linear sweep of the wave count, so the shimmer moves at one steady speed: -10 at the start,
+      // 10 half a period later, and back at the same rate.
+      const turn = (((now - started) / 1000 / period) % 1) * 2;
+      const progress = turn <= 1 ? turn : 2 - turn;
+      draw(WAVES_MIN + (WAVES_MAX - WAVES_MIN) * progress);
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);

@@ -196,7 +196,6 @@ export function QueryPage() {
   const selectedResponse = selected?.state.tag === "done" ? selected.state.response : null;
   const lastDone = turns.findLast((turn) => turn.state.tag === "done");
   const lastResponse = lastDone?.state.tag === "done" ? lastDone.state.response : null;
-  const timestamp = lastResponse?.meta.source?.data_timestamp;
 
   return (
     <div className="flex min-h-dvh flex-1 flex-col">
@@ -204,7 +203,6 @@ export function QueryPage() {
         <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
           <div className="min-w-0">
             <h1 className="truncate text-base font-semibold tracking-tight sm:text-lg">CTViz Agent</h1>
-            <p className="hidden text-xs text-muted-foreground sm:block">Ask a question about clinical trials and get a chart with its sources.</p>
           </div>
           <Button variant="outline" size="sm" onClick={newConversation} disabled={turns.length === 0 && values.query === ""} className="shrink-0">
             <MessageSquarePlusIcon aria-hidden />
@@ -245,9 +243,6 @@ export function QueryPage() {
             ))}
           </div>
         )}
-        <footer className="mt-auto border-t pt-4 text-xs text-muted-foreground">
-          Source: ClinicalTrials.gov{timestamp ? `, data as of ${timestamp.slice(0, 10)}` : ""}. Counts are aggregated by this service.
-        </footer>
         <div ref={end} aria-hidden />
       </main>
 
