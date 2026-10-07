@@ -1,0 +1,35 @@
+{
+  "interpretation": "Plot enrollment against duration for completed Duchenne muscular dystrophy trials.",
+  "entities": [
+    {
+      "kind": "condition",
+      "value": "Duchenne muscular dystrophy",
+      "role": "filter"
+    }
+  ],
+  "filters": {
+    "phases": [],
+    "statuses": [
+      "COMPLETED"
+    ],
+    "study_types": [],
+    "sponsor_classes": [],
+    "intervention_types": [],
+    "evidence": [
+      {
+        "family": "statuses",
+        "phrase": "completed"
+      }
+    ],
+    "date_field": "start_date",
+    "year_from": null,
+    "year_to": null
+  },
+  "analysis": {
+    "kind": "relate",
+    "x": "enrollment",
+    "y": "duration_months",
+    "color_by": null
+  },
+  "chart_preference": "scatter_plot"
+}

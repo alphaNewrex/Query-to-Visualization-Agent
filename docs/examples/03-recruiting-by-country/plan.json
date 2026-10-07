@@ -1,0 +1,36 @@
+{
+  "interpretation": "Count recruiting lung cancer trials by country.",
+  "entities": [
+    {
+      "kind": "condition",
+      "value": "lung cancer",
+      "role": "filter"
+    }
+  ],
+  "filters": {
+    "phases": [],
+    "statuses": [
+      "RECRUITING"
+    ],
+    "study_types": [],
+    "sponsor_classes": [],
+    "intervention_types": [],
+    "evidence": [
+      {
+        "family": "statuses",
+        "phrase": "recruiting"
+      }
+    ],
+    "date_field": "start_date",
+    "year_from": null,
+    "year_to": null
+  },
+  "analysis": {
+    "kind": "aggregate",
+    "dimension": "country",
+    "series": null,
+    "time_unit": null,
+    "top_n": 15
+  },
+  "chart_preference": null
+}

@@ -1,0 +1,23 @@
+{
+  "interpretation": "Count trials for an unnamed drug by time.",
+  "entities": [],
+  "filters": {
+    "phases": [],
+    "statuses": [],
+    "study_types": [],
+    "sponsor_classes": [],
+    "intervention_types": [],
+    "evidence": [],
+    "date_field": null,
+    "year_from": null,
+    "year_to": null
+  },
+  "analysis": {
+    "kind": "clarify",
+    "reason": "missing_entity",
+    "missing": [
+      "drug_name"
+    ]
+  },
+  "chart_preference": null
+}

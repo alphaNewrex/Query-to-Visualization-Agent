@@ -1,0 +1,334 @@
+{
+  "protocolSection": {
+    "identificationModule": {
+      "nctId": "NCT02130466",
+      "briefTitle": "A Study of the Safety and Efficacy of Pembrolizumab (MK-3475) in Combination With Trametinib and Dabrafenib in Participants With Advanced Melanoma (MK-3475-022/KEYNOTE-022)",
+      "organization": {
+        "fullName": "Merck Sharp & Dohme LLC",
+        "class": "INDUSTRY"
+      }
+    },
+    "statusModule": {
+      "statusVerifiedDate": "2022-06",
+      "overallStatus": "COMPLETED",
+      "expandedAccessInfo": {
+        "hasExpandedAccess": true,
+        "nctId": "NCT02083484",
+        "statusForNctId": "NO_LONGER_AVAILABLE"
+      },
+      "startDateStruct": {
+        "date": "2014-05-29",
+        "type": "ACTUAL"
+      },
+      "primaryCompletionDateStruct": {
+        "date": "2021-07-14",
+        "type": "ACTUAL"
+      },
+      "completionDateStruct": {
+        "date": "2021-07-14",
+        "type": "ACTUAL"
+      },
+      "studyFirstSubmitDate": "2014-05-01",
+      "studyFirstSubmitQcDate": "2014-05-01",
+      "studyFirstPostDateStruct": {
+        "date": "2014-05-05",
+        "type": "ESTIMATED"
+      },
+      "resultsFirstSubmitDate": "2022-06-30",
+      "resultsFirstSubmitQcDate": "2022-06-30",
+      "resultsFirstPostDateStruct": {
+        "date": "2022-08-01",
+        "type": "ACTUAL"
+      },
+      "lastUpdateSubmitDate": "2022-06-30",
+      "lastUpdatePostDateStruct": {
+        "date": "2022-08-01",
+        "type": "ACTUAL"
+      }
+    },
+    "sponsorCollaboratorsModule": {
+      "leadSponsor": {
+        "name": "Merck Sharp & Dohme LLC",
+        "class": "INDUSTRY"
+      }
+    },
+    "conditionsModule": {
+      "conditions": [
+        "Melanoma",
+        "Solid Tumors"
+      ]
+    },
+    "designModule": {
+      "studyType": "INTERVENTIONAL",
+      "phases": [
+        "PHASE1",
+        "PHASE2"
+      ],
+      "designInfo": {
+        "allocation": "RANDOMIZED",
+        "interventionModel": "PARALLEL",
+        "primaryPurpose": "TREATMENT",
+        "maskingInfo": {
+          "masking": "DOUBLE",
+          "whoMasked": [
+            "PARTICIPANT",
+            "INVESTIGATOR"
+          ]
+        }
+      },
+      "enrollmentInfo": {
+        "count": 184,
+        "type": "ACTUAL"
+      }
+    },
+    "armsInterventionsModule": {
+      "armGroups": [
+        {
+          "label": "Part 1:pembrolizumab 2 mg/kg+dabrafenib150 mg+trametinib 2 mg",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF mutant melanoma received 2 mg/kg pembrolizumab administered by intravenous (IV) infusion on Days 1 and 22 of each 6-week cycle (Q6W); 150 mg/day total dabrafenib orally, in a divided dose, twice a day (BID) starting on Day 1 and continuing up until study treatment discontinuation; and 2 mg trametinib orally once a day (QD) starting on Day 1 and continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Dabrafenib",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 1:pembrolizumab 2 mg/kg+trametinib 2 mg",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF wild-type melanoma received 2 mg/kg pembrolizumab administered by IV infusion on Days 1 and 22 Q6W and 2 mg trametinib orally QD starting on Day 1 and continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 1:pembrolizumab 2 mg/kg+trametinib 1.5 mg",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF wild-type melanoma received 2 mg/kg pembrolizumab administered by IV infusion on Days 1 and 22 Q6W and 1.5 mg trametinib orally QD starting on Day 1 and continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 2:pembrolizumab 2 mg/kg+dabrafenib 150 mg+trametinib 2 mg",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF mutant melanoma received 2 mg/kg pembrolizumab administered by IV infusion on Days 1 and 22 Q6W; 150 mg/day total dabrafenib orally, in a divided dose, BID starting on Day 1 and continuing up until study treatment discontinuation; and 2 mg trametinib orally QD starting on Day 1 and continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Dabrafenib",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 2:pembrolizumab 2 mg/kg+trametinib 1.5 mg",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF wild-type melanoma received 2 mg/kg pembrolizumab administered by IV infusion on Days 1 and 22 Q6W and 1.5 mg trametinib orally QD starting on Day 1 and continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 3:pembrolizumab 2 mg/kg+dabrafenib 150 mg+trametinib 2 mg",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF mutant melanoma received 2 mg/kg pembrolizumab administered by IV infusion on Days 1 and 22 Q6W; 150 mg/day total dabrafenib orally, in a divided dose, BID starting on Day 1 and continuing up until study treatment discontinuation; and 2 mg trametinib orally QD starting on Day 1 and continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Dabrafenib",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 3:placebo+dabrafenib 150 mg+trametinib 2 mg",
+          "type": "PLACEBO_COMPARATOR",
+          "description": "Participants with BRAF mutant melanoma received saline placebo administered by IV infusion on Days 1 and 22 Q6W; 150 mg/day total dabrafenib orally, in a divided dose, BID starting on Day 1 and continuing up until study treatment discontinuation; and 2 mg trametinib orally QD starting on Day 1 and continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Drug: Dabrafenib",
+            "Drug: Trametinib",
+            "Drug: Placebo"
+          ]
+        },
+        {
+          "label": "Part 4:trametinib 2 mg for 4 weeks+pembrolizumab 200 mg+trametinib 2 mg concurrent dosing",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF wild-type melanoma or solid tumors (irrespective of BRAF status) received 2 mg trametinib orally QD for 4 weeks. Starting with Week 5, participants received 200 mg pembrolizumab administered by IV infusion on Day 1 of each 3-week cycle (Q3W) and a concurrent dosing schedule of 2 mg trametinib orally QD starting on Day 1 and continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 4:trametinib 1.5 mg for 2 weeks+pembrolizumab 200 mg+trametinib 1.5 mg concurrent dosing",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF wild-type melanoma or solid tumors (irrespective of BRAF status) received 1.5 mg trametinib orally QD for 2 weeks. Starting with Week 3, participants received 200 mg pembrolizumab administered by IV infusion on Day 1 Q3W and a concurrent dosing schedule of 1.5 mg trametinib orally QD starting on Day 1 and continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 4:trametinib 1.5 mg for 4 weeks+pembrolizumab 200 mg+trametinib 1.5 mg concurrent dosing",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF wild-type melanoma or solid tumors (irrespective of BRAF status) received 1.5 mg trametinib orally QD for 4 weeks. Starting with Week 5, participants received 200 mg pembrolizumab administered by IV infusion on Day 1 Q3W and a concurrent dosing schedule of 1.5 mg trametinib orally QD starting on Day 1 and continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 4:trametinib 2 mg for 2 weeks+pembrolizumab 200 mg+trametinib 2 mg intermittent dosing",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF wild-type melanoma or solid tumors (irrespective of BRAF status) received 2 mg trametinib orally QD for 2 weeks. Starting with Week 3, participants received 200 mg pembrolizumab administered by IV infusion on Day 1 Q3W and an intermittent dose schedule of 2 mg trametinib orally QD with 1 week OFF trametinib and 2 weeks ON trametinib continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 4:trametinib 1.5 mg for 2 weeks+pembrolizumab 200 mg+trametinib 1.5 mg intermittent dosing",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF wild-type melanoma or solid tumors (irrespective of BRAF status) received 1.5 mg trametinib orally QD for 2 weeks. Starting with Week 3, participants received 200 mg pembrolizumab administered by IV infusion on Day 1 Q3W and an intermittent dose schedule of 1.5 mg trametinib orally QD with 1 week OFF trametinib and 2 weeks ON trametinib continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 5:trametinib 1.5 mg for 2 weeks+pembrolizumab 200 mg+trametinib 1.5 mg concurrent dosing",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF wild-type melanoma or solid tumors (irrespective of BRAF status) received 1.5 mg trametinib orally QD for 2 weeks. Starting with Week 3, participants received 200 mg pembrolizumab administered by IV infusion on Day 1 Q3W and a concurrent dosing schedule of 1.5 mg trametinib orally QD starting on Day 1 and continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Trametinib"
+          ]
+        },
+        {
+          "label": "Part 5:trametinib 2 mg for 2 weeks+pembrolizumab 200 mg+trametinib 2 mg intermittent dosing",
+          "type": "EXPERIMENTAL",
+          "description": "Participants with BRAF wild-type melanoma or solid tumors (irrespective of BRAF status) received 2 mg trametinib orally QD for 2 weeks. Starting with Week 3, participants received 200 mg pembrolizumab administered by IV infusion on Day 1 Q3W and an intermittent dose schedule of 2 mg trametinib orally QD with 1 week OFF trametinib and 2 weeks ON trametinib continuing up until study treatment discontinuation.",
+          "interventionNames": [
+            "Biological: Pembrolizumab",
+            "Drug: Trametinib"
+          ]
+        }
+      ],
+      "interventions": [
+        {
+          "type": "BIOLOGICAL",
+          "name": "Pembrolizumab",
+          "description": "IV infusion",
+          "armGroupLabels": [
+            "Part 1:pembrolizumab 2 mg/kg+dabrafenib150 mg+trametinib 2 mg",
+            "Part 1:pembrolizumab 2 mg/kg+trametinib 1.5 mg",
+            "Part 1:pembrolizumab 2 mg/kg+trametinib 2 mg",
+            "Part 2:pembrolizumab 2 mg/kg+dabrafenib 150 mg+trametinib 2 mg",
+            "Part 2:pembrolizumab 2 mg/kg+trametinib 1.5 mg",
+            "Part 3:pembrolizumab 2 mg/kg+dabrafenib 150 mg+trametinib 2 mg",
+            "Part 4:trametinib 1.5 mg for 2 weeks+pembrolizumab 200 mg+trametinib 1.5 mg concurrent dosing",
+            "Part 4:trametinib 1.5 mg for 2 weeks+pembrolizumab 200 mg+trametinib 1.5 mg intermittent dosing",
+            "Part 4:trametinib 1.5 mg for 4 weeks+pembrolizumab 200 mg+trametinib 1.5 mg concurrent dosing",
+            "Part 4:trametinib 2 mg for 2 weeks+pembrolizumab 200 mg+trametinib 2 mg intermittent dosing",
+            "Part 4:trametinib 2 mg for 4 weeks+pembrolizumab 200 mg+trametinib 2 mg concurrent dosing",
+            "Part 5:trametinib 1.5 mg for 2 weeks+pembrolizumab 200 mg+trametinib 1.5 mg concurrent dosing",
+            "Part 5:trametinib 2 mg for 2 weeks+pembrolizumab 200 mg+trametinib 2 mg intermittent dosing"
+          ],
+          "otherNames": [
+            "MK-3475",
+            "KEYTRUDA®"
+          ]
+        },
+        {
+          "type": "DRUG",
+          "name": "Dabrafenib",
+          "description": "oral capsule",
+          "armGroupLabels": [
+            "Part 1:pembrolizumab 2 mg/kg+dabrafenib150 mg+trametinib 2 mg",
+            "Part 2:pembrolizumab 2 mg/kg+dabrafenib 150 mg+trametinib 2 mg",
+            "Part 3:pembrolizumab 2 mg/kg+dabrafenib 150 mg+trametinib 2 mg",
+            "Part 3:placebo+dabrafenib 150 mg+trametinib 2 mg"
+          ],
+          "otherNames": [
+            "TAFINLAR®"
+          ]
+        },
+        {
+          "type": "DRUG",
+          "name": "Trametinib",
+          "description": "oral tablet",
+          "armGroupLabels": [
+            "Part 1:pembrolizumab 2 mg/kg+dabrafenib150 mg+trametinib 2 mg",
+            "Part 1:pembrolizumab 2 mg/kg+trametinib 1.5 mg",
+            "Part 1:pembrolizumab 2 mg/kg+trametinib 2 mg",
+            "Part 2:pembrolizumab 2 mg/kg+dabrafenib 150 mg+trametinib 2 mg",
+            "Part 2:pembrolizumab 2 mg/kg+trametinib 1.5 mg",
+            "Part 3:pembrolizumab 2 mg/kg+dabrafenib 150 mg+trametinib 2 mg",
+            "Part 3:placebo+dabrafenib 150 mg+trametinib 2 mg",
+            "Part 4:trametinib 1.5 mg for 2 weeks+pembrolizumab 200 mg+trametinib 1.5 mg concurrent dosing",
+            "Part 4:trametinib 1.5 mg for 2 weeks+pembrolizumab 200 mg+trametinib 1.5 mg intermittent dosing",
+            "Part 4:trametinib 1.5 mg for 4 weeks+pembrolizumab 200 mg+trametinib 1.5 mg concurrent dosing",
+            "Part 4:trametinib 2 mg for 2 weeks+pembrolizumab 200 mg+trametinib 2 mg intermittent dosing",
+            "Part 4:trametinib 2 mg for 4 weeks+pembrolizumab 200 mg+trametinib 2 mg concurrent dosing",
+            "Part 5:trametinib 1.5 mg for 2 weeks+pembrolizumab 200 mg+trametinib 1.5 mg concurrent dosing",
+            "Part 5:trametinib 2 mg for 2 weeks+pembrolizumab 200 mg+trametinib 2 mg intermittent dosing"
+          ],
+          "otherNames": [
+            "MEKINIST®"
+          ]
+        },
+        {
+          "type": "DRUG",
+          "name": "Placebo",
+          "description": "IV infusion",
+          "armGroupLabels": [
+            "Part 3:placebo+dabrafenib 150 mg+trametinib 2 mg"
+          ]
+        }
+      ]
+    },
+    "eligibilityModule": {
+      "sex": "ALL",
+      "minimumAge": "18 Years",
+      "stdAges": [
+        "ADULT",
+        "OLDER_ADULT"
+      ]
+    },
+    "contactsLocationsModule": {
+      "overallOfficials": [
+        {
+          "name": "Medical Director",
+          "affiliation": "Merck Sharp & Dohme LLC",
+          "role": "STUDY_DIRECTOR"
+        }
+      ]
+    }
+  },
+  "derivedSection": {
+    "conditionBrowseModule": {
+      "meshes": [
+        {
+          "term": "Melanoma"
+        },
+        {
+          "term": "Parkinson Disease 4, Autosomal Dominant Lewy Body"
+        }
+      ]
+    },
+    "interventionBrowseModule": {
+      "meshes": [
+        {
+          "term": "pembrolizumab"
+        },
+        {
+          "term": "dabrafenib"
+        },
+        {
+          "term": "trametinib"
+        }
+      ]
+    }
+  },
+  "hasResults": true
+}

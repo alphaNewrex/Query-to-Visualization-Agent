@@ -1,0 +1,32 @@
+{
+  "interpretation": "Count recruiting Duchenne muscular dystrophy trials.",
+  "entities": [
+    {
+      "kind": "condition",
+      "value": "Duchenne muscular dystrophy",
+      "role": "filter"
+    }
+  ],
+  "filters": {
+    "phases": [],
+    "statuses": [
+      "RECRUITING"
+    ],
+    "study_types": [],
+    "sponsor_classes": [],
+    "intervention_types": [],
+    "evidence": [
+      {
+        "family": "statuses",
+        "phrase": "recruiting"
+      }
+    ],
+    "date_field": "start_date",
+    "year_from": null,
+    "year_to": null
+  },
+  "analysis": {
+    "kind": "total"
+  },
+  "chart_preference": null
+}

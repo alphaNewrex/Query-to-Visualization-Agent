@@ -1,0 +1,240 @@
+"""The query plan: what the planner model writes, what `POST /v1/analyses` accepts, what a response echoes.
+
+Written for OpenAI strict structured outputs, as measured live on every allowed model: every field is
+required and has no default (optional means `X | None`), and the tagged union is a plain union of
+variants that each carry a `Literal` tag. A `Field(discriminator=...)` union, `dict`, `set` and `tuple`
+fields are all rejected with HTTP 400. Output follows key order, so the short free-text field comes first.
+No field can hold a data value, a row, a title or an NCT ID.
+
+Strict mode enforces a numeric or length bound by silently changing the value, so a bound here is not a
+validator: the bounds are loose on purpose and `planning/validate.py` clamps with a recorded adjustment.
+
+The classes carry comments and no docstrings: a docstring becomes a `description` in the schema the
+model receives, and the schema is measured and kept as small as it is.
+"""
+
+from dataclasses import dataclass
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class PlanModel(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+
+EntityKind = Literal["drug", "condition", "sponsor", "country", "term"]
+Phase = Literal["EARLY_PHASE1", "PHASE1", "PHASE2", "PHASE3", "PHASE4", "NA"]
+Status = Literal[
+    "NOT_YET_RECRUITING",
+    "RECRUITING",
+    "ENROLLING_BY_INVITATION",
+    "ACTIVE_NOT_RECRUITING",
+    "COMPLETED",
+    "SUSPENDED",
+    "TERMINATED",
+    "WITHDRAWN",
+    "AVAILABLE",
+    "NO_LONGER_AVAILABLE",
+    "TEMPORARILY_NOT_AVAILABLE",
+    "APPROVED_FOR_MARKETING",
+    "WITHHELD",
+    "UNKNOWN",
+]
+StudyType = Literal["INTERVENTIONAL", "OBSERVATIONAL", "EXPANDED_ACCESS"]
+SponsorClass = Literal["NIH", "FED", "OTHER_GOV", "INDIV", "INDUSTRY", "NETWORK", "AMBIG", "OTHER", "UNKNOWN"]
+InterventionType = Literal[
+    "BEHAVIORAL",
+    "BIOLOGICAL",
+    "COMBINATION_PRODUCT",
+    "DEVICE",
+    "DIAGNOSTIC_TEST",
+    "DIETARY_SUPPLEMENT",
+    "DRUG",
+    "GENETIC",
+    "PROCEDURE",
+    "RADIATION",
+    "OTHER",
+]
+DateField = Literal["start_date", "primary_completion_date", "completion_date", "first_posted_date"]
+ClosedDimension = Literal[
+    "phase",
+    "overall_status",
+    "study_type",
+    "sponsor_class",
+    "intervention_type",
+    "sex",
+    "age_group",
+    "allocation",
+    "masking",
+    "primary_purpose",
+    "has_results",
+]
+DimensionKey = Literal[
+    "phase",
+    "overall_status",
+    "study_type",
+    "sponsor_class",
+    "intervention_type",
+    "sex",
+    "age_group",
+    "allocation",
+    "masking",
+    "primary_purpose",
+    "has_results",  # closed
+    "country",
+    "sponsor",
+    "drug",
+    "condition",  # open
+    "start_date",
+    "primary_completion_date",
+    "completion_date",
+    "first_posted_date",  # dates
+    "enrollment",  # number, binned
+]
+NumericField = Literal["enrollment", "duration_months", "site_count"]
+NodeKind = Literal["sponsor", "drug", "condition", "country"]
+SortField = Literal["enrollment", "start_date", "completion_date", "first_posted_date"]
+FilterFamily = Literal["phases", "statuses", "study_types", "sponsor_classes", "intervention_types"]
+ChartType = Literal[
+    "bar_chart", "time_series", "histogram", "scatter_plot", "network_graph", "table", "metric"
+]
+
+# Not in the model's schema as names: each is a plain `Literal` there, exactly as written in the plan.
+TimeUnit = Literal["year", "quarter", "month"]
+Pairing = Literal["same_trial", "same_arm"]
+SortOrder = Literal["desc", "asc"]
+
+
+class Entity(PlanModel):
+    kind: EntityKind
+    value: str = Field(
+        description="The words exactly as they appear in the question or in a structured field. "
+        "Never translate, expand, correct or add a name."
+    )
+    role: Literal["filter", "compare"] = Field(
+        description="'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison."
+    )
+
+
+class FilterEvidence(PlanModel):
+    family: FilterFamily
+    phrase: str = Field(description="The words of the question that state this filter, copied verbatim.")
+
+
+class PlanFilters(PlanModel):
+    phases: list[Phase] = Field(description="Empty unless the question restricts phase.")
+    statuses: list[Status] = Field(
+        description="Empty unless the question restricts status. 'recruiting' means RECRUITING only."
+    )
+    study_types: list[StudyType] = Field(description="Empty unless the question restricts study type.")
+    sponsor_classes: list[SponsorClass] = Field(
+        description="Empty unless the question restricts the kind of sponsor, e.g. industry."
+    )
+    intervention_types: list[InterventionType] = Field(
+        description="Empty unless the question restricts the kind of intervention."
+    )
+    evidence: list[FilterEvidence] = Field(description="One item for every non-empty list above.")
+    date_field: DateField | None = Field(
+        description="Which date year_from and year_to apply to; null lets the service decide."
+    )
+    year_from: int | None = Field(
+        ge=1900, le=2100, description="First year, inclusive; null if the question gives none."
+    )
+    year_to: int | None = Field(
+        ge=1900, le=2100, description="Last year, inclusive; null if the question gives none."
+    )
+
+
+# Count trials by one dimension, optionally split by a second.
+class Aggregate(PlanModel):
+    kind: Literal["aggregate"]
+    dimension: DimensionKey = Field(
+        description="What trials are counted by: a category, a date or enrollment size."
+    )
+    series: ClosedDimension | None = Field(
+        description="A second, closed dimension that splits the first; null otherwise."
+    )
+    time_unit: TimeUnit | None = Field(
+        description="Only for date dimensions; null lets the service use year."
+    )
+    top_n: int | None = Field(
+        ge=1, le=500, description="Only when the user asks for a number of items; otherwise null."
+    )
+
+
+# One number.
+class Total(PlanModel):
+    kind: Literal["total"]
+
+
+# One point per trial.
+class Relate(PlanModel):
+    kind: Literal["relate"]
+    x: NumericField
+    y: NumericField
+    color_by: ClosedDimension | None
+
+
+# Co-occurrence of two kinds of thing across trials.
+class Network(PlanModel):
+    kind: Literal["network"]
+    source: NodeKind
+    target: NodeKind = Field(description="The same kind as source for co-occurrence, e.g. drug and drug.")
+    link: Pairing | None = Field(
+        description="'same_arm' when the question is about combinations; null lets the service decide."
+    )
+
+
+# The largest, latest or earliest N trials.
+class TrialList(PlanModel):
+    kind: Literal["trial_list"]
+    sort_by: SortField
+    order: SortOrder
+    limit: int | None = Field(ge=1, le=500, description="Only when the user gives a number; otherwise null.")
+
+
+class Clarify(PlanModel):
+    kind: Literal["clarify"]
+    reason: Literal["missing_entity", "ambiguous_request"]
+    missing: list[Literal["drug_name", "condition", "sponsor", "country", "compare", "group_by"]]
+
+
+class Unsupported(PlanModel):
+    kind: Literal["unsupported"]
+    category: Literal[
+        "not_about_clinical_trials",
+        "needs_data_not_in_registry",
+        "single_trial_lookup",
+        "analysis_not_supported",
+        "other",
+    ]
+    reason: str = Field(description="One sentence. No figures other than those in the question.")
+
+
+Analysis = Aggregate | Total | Relate | Network | TrialList | Clarify | Unsupported
+
+
+class QueryPlan(PlanModel):
+    interpretation: str = Field(
+        description="One sentence restating what will be counted and how it is grouped. "
+        "No figures other than those in the question."
+    )
+    entities: list[Entity] = Field(
+        max_length=12, description="Named drugs, conditions, sponsors, countries or other terms."
+    )
+    filters: PlanFilters
+    analysis: Analysis
+    chart_preference: ChartType | None = Field(
+        description="Only when the user names a chart form; otherwise null."
+    )
+
+
+@dataclass(frozen=True)
+class PlanIssue:
+    """A problem in a plan that code cannot repair, sent back to the model for its one repair turn."""
+
+    code: str
+    path: str
+    message: str
+    allowed: tuple[str, ...] = ()  # the values that would be accepted at `path`, when there is a closed list

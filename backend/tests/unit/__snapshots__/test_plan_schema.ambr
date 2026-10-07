@@ -1,0 +1,667 @@
+# serializer version: 1
+# name: test_the_wire_schema_snapshot
+  dict({
+    '$defs': dict({
+      'Aggregate': dict({
+        'additionalProperties': False,
+        'properties': dict({
+          'dimension': dict({
+            'description': 'What trials are counted by: a category, a date or enrollment size.',
+            'enum': list([
+              'phase',
+              'overall_status',
+              'study_type',
+              'sponsor_class',
+              'intervention_type',
+              'sex',
+              'age_group',
+              'allocation',
+              'masking',
+              'primary_purpose',
+              'has_results',
+              'country',
+              'sponsor',
+              'drug',
+              'condition',
+              'start_date',
+              'primary_completion_date',
+              'completion_date',
+              'first_posted_date',
+              'enrollment',
+            ]),
+            'title': 'Dimension',
+            'type': 'string',
+          }),
+          'kind': dict({
+            'const': 'aggregate',
+            'title': 'Kind',
+            'type': 'string',
+          }),
+          'series': dict({
+            'anyOf': list([
+              dict({
+                'enum': list([
+                  'phase',
+                  'overall_status',
+                  'study_type',
+                  'sponsor_class',
+                  'intervention_type',
+                  'sex',
+                  'age_group',
+                  'allocation',
+                  'masking',
+                  'primary_purpose',
+                  'has_results',
+                ]),
+                'type': 'string',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': 'A second, closed dimension that splits the first; null otherwise.',
+            'title': 'Series',
+          }),
+          'time_unit': dict({
+            'anyOf': list([
+              dict({
+                'enum': list([
+                  'year',
+                  'quarter',
+                  'month',
+                ]),
+                'type': 'string',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': 'Only for date dimensions; null lets the service use year.',
+            'title': 'Time Unit',
+          }),
+          'top_n': dict({
+            'anyOf': list([
+              dict({
+                'maximum': 500,
+                'minimum': 1,
+                'type': 'integer',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': 'Only when the user asks for a number of items; otherwise null.',
+            'title': 'Top N',
+          }),
+        }),
+        'required': list([
+          'kind',
+          'dimension',
+          'series',
+          'time_unit',
+          'top_n',
+        ]),
+        'title': 'Aggregate',
+        'type': 'object',
+      }),
+      'Clarify': dict({
+        'additionalProperties': False,
+        'properties': dict({
+          'kind': dict({
+            'const': 'clarify',
+            'title': 'Kind',
+            'type': 'string',
+          }),
+          'missing': dict({
+            'items': dict({
+              'enum': list([
+                'drug_name',
+                'condition',
+                'sponsor',
+                'country',
+                'compare',
+                'group_by',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Missing',
+            'type': 'array',
+          }),
+          'reason': dict({
+            'enum': list([
+              'missing_entity',
+              'ambiguous_request',
+            ]),
+            'title': 'Reason',
+            'type': 'string',
+          }),
+        }),
+        'required': list([
+          'kind',
+          'reason',
+          'missing',
+        ]),
+        'title': 'Clarify',
+        'type': 'object',
+      }),
+      'Entity': dict({
+        'additionalProperties': False,
+        'properties': dict({
+          'kind': dict({
+            'enum': list([
+              'drug',
+              'condition',
+              'sponsor',
+              'country',
+              'term',
+            ]),
+            'title': 'Kind',
+            'type': 'string',
+          }),
+          'role': dict({
+            'description': "'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison.",
+            'enum': list([
+              'filter',
+              'compare',
+            ]),
+            'title': 'Role',
+            'type': 'string',
+          }),
+          'value': dict({
+            'description': 'The words exactly as they appear in the question or in a structured field. Never translate, expand, correct or add a name.',
+            'title': 'Value',
+            'type': 'string',
+          }),
+        }),
+        'required': list([
+          'kind',
+          'value',
+          'role',
+        ]),
+        'title': 'Entity',
+        'type': 'object',
+      }),
+      'FilterEvidence': dict({
+        'additionalProperties': False,
+        'properties': dict({
+          'family': dict({
+            'enum': list([
+              'phases',
+              'statuses',
+              'study_types',
+              'sponsor_classes',
+              'intervention_types',
+            ]),
+            'title': 'Family',
+            'type': 'string',
+          }),
+          'phrase': dict({
+            'description': 'The words of the question that state this filter, copied verbatim.',
+            'title': 'Phrase',
+            'type': 'string',
+          }),
+        }),
+        'required': list([
+          'family',
+          'phrase',
+        ]),
+        'title': 'FilterEvidence',
+        'type': 'object',
+      }),
+      'Network': dict({
+        'additionalProperties': False,
+        'properties': dict({
+          'kind': dict({
+            'const': 'network',
+            'title': 'Kind',
+            'type': 'string',
+          }),
+          'link': dict({
+            'anyOf': list([
+              dict({
+                'enum': list([
+                  'same_trial',
+                  'same_arm',
+                ]),
+                'type': 'string',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': "'same_arm' when the question is about combinations; null lets the service decide.",
+            'title': 'Link',
+          }),
+          'source': dict({
+            'enum': list([
+              'sponsor',
+              'drug',
+              'condition',
+              'country',
+            ]),
+            'title': 'Source',
+            'type': 'string',
+          }),
+          'target': dict({
+            'description': 'The same kind as source for co-occurrence, e.g. drug and drug.',
+            'enum': list([
+              'sponsor',
+              'drug',
+              'condition',
+              'country',
+            ]),
+            'title': 'Target',
+            'type': 'string',
+          }),
+        }),
+        'required': list([
+          'kind',
+          'source',
+          'target',
+          'link',
+        ]),
+        'title': 'Network',
+        'type': 'object',
+      }),
+      'PlanFilters': dict({
+        'additionalProperties': False,
+        'properties': dict({
+          'date_field': dict({
+            'anyOf': list([
+              dict({
+                'enum': list([
+                  'start_date',
+                  'primary_completion_date',
+                  'completion_date',
+                  'first_posted_date',
+                ]),
+                'type': 'string',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': 'Which date year_from and year_to apply to; null lets the service decide.',
+            'title': 'Date Field',
+          }),
+          'evidence': dict({
+            'description': 'One item for every non-empty list above.',
+            'items': dict({
+              '$ref': '#/$defs/FilterEvidence',
+            }),
+            'title': 'Evidence',
+            'type': 'array',
+          }),
+          'intervention_types': dict({
+            'description': 'Empty unless the question restricts the kind of intervention.',
+            'items': dict({
+              'enum': list([
+                'BEHAVIORAL',
+                'BIOLOGICAL',
+                'COMBINATION_PRODUCT',
+                'DEVICE',
+                'DIAGNOSTIC_TEST',
+                'DIETARY_SUPPLEMENT',
+                'DRUG',
+                'GENETIC',
+                'PROCEDURE',
+                'RADIATION',
+                'OTHER',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Intervention Types',
+            'type': 'array',
+          }),
+          'phases': dict({
+            'description': 'Empty unless the question restricts phase.',
+            'items': dict({
+              'enum': list([
+                'EARLY_PHASE1',
+                'PHASE1',
+                'PHASE2',
+                'PHASE3',
+                'PHASE4',
+                'NA',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Phases',
+            'type': 'array',
+          }),
+          'sponsor_classes': dict({
+            'description': 'Empty unless the question restricts the kind of sponsor, e.g. industry.',
+            'items': dict({
+              'enum': list([
+                'NIH',
+                'FED',
+                'OTHER_GOV',
+                'INDIV',
+                'INDUSTRY',
+                'NETWORK',
+                'AMBIG',
+                'OTHER',
+                'UNKNOWN',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Sponsor Classes',
+            'type': 'array',
+          }),
+          'statuses': dict({
+            'description': "Empty unless the question restricts status. 'recruiting' means RECRUITING only.",
+            'items': dict({
+              'enum': list([
+                'NOT_YET_RECRUITING',
+                'RECRUITING',
+                'ENROLLING_BY_INVITATION',
+                'ACTIVE_NOT_RECRUITING',
+                'COMPLETED',
+                'SUSPENDED',
+                'TERMINATED',
+                'WITHDRAWN',
+                'AVAILABLE',
+                'NO_LONGER_AVAILABLE',
+                'TEMPORARILY_NOT_AVAILABLE',
+                'APPROVED_FOR_MARKETING',
+                'WITHHELD',
+                'UNKNOWN',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Statuses',
+            'type': 'array',
+          }),
+          'study_types': dict({
+            'description': 'Empty unless the question restricts study type.',
+            'items': dict({
+              'enum': list([
+                'INTERVENTIONAL',
+                'OBSERVATIONAL',
+                'EXPANDED_ACCESS',
+              ]),
+              'type': 'string',
+            }),
+            'title': 'Study Types',
+            'type': 'array',
+          }),
+          'year_from': dict({
+            'anyOf': list([
+              dict({
+                'maximum': 2100,
+                'minimum': 1900,
+                'type': 'integer',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': 'First year, inclusive; null if the question gives none.',
+            'title': 'Year From',
+          }),
+          'year_to': dict({
+            'anyOf': list([
+              dict({
+                'maximum': 2100,
+                'minimum': 1900,
+                'type': 'integer',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': 'Last year, inclusive; null if the question gives none.',
+            'title': 'Year To',
+          }),
+        }),
+        'required': list([
+          'phases',
+          'statuses',
+          'study_types',
+          'sponsor_classes',
+          'intervention_types',
+          'evidence',
+          'date_field',
+          'year_from',
+          'year_to',
+        ]),
+        'title': 'PlanFilters',
+        'type': 'object',
+      }),
+      'Relate': dict({
+        'additionalProperties': False,
+        'properties': dict({
+          'color_by': dict({
+            'anyOf': list([
+              dict({
+                'enum': list([
+                  'phase',
+                  'overall_status',
+                  'study_type',
+                  'sponsor_class',
+                  'intervention_type',
+                  'sex',
+                  'age_group',
+                  'allocation',
+                  'masking',
+                  'primary_purpose',
+                  'has_results',
+                ]),
+                'type': 'string',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'title': 'Color By',
+          }),
+          'kind': dict({
+            'const': 'relate',
+            'title': 'Kind',
+            'type': 'string',
+          }),
+          'x': dict({
+            'enum': list([
+              'enrollment',
+              'duration_months',
+              'site_count',
+            ]),
+            'title': 'X',
+            'type': 'string',
+          }),
+          'y': dict({
+            'enum': list([
+              'enrollment',
+              'duration_months',
+              'site_count',
+            ]),
+            'title': 'Y',
+            'type': 'string',
+          }),
+        }),
+        'required': list([
+          'kind',
+          'x',
+          'y',
+          'color_by',
+        ]),
+        'title': 'Relate',
+        'type': 'object',
+      }),
+      'Total': dict({
+        'additionalProperties': False,
+        'properties': dict({
+          'kind': dict({
+            'const': 'total',
+            'title': 'Kind',
+            'type': 'string',
+          }),
+        }),
+        'required': list([
+          'kind',
+        ]),
+        'title': 'Total',
+        'type': 'object',
+      }),
+      'TrialList': dict({
+        'additionalProperties': False,
+        'properties': dict({
+          'kind': dict({
+            'const': 'trial_list',
+            'title': 'Kind',
+            'type': 'string',
+          }),
+          'limit': dict({
+            'anyOf': list([
+              dict({
+                'maximum': 500,
+                'minimum': 1,
+                'type': 'integer',
+              }),
+              dict({
+                'type': 'null',
+              }),
+            ]),
+            'description': 'Only when the user gives a number; otherwise null.',
+            'title': 'Limit',
+          }),
+          'order': dict({
+            'enum': list([
+              'desc',
+              'asc',
+            ]),
+            'title': 'Order',
+            'type': 'string',
+          }),
+          'sort_by': dict({
+            'enum': list([
+              'enrollment',
+              'start_date',
+              'completion_date',
+              'first_posted_date',
+            ]),
+            'title': 'Sort By',
+            'type': 'string',
+          }),
+        }),
+        'required': list([
+          'kind',
+          'sort_by',
+          'order',
+          'limit',
+        ]),
+        'title': 'TrialList',
+        'type': 'object',
+      }),
+      'Unsupported': dict({
+        'additionalProperties': False,
+        'properties': dict({
+          'category': dict({
+            'enum': list([
+              'not_about_clinical_trials',
+              'needs_data_not_in_registry',
+              'single_trial_lookup',
+              'analysis_not_supported',
+              'other',
+            ]),
+            'title': 'Category',
+            'type': 'string',
+          }),
+          'kind': dict({
+            'const': 'unsupported',
+            'title': 'Kind',
+            'type': 'string',
+          }),
+          'reason': dict({
+            'description': 'One sentence. No figures other than those in the question.',
+            'title': 'Reason',
+            'type': 'string',
+          }),
+        }),
+        'required': list([
+          'kind',
+          'category',
+          'reason',
+        ]),
+        'title': 'Unsupported',
+        'type': 'object',
+      }),
+    }),
+    'additionalProperties': False,
+    'properties': dict({
+      'analysis': dict({
+        'anyOf': list([
+          dict({
+            '$ref': '#/$defs/Aggregate',
+          }),
+          dict({
+            '$ref': '#/$defs/Total',
+          }),
+          dict({
+            '$ref': '#/$defs/Relate',
+          }),
+          dict({
+            '$ref': '#/$defs/Network',
+          }),
+          dict({
+            '$ref': '#/$defs/TrialList',
+          }),
+          dict({
+            '$ref': '#/$defs/Clarify',
+          }),
+          dict({
+            '$ref': '#/$defs/Unsupported',
+          }),
+        ]),
+        'title': 'Analysis',
+      }),
+      'chart_preference': dict({
+        'anyOf': list([
+          dict({
+            'enum': list([
+              'bar_chart',
+              'time_series',
+              'histogram',
+              'scatter_plot',
+              'network_graph',
+              'table',
+              'metric',
+            ]),
+            'type': 'string',
+          }),
+          dict({
+            'type': 'null',
+          }),
+        ]),
+        'description': 'Only when the user names a chart form; otherwise null.',
+        'title': 'Chart Preference',
+      }),
+      'entities': dict({
+        'description': 'Named drugs, conditions, sponsors, countries or other terms.',
+        'items': dict({
+          '$ref': '#/$defs/Entity',
+        }),
+        'maxItems': 12,
+        'title': 'Entities',
+        'type': 'array',
+      }),
+      'filters': dict({
+        '$ref': '#/$defs/PlanFilters',
+      }),
+      'interpretation': dict({
+        'description': 'One sentence restating what will be counted and how it is grouped. No figures other than those in the question.',
+        'title': 'Interpretation',
+        'type': 'string',
+      }),
+    }),
+    'required': list([
+      'interpretation',
+      'entities',
+      'filters',
+      'analysis',
+      'chart_preference',
+    ]),
+    'title': 'QueryPlan',
+    'type': 'object',
+  })
+# ---

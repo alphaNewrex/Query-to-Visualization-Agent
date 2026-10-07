@@ -1,0 +1,564 @@
+{
+  "spec_version": "1.0",
+  "kind": "visualization",
+  "message": "10 of 10 trials, ordered by largest enrollment.",
+  "visualization": {
+    "type": "table",
+    "title": "Trials with the largest enrollment: lung cancer",
+    "subtitle": "10 trials · ClinicalTrials.gov, data as of 2026-10-06",
+    "encoding": {
+      "columns": [
+        {
+          "field": "nct_id",
+          "title": "NCT ID",
+          "type": "nominal",
+          "unit": null,
+          "format": null,
+          "href_field": "url"
+        },
+        {
+          "field": "title",
+          "title": "Title",
+          "type": "nominal",
+          "unit": null,
+          "format": null,
+          "href_field": null
+        },
+        {
+          "field": "enrollment",
+          "title": "Enrollment",
+          "type": "quantitative",
+          "unit": "participants",
+          "format": ",d",
+          "href_field": null
+        },
+        {
+          "field": "phase",
+          "title": "Phase",
+          "type": "nominal",
+          "unit": null,
+          "format": null,
+          "href_field": null
+        },
+        {
+          "field": "overall_status",
+          "title": "Status",
+          "type": "nominal",
+          "unit": null,
+          "format": null,
+          "href_field": null
+        },
+        {
+          "field": "start_date",
+          "title": "Start date",
+          "type": "temporal",
+          "unit": null,
+          "format": null,
+          "href_field": null
+        },
+        {
+          "field": "lead_sponsor",
+          "title": "Lead sponsor",
+          "type": "nominal",
+          "unit": null,
+          "format": null,
+          "href_field": null
+        }
+      ]
+    },
+    "data": [
+      {
+        "citations": [
+          {
+            "nct_id": "NCT03847753",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "5940299"
+          }
+        ],
+        "citation_count": 1,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies/NCT03847753",
+        "nct_id": "NCT03847753",
+        "title": "Exploring the Comorbidity Between Mental Disorders and General Medical Conditions",
+        "url": "https://clinicaltrials.gov/study/NCT03847753",
+        "enrollment": 5940299,
+        "phase": "No phase listed",
+        "overall_status": "Completed",
+        "start_date": "2000-01-01",
+        "lead_sponsor": "University of Aarhus"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT01236053",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "2323608"
+          }
+        ],
+        "citation_count": 1,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies/NCT01236053",
+        "nct_id": "NCT01236053",
+        "title": "Cancer in Patients With Gabapentin (GPRD)",
+        "url": "https://clinicaltrials.gov/study/NCT01236053",
+        "enrollment": 2323608,
+        "phase": "No phase listed",
+        "overall_status": "Completed",
+        "start_date": "2010-06",
+        "lead_sponsor": "GlaxoSmithKline"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT04506528",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "1634381"
+          }
+        ],
+        "citation_count": 1,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies/NCT04506528",
+        "nct_id": "NCT04506528",
+        "title": "COVID EHR COHORT at the University of Wisconsin",
+        "url": "https://clinicaltrials.gov/study/NCT04506528",
+        "enrollment": 1634381,
+        "phase": "No phase listed",
+        "overall_status": "Completed",
+        "start_date": "2020-06-11",
+        "lead_sponsor": "University of Wisconsin, Madison"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT02501668",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "1375842"
+          }
+        ],
+        "citation_count": 1,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies/NCT02501668",
+        "nct_id": "NCT02501668",
+        "title": "The Prevalence of Lung Cancer in Patients With Interstitial Lung Disease",
+        "url": "https://clinicaltrials.gov/study/NCT02501668",
+        "enrollment": 1375842,
+        "phase": "No phase listed",
+        "overall_status": "Completed",
+        "start_date": "2015-07",
+        "lead_sponsor": "Keimyung University Dongsan Medical Center"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT05506800",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "1000000"
+          }
+        ],
+        "citation_count": 1,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies/NCT05506800",
+        "nct_id": "NCT05506800",
+        "title": "Guangzhou Women's Health Cohort Study (GWHCS)",
+        "url": "https://clinicaltrials.gov/study/NCT05506800",
+        "enrollment": 1000000,
+        "phase": "No phase listed",
+        "overall_status": "Suspended",
+        "start_date": "2016-03-03",
+        "lead_sponsor": "Guangzhou Women and Children's Medical Center"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT06632886",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "1000000"
+          }
+        ],
+        "citation_count": 1,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies/NCT06632886",
+        "nct_id": "NCT06632886",
+        "title": "AI-Assisted Non-Contrast CT for Multi-Cancer Screening",
+        "url": "https://clinicaltrials.gov/study/NCT06632886",
+        "enrollment": 1000000,
+        "phase": "Not Applicable",
+        "overall_status": "Recruiting",
+        "start_date": "2024-10-07",
+        "lead_sponsor": "Guo ShiWei"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT02012699",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "999999"
+          }
+        ],
+        "citation_count": 1,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies/NCT02012699",
+        "nct_id": "NCT02012699",
+        "title": "Integrated Cancer Repository for Cancer Research",
+        "url": "https://clinicaltrials.gov/study/NCT02012699",
+        "enrollment": 999999,
+        "phase": "No phase listed",
+        "overall_status": "Recruiting",
+        "start_date": "2013-11-01",
+        "lead_sponsor": "University of Nebraska"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT04334239",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "670000"
+          }
+        ],
+        "citation_count": 1,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies/NCT04334239",
+        "nct_id": "NCT04334239",
+        "title": "Effectiveness of Care in Certified Cancer Centres in Germany",
+        "url": "https://clinicaltrials.gov/study/NCT04334239",
+        "enrollment": 670000,
+        "phase": "No phase listed",
+        "overall_status": "Completed",
+        "start_date": "2017-05-01",
+        "lead_sponsor": "Technische Universität Dresden"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07008560",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "438000"
+          }
+        ],
+        "citation_count": 1,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies/NCT07008560",
+        "nct_id": "NCT07008560",
+        "title": "Spatiotemporal Associations Between the COVID-19 Pandemic and Cancer Diagnoses in Bavaria",
+        "url": "https://clinicaltrials.gov/study/NCT07008560",
+        "enrollment": 438000,
+        "phase": "No phase listed",
+        "overall_status": "Active, not recruiting",
+        "start_date": "2025-09-03",
+        "lead_sponsor": "Bavarian Cancer Registry"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT04125381",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "314000"
+          }
+        ],
+        "citation_count": 1,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies/NCT04125381",
+        "nct_id": "NCT04125381",
+        "title": "Arsenic Exposure and Lung Cancer Incidence",
+        "url": "https://clinicaltrials.gov/study/NCT04125381",
+        "enrollment": 314000,
+        "phase": "No phase listed",
+        "overall_status": "Completed",
+        "start_date": "2019-01-14",
+        "lead_sponsor": "University of Rome Tor Vergata"
+      }
+    ]
+  },
+  "clarification": null,
+  "references": {
+    "NCT03847753": {
+      "title": "Exploring the Comorbidity Between Mental Disorders and General Medical Conditions",
+      "url": "https://clinicaltrials.gov/study/NCT03847753",
+      "scope_evidence": []
+    },
+    "NCT01236053": {
+      "title": "Cancer in Patients With Gabapentin (GPRD)",
+      "url": "https://clinicaltrials.gov/study/NCT01236053",
+      "scope_evidence": []
+    },
+    "NCT04506528": {
+      "title": "COVID EHR COHORT at the University of Wisconsin",
+      "url": "https://clinicaltrials.gov/study/NCT04506528",
+      "scope_evidence": []
+    },
+    "NCT02501668": {
+      "title": "The Prevalence of Lung Cancer in Patients With Interstitial Lung Disease",
+      "url": "https://clinicaltrials.gov/study/NCT02501668",
+      "scope_evidence": []
+    },
+    "NCT05506800": {
+      "title": "Guangzhou Women's Health Cohort Study (GWHCS)",
+      "url": "https://clinicaltrials.gov/study/NCT05506800",
+      "scope_evidence": []
+    },
+    "NCT06632886": {
+      "title": "AI-Assisted Non-Contrast CT for Multi-Cancer Screening",
+      "url": "https://clinicaltrials.gov/study/NCT06632886",
+      "scope_evidence": []
+    },
+    "NCT02012699": {
+      "title": "Integrated Cancer Repository for Cancer Research",
+      "url": "https://clinicaltrials.gov/study/NCT02012699",
+      "scope_evidence": []
+    },
+    "NCT04334239": {
+      "title": "Effectiveness of Care in Certified Cancer Centres in Germany",
+      "url": "https://clinicaltrials.gov/study/NCT04334239",
+      "scope_evidence": []
+    },
+    "NCT07008560": {
+      "title": "Spatiotemporal Associations Between the COVID-19 Pandemic and Cancer Diagnoses in Bavaria",
+      "url": "https://clinicaltrials.gov/study/NCT07008560",
+      "scope_evidence": []
+    },
+    "NCT04125381": {
+      "title": "Arsenic Exposure and Lung Cancer Incidence",
+      "url": "https://clinicaltrials.gov/study/NCT04125381",
+      "scope_evidence": []
+    }
+  },
+  "meta": {
+    "request_id": "92486a30-ae06-438f-8fa2-c97b00cb17fd",
+    "generated_at": "2026-10-07T00:59:43.699390Z",
+    "query": "List the 10 largest lung cancer trials.",
+    "filters": {
+      "drug_name": [],
+      "condition": [
+        "lung cancer"
+      ],
+      "sponsor": [],
+      "country": [],
+      "term": [],
+      "trial_phase": [],
+      "status": [],
+      "study_type": [],
+      "sponsor_class": [],
+      "intervention_type": [],
+      "start_year": null,
+      "end_year": null,
+      "date_field": "start_date",
+      "compare": null
+    },
+    "interpretation": {
+      "summary": "Listing trials for lung cancer.",
+      "analysis": "trial_list",
+      "measure": null,
+      "group_by": [],
+      "compare": null,
+      "time_granularity": null,
+      "counting_unit": "trial",
+      "entities": [
+        {
+          "kind": "condition",
+          "source": "question",
+          "text": "lung cancer",
+          "term_searched": "lung cancer",
+          "definition": "condition_search",
+          "status": "ok",
+          "trials_matched": 14604,
+          "strict_name_matches": null,
+          "other_readings": [
+            {
+              "kind": "drug",
+              "trials_matched": 11628
+            }
+          ],
+          "candidates": []
+        }
+      ],
+      "adjustments": [],
+      "strategy": [
+        {
+          "series": null,
+          "name": "sorted_page",
+          "reason": "A list of trials is one page in the requested order.",
+          "upstream_requests": 1
+        }
+      ],
+      "chart_rationale": "Rule 2: a list of trials, so a table."
+    },
+    "plan": {
+      "interpretation": "List lung cancer trials by enrollment, largest first.",
+      "entities": [
+        {
+          "kind": "condition",
+          "value": "lung cancer",
+          "role": "filter"
+        }
+      ],
+      "filters": {
+        "phases": [],
+        "statuses": [],
+        "study_types": [],
+        "sponsor_classes": [],
+        "intervention_types": [],
+        "evidence": [],
+        "date_field": "start_date",
+        "year_from": null,
+        "year_to": null
+      },
+      "analysis": {
+        "kind": "trial_list",
+        "sort_by": "enrollment",
+        "order": "desc",
+        "limit": 10
+      },
+      "chart_preference": null
+    },
+    "options": {
+      "planner": "llm",
+      "citations_per_datum": 5,
+      "drug_match": "broad",
+      "include_trace": true,
+      "use_cache": true
+    },
+    "planner": {
+      "mode": "llm",
+      "model": "gpt-5.4-mini-2026-03-17",
+      "reasoning_effort": "low",
+      "prompt_version": "plan-v1",
+      "attempts": 1,
+      "is_repaired": false,
+      "is_fallback": false,
+      "usage": {
+        "input_tokens": 4144,
+        "output_tokens": 131,
+        "reasoning_tokens": 21,
+        "cached_tokens": 3840
+      }
+    },
+    "assumptions": [
+      "Matched 'lung cancer' with the registry's condition search (conditions, titles, keywords and MeSH terms, with synonyms)."
+    ],
+    "warnings": [],
+    "source": {
+      "name": "ClinicalTrials.gov",
+      "url": "https://clinicaltrials.gov",
+      "api_version": "2.0.5",
+      "data_timestamp": "2026-10-06T09:00:05",
+      "retrieved_at": "2026-10-07T00:59:43.699390Z",
+      "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
+      "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
+      "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 14604,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=lung%20cancer&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 11628,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 14604,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "probe"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&countTotal=true&pageSize=10&fields=NCTId,BriefTitle,Condition,EnrollmentCount,LeadSponsorName,OverallStatus,Phase,StartDate,StudyFirstPostDate&sort=EnrollmentCount:desc",
+          "status": 200,
+          "duration_ms": 124,
+          "total_count": 14604,
+          "records_returned": 10,
+          "is_cached": false,
+          "origin": "execution"
+        }
+      ]
+    },
+    "counts": {
+      "data_points": 10,
+      "series": [
+        {
+          "label": null,
+          "trials_matched": 14604,
+          "trials_analyzed": 10,
+          "trials_excluded": [
+            {
+              "reason": "beyond_listed_rows",
+              "count": 14594,
+              "message": "Not among the 10 listed"
+            }
+          ]
+        }
+      ],
+      "trials_in_several_series": null
+    },
+    "truncation": {
+      "is_truncated": true,
+      "items": [
+        {
+          "scope": "rows",
+          "shown": 10,
+          "total": 14604,
+          "rule": "The first 10 trials in the requested order."
+        }
+      ]
+    },
+    "citations": {
+      "is_enabled": true,
+      "max_per_datum": 5,
+      "selection": "most relevant trials by ClinicalTrials.gov's own ranking",
+      "trials_cited": 10
+    },
+    "suggested_followups": [],
+    "cache": {
+      "is_plan_cached": false,
+      "is_response_cached": false,
+      "cached_at": null
+    },
+    "timing": {
+      "total_ms": 1379,
+      "plan_ms": 1251,
+      "resolve_ms": 1,
+      "fetch_ms": 125,
+      "build_ms": 0
+    },
+    "debug": {
+      "trace": [
+        {
+          "index": 0,
+          "type": "plan",
+          "summary": "List lung cancer trials by enrollment, largest first.",
+          "duration_ms": 1251,
+          "request_indexes": [],
+          "detail": {}
+        },
+        {
+          "index": 1,
+          "type": "resolve_entity",
+          "summary": "1 entities",
+          "duration_ms": 1,
+          "request_indexes": [
+            0,
+            1,
+            2
+          ],
+          "detail": {}
+        },
+        {
+          "index": 2,
+          "type": "execute",
+          "summary": "1 requests",
+          "duration_ms": 125,
+          "request_indexes": [
+            3
+          ],
+          "detail": {}
+        }
+      ]
+    }
+  }
+}

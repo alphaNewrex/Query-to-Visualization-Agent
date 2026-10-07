@@ -28,20 +28,8 @@ check() {  # check NAME URL TEXT: the URL must answer 200 with TEXT in its body
   fi
 }
 
-check_proxy() {  # the browser's path: frontend proxy to backend
-  # Until the backend serves /v1/examples it answers this allow-listed path with its own 404 envelope,
-  # which still proves the route end to end: a proxy that cannot reach the backend answers 502
-  # backend_unreachable. Tighten this to a 200 holding the first example once that endpoint exists.
-  local body
-  if ! body=$(curl --silent --show-error --max-time 10 "$web/api/backend/v1/examples"); then
-    echo "FAIL  browser path: the frontend did not answer"
-    return 1
-  fi
-  case $body in
-    *backend_unreachable*) echo "FAIL  browser path: the frontend could not reach the backend"; return 1 ;;
-    *'"01-'* | *not_found*) echo "ok    browser path: proxy to backend" ;;
-    *) echo "FAIL  browser path: unexpected answer: $body"; return 1 ;;
-  esac
+check_proxy() {  # the browser's path: frontend proxy to backend, which lists the recorded examples
+  check "browser path: proxy to backend" "$web/api/backend/v1/examples" '"01-'
 }
 
 docker compose -p "$project" up --build --wait --wait-timeout 120

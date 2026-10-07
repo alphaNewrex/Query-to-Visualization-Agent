@@ -1,0 +1,1790 @@
+{
+  "spec_version": "1.0",
+  "kind": "visualization",
+  "message": "The largest group is Phase 2 for pembrolizumab, with 1,259 trials.",
+  "visualization": {
+    "type": "bar_chart",
+    "title": "Trials by phase and drug: pembrolizumab vs nivolumab",
+    "subtitle": "pembrolizumab: 2,971, nivolumab: 2,029 trials · ClinicalTrials.gov, data as of 2026-10-06",
+    "orientation": "vertical",
+    "stack": "none",
+    "encoding": {
+      "x": {
+        "field": "phase",
+        "type": "ordinal",
+        "title": "Phase",
+        "domain": [
+          "Early Phase 1",
+          "Phase 1",
+          "Phase 1/Phase 2",
+          "Phase 2",
+          "Phase 2/Phase 3",
+          "Phase 3",
+          "Phase 4",
+          "Not Applicable",
+          "No phase listed"
+        ],
+        "sort": {
+          "by": "natural",
+          "order": "ascending"
+        },
+        "is_exclusive": true
+      },
+      "y": {
+        "field": "trial_count",
+        "type": "quantitative",
+        "title": "Trials",
+        "unit": "trials",
+        "format": ",d",
+        "scale": "linear"
+      },
+      "series": {
+        "field": "group",
+        "type": "nominal",
+        "title": "Drug",
+        "domain": [
+          "pembrolizumab",
+          "nivolumab"
+        ],
+        "sort": null,
+        "is_exclusive": false
+      },
+      "tooltip": [
+        {
+          "field": "share",
+          "title": "Share of trials",
+          "type": "quantitative",
+          "unit": null,
+          "format": ".1%",
+          "href_field": null
+        }
+      ]
+    },
+    "data": [
+      {
+        "citations": [
+          {
+            "nct_id": "NCT06413095",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "EARLY_PHASE1"
+          },
+          {
+            "nct_id": "NCT03197389",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "EARLY_PHASE1"
+          },
+          {
+            "nct_id": "NCT03395847",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "EARLY_PHASE1"
+          },
+          {
+            "nct_id": "NCT03832569",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "EARLY_PHASE1"
+          },
+          {
+            "nct_id": "NCT02728830",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "EARLY_PHASE1"
+          }
+        ],
+        "citation_count": 51,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5DEARLY_PHASE1&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Early Phase 1",
+        "group": "pembrolizumab",
+        "trial_count": 51,
+        "share": 0.0172
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT03316274",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "EARLY_PHASE1"
+          },
+          {
+            "nct_id": "NCT07210632",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "EARLY_PHASE1"
+          },
+          {
+            "nct_id": "NCT04272333",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "EARLY_PHASE1"
+          },
+          {
+            "nct_id": "NCT04891718",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "EARLY_PHASE1"
+          },
+          {
+            "nct_id": "NCT03575598",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "EARLY_PHASE1"
+          }
+        ],
+        "citation_count": 34,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5DEARLY_PHASE1&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Early Phase 1",
+        "group": "nivolumab",
+        "trial_count": 34,
+        "share": 0.0168
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT02852655",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT06153238",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT06268613",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT02268825",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT07160335",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          }
+        ],
+        "citation_count": 573,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5D%28PHASE1%20AND%20NOT%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 1",
+        "group": "pembrolizumab",
+        "trial_count": 573,
+        "share": 0.1929
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT00441337",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT00730639",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT06112808",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT07518043",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT07476326",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          }
+        ],
+        "citation_count": 391,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5D%28PHASE1%20AND%20NOT%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 1",
+        "group": "nivolumab",
+        "trial_count": 391,
+        "share": 0.1927
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT03003468",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT03003468",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT02348008",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT02348008",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT02129556",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT02129556",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT02422381",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT02422381",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT06249048",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT06249048",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE2"
+          }
+        ],
+        "citation_count": 473,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5D%28PHASE1%20AND%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 1/Phase 2",
+        "group": "pembrolizumab",
+        "trial_count": 473,
+        "share": 0.1592
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT04021420",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT04021420",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT04165330",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT04165330",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT05187429",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT05187429",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT03656718",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT03656718",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT02992964",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE1"
+          },
+          {
+            "nct_id": "NCT02992964",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE2"
+          }
+        ],
+        "citation_count": 323,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5D%28PHASE1%20AND%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 1/Phase 2",
+        "group": "nivolumab",
+        "trial_count": 323,
+        "share": 0.1592
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT04098068",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT05737199",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT03110328",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT02289209",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT02736266",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          }
+        ],
+        "citation_count": 1259,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5D%28PHASE2%20AND%20NOT%20PHASE1%20AND%20NOT%20PHASE3%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 2",
+        "group": "pembrolizumab",
+        "trial_count": 1259,
+        "share": 0.4238
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT04875611",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT03146468",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT03304093",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT03630640",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT03226756",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          }
+        ],
+        "citation_count": 813,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5D%28PHASE2%20AND%20NOT%20PHASE1%20AND%20NOT%20PHASE3%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 2",
+        "group": "nivolumab",
+        "trial_count": 813,
+        "share": 0.4007
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT06697301",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT06697301",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT04613596",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT04613596",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT06788990",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT06788990",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT05429697",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT05429697",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT06295731",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT06295731",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE3"
+          }
+        ],
+        "citation_count": 43,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5D%28PHASE2%20AND%20PHASE3%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 2/Phase 3",
+        "group": "pembrolizumab",
+        "trial_count": 43,
+        "share": 0.0145
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT04695977",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT04695977",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT04044651",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT04044651",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT03470922",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT03470922",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT06581406",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT06581406",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT07392892",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE2"
+          },
+          {
+            "nct_id": "NCT07392892",
+            "field": "protocolSection.designModule.phases[1]",
+            "excerpt": "PHASE3"
+          }
+        ],
+        "citation_count": 27,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5D%28PHASE2%20AND%20PHASE3%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 2/Phase 3",
+        "group": "nivolumab",
+        "trial_count": 27,
+        "share": 0.0133
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT06847334",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT03783078",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT05986331",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT06320353",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT06643117",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE3"
+          }
+        ],
+        "citation_count": 324,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5D%28PHASE3%20AND%20NOT%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 3",
+        "group": "pembrolizumab",
+        "trial_count": 324,
+        "share": 0.1091
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT06640530",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT07221734",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT06022861",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT06587451",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE3"
+          },
+          {
+            "nct_id": "NCT05297565",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE3"
+          }
+        ],
+        "citation_count": 159,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5D%28PHASE3%20AND%20NOT%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 3",
+        "group": "nivolumab",
+        "trial_count": 159,
+        "share": 0.0784
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT05235737",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE4"
+          },
+          {
+            "nct_id": "NCT03715205",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE4"
+          },
+          {
+            "nct_id": "NCT03134456",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE4"
+          },
+          {
+            "nct_id": "NCT04554524",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE4"
+          },
+          {
+            "nct_id": "NCT04489888",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE4"
+          }
+        ],
+        "citation_count": 19,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5DPHASE4&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 4",
+        "group": "pembrolizumab",
+        "trial_count": 19,
+        "share": 0.0064
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT02596035",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE4"
+          },
+          {
+            "nct_id": "NCT06116461",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE4"
+          },
+          {
+            "nct_id": "NCT03444766",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE4"
+          },
+          {
+            "nct_id": "NCT06934057",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE4"
+          },
+          {
+            "nct_id": "NCT07459543",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "PHASE4"
+          }
+        ],
+        "citation_count": 17,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5DPHASE4&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Phase 4",
+        "group": "nivolumab",
+        "trial_count": 17,
+        "share": 0.0084
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT02658279",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "NA"
+          },
+          {
+            "nct_id": "NCT05368207",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "NA"
+          },
+          {
+            "nct_id": "NCT02760225",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "NA"
+          },
+          {
+            "nct_id": "NCT05745233",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "NA"
+          },
+          {
+            "nct_id": "NCT03769129",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "NA"
+          }
+        ],
+        "citation_count": 54,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5DNA&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Not Applicable",
+        "group": "pembrolizumab",
+        "trial_count": 54,
+        "share": 0.0182
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT04845139",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "NA"
+          },
+          {
+            "nct_id": "NCT05652673",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "NA"
+          },
+          {
+            "nct_id": "NCT04603248",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "NA"
+          },
+          {
+            "nct_id": "NCT07436390",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "NA"
+          },
+          {
+            "nct_id": "NCT05001360",
+            "field": "protocolSection.designModule.phases[0]",
+            "excerpt": "NA"
+          }
+        ],
+        "citation_count": 50,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5DNA&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "Not Applicable",
+        "group": "nivolumab",
+        "trial_count": 50,
+        "share": 0.0246
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT06771674",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT04740996",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT03311542",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT04076228",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT04557007",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          }
+        ],
+        "citation_count": 175,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5DMISSING&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "No phase listed",
+        "group": "pembrolizumab",
+        "trial_count": 175,
+        "share": 0.0589
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT03126643",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT06163170",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT05068609",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT04146324",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          },
+          {
+            "nct_id": "NCT04936399",
+            "field": "protocolSection.designModule.phases",
+            "excerpt": null
+          }
+        ],
+        "citation_count": 215,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5DMISSING&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+        "phase": "No phase listed",
+        "group": "nivolumab",
+        "trial_count": 215,
+        "share": 0.106
+      }
+    ]
+  },
+  "clarification": null,
+  "references": {
+    "NCT06413095": {
+      "title": "PBI-MST-01 (NCT04541108) Substudy MSD-03: Intratumoral Microdosing of Pembrolizumab Alone and With MK-0482 or MK-4830 in HNSCC or STS",
+      "url": "https://clinicaltrials.gov/study/NCT06413095",
+      "scope_evidence": []
+    },
+    "NCT03197389": {
+      "title": "Effect of Pembrolizumab (Keytruda®) on Biomarkers in Early Breast Cancer.",
+      "url": "https://clinicaltrials.gov/study/NCT03197389",
+      "scope_evidence": []
+    },
+    "NCT03395847": {
+      "title": "Pembrolizumab in Treating Patients With Metastatic or Unresectable Gastroesophageal Adenocarcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT03395847",
+      "scope_evidence": []
+    },
+    "NCT03832569": {
+      "title": "Study of Pembrolizumab Following Surgery in Patients With Microsatellite Instability High (MSI-H) Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT03832569",
+      "scope_evidence": []
+    },
+    "NCT02728830": {
+      "title": "A Study of Pembrolizumab on the Tumoral Immunoprofile of Gynecologic Cancers",
+      "url": "https://clinicaltrials.gov/study/NCT02728830",
+      "scope_evidence": []
+    },
+    "NCT03316274": {
+      "title": "Intra-lesional Nivolumab Therapy for Limited Cutaneous Kaposi Sarcoma",
+      "url": "https://clinicaltrials.gov/study/NCT03316274",
+      "scope_evidence": []
+    },
+    "NCT07210632": {
+      "title": "Window Trial of Fluorescently Labeled Nivolumab-IRDye800 (Nivo800) in High Grade Glioma (HGG)",
+      "url": "https://clinicaltrials.gov/study/NCT07210632",
+      "scope_evidence": []
+    },
+    "NCT04272333": {
+      "title": "Intratumoral Microdosing of Motolimod in HNSCC",
+      "url": "https://clinicaltrials.gov/study/NCT04272333",
+      "scope_evidence": []
+    },
+    "NCT04891718": {
+      "title": "CIVO Intratumoural Microdosing of Anti-Cancer Therapies in Australia",
+      "url": "https://clinicaltrials.gov/study/NCT04891718",
+      "scope_evidence": []
+    },
+    "NCT03575598": {
+      "title": "Sitravatinib (MGCD516) and Nivolumab in Oral Cavity Cancer Window Opportunity Study",
+      "url": "https://clinicaltrials.gov/study/NCT03575598",
+      "scope_evidence": []
+    },
+    "NCT02852655": {
+      "title": "A Pilot Surgical Trial To Evaluate Early Immunologic Pharmacodynamic Parameters For The PD-1 Checkpoint Inhibitor, Pembrolizumab (MK-3475), In Patients With Surgically Accessible Recurrent/Progressive Glioblastoma",
+      "url": "https://clinicaltrials.gov/study/NCT02852655",
+      "scope_evidence": []
+    },
+    "NCT06153238": {
+      "title": "A PK Study to Compare GME751 (Proposed Pembrolizumab Biosimilar) and US-licensed and EU-authorized Keytruda® in Participants With Stage II and III Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT06153238",
+      "scope_evidence": []
+    },
+    "NCT06268613": {
+      "title": "A Study to Compare the Pharmacokinetics, Efficacy, Safety, and Immunogenicity of Pembrolizumab (SB27, EU Sourced Keytruda, and US Sourced Keytruda) in Subjects With Stage II-IIIA NSCLC Following Complete Resection and Adjuvant Platinum-based Chemotherapy",
+      "url": "https://clinicaltrials.gov/study/NCT06268613",
+      "scope_evidence": []
+    },
+    "NCT02268825": {
+      "title": "Phase I Study MK-3475 With Chemotherapy in Patients With Advanced GI Cancers",
+      "url": "https://clinicaltrials.gov/study/NCT02268825",
+      "scope_evidence": []
+    },
+    "NCT07160335": {
+      "title": "A Phase I Clinical Study to Evaluate the PK Profile, Efficacy, Safety and Immunogenicity of HLX17 vs. Keytruda® in Multiple Resected Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07160335",
+      "scope_evidence": []
+    },
+    "NCT00441337": {
+      "title": "A Study of MDX-1106 in Patients With Selected Refractory or Relapsed Malignancies",
+      "url": "https://clinicaltrials.gov/study/NCT00441337",
+      "scope_evidence": []
+    },
+    "NCT00730639": {
+      "title": "A Phase 1 Study of Nivolumab (BMS-936558) in Subjects With Advanced or Recurrent Malignancies",
+      "url": "https://clinicaltrials.gov/study/NCT00730639",
+      "scope_evidence": []
+    },
+    "NCT06112808": {
+      "title": "A Clinical Study of the Pharmacokinetics and Safety of BCD-263 and Opdivo® as Monotherapy in Subjects With Advanced Melanoma of the Skin",
+      "url": "https://clinicaltrials.gov/study/NCT06112808",
+      "scope_evidence": []
+    },
+    "NCT07518043": {
+      "title": "A Study of HLX18 vs. OPDIVO® in Multiple Resected Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07518043",
+      "scope_evidence": []
+    },
+    "NCT07476326": {
+      "title": "Pharmacokinetics, Safety, and Immunogenicity Comparison of Bmab1700 and Opdivo® as Adjuvant Monotherapy in Participants With Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT07476326",
+      "scope_evidence": []
+    },
+    "NCT03003468": {
+      "title": "Pembrolizumab + Imprime PGG for Metastatic Non-small Cell Lung Cancer After Progression on First-Line Therapy: Big Ten Cancer Research Consortium BTCRC-LUN15-017",
+      "url": "https://clinicaltrials.gov/study/NCT03003468",
+      "scope_evidence": []
+    },
+    "NCT02348008": {
+      "title": "Phase Ib and Phase II Studies of MK-3475 in Combination + for Renal Cell Carcinoma:",
+      "url": "https://clinicaltrials.gov/study/NCT02348008",
+      "scope_evidence": []
+    },
+    "NCT02129556": {
+      "title": "Anti-PD-1 Monoclonal Antibody in Advanced, Trastuzumab-resistant, HER2-positive Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT02129556",
+      "scope_evidence": []
+    },
+    "NCT02422381": {
+      "title": "MK-3475 and Gemcitabine in Non-Small Cell Lung Cancer (NSCLC)",
+      "url": "https://clinicaltrials.gov/study/NCT02422381",
+      "scope_evidence": []
+    },
+    "NCT06249048": {
+      "title": "Phase 1/2 Study of Intratumoral Injection of STX-001 in Advanced Solid Tumors as Monotherapy or in Combination With Pembrolizumab",
+      "url": "https://clinicaltrials.gov/study/NCT06249048",
+      "scope_evidence": []
+    },
+    "NCT04021420": {
+      "title": "Safety and Efficacy of Sonocloud Device Combined With Nivolumab in Brain Metastases From Patients With Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT04021420",
+      "scope_evidence": []
+    },
+    "NCT04165330": {
+      "title": "Evaluation of AL3818 in Combination With Nivolumab in Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT04165330",
+      "scope_evidence": []
+    },
+    "NCT05187429": {
+      "title": "Low Dose Nivolumab in Adults Living With HIV on Antiretroviral Therapy",
+      "url": "https://clinicaltrials.gov/study/NCT05187429",
+      "scope_evidence": []
+    },
+    "NCT03656718": {
+      "title": "A Study of Subcutaneous Nivolumab Monotherapy With or Without Recombinant Human Hyaluronidase PH20 (rHuPH20)",
+      "url": "https://clinicaltrials.gov/study/NCT03656718",
+      "scope_evidence": []
+    },
+    "NCT02992964": {
+      "title": "Pilot Study of Nivolumab in Pediatric Patients With Hypermutant Cancers",
+      "url": "https://clinicaltrials.gov/study/NCT02992964",
+      "scope_evidence": []
+    },
+    "NCT04098068": {
+      "title": "Study of MK-3475 (Pembrolizumab) in Patients With Microsatellite Unstable (MSI) Tumors (Cohort D)",
+      "url": "https://clinicaltrials.gov/study/NCT04098068",
+      "scope_evidence": []
+    },
+    "NCT05737199": {
+      "title": "Assessment of the Efficacy and Safety of Pembrolizumab for Ovarian Squamous Cell Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT05737199",
+      "scope_evidence": []
+    },
+    "NCT03110328": {
+      "title": "Study of Pembrolizumab in Metastatic Biliary Tract Cancer as Second-line Treatment After Failing to at Least One Cytotoxic Chemotherapy Regimen: Integration of Genomic Analysis to Identify Predictive Molecular Subtypes",
+      "url": "https://clinicaltrials.gov/study/NCT03110328",
+      "scope_evidence": []
+    },
+    "NCT02289209": {
+      "title": "Reirradiation With Pembrolizumab in Locoregional Inoperable Recurrence or Second Primary Squamous Cell CA of the Head and Neck",
+      "url": "https://clinicaltrials.gov/study/NCT02289209",
+      "scope_evidence": []
+    },
+    "NCT02736266": {
+      "title": "Neoadjuvant Pembrolizumab for Muscle-invasive Urothelial Bladder Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT02736266",
+      "scope_evidence": []
+    },
+    "NCT04875611": {
+      "title": "Nivolumab in Nasopharyngeal Cancer With Progression During or After Platinum-based Treatment",
+      "url": "https://clinicaltrials.gov/study/NCT04875611",
+      "scope_evidence": []
+    },
+    "NCT03146468": {
+      "title": "Nivolumab for Relapsed or Residual Haematological Malignancies After Allogeneic Stem Cell Transplantation",
+      "url": "https://clinicaltrials.gov/study/NCT03146468",
+      "scope_evidence": []
+    },
+    "NCT03304093": {
+      "title": "Immunotherapy by Nivolumab for HIV+ Patients",
+      "url": "https://clinicaltrials.gov/study/NCT03304093",
+      "scope_evidence": []
+    },
+    "NCT03630640": {
+      "title": "Neoadjuvant and Adjuvant Nivolumab in HCC Patients Treated by Electroporation",
+      "url": "https://clinicaltrials.gov/study/NCT03630640",
+      "scope_evidence": []
+    },
+    "NCT03226756": {
+      "title": "Nivolumab in Recurrent and/or Metastatic SCCHN",
+      "url": "https://clinicaltrials.gov/study/NCT03226756",
+      "scope_evidence": []
+    },
+    "NCT06697301": {
+      "title": "Safety and Efficacy of EIK1001 in Combo With Pembro Versus Placebo and Pembro as First-Line Therapy in Patients With Advanced Melanoma.",
+      "url": "https://clinicaltrials.gov/study/NCT06697301",
+      "scope_evidence": []
+    },
+    "NCT04613596": {
+      "title": "Phase 2 Trial of Adagrasib Monotherapy and in Combination With Pembrolizumab and a Phase 3 Trial of Adagrasib in Combination in Patients With a KRAS G12C Mutation KRYSTAL-7",
+      "url": "https://clinicaltrials.gov/study/NCT04613596",
+      "scope_evidence": []
+    },
+    "NCT06788990": {
+      "title": "FORTIFI-HN01: A Study of Ficerafusp Alfa (BCA101) or Placebo in Combination With Pembrolizumab in First-Line PD-L1-pos, R or M HNSCC",
+      "url": "https://clinicaltrials.gov/study/NCT06788990",
+      "scope_evidence": []
+    },
+    "NCT05429697": {
+      "title": "Study of SMT-NK Inj. Plus Pembrolizumab vs Pembrolizumab Monotherapy in Patients With Advanced Biliary Tract Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT05429697",
+      "scope_evidence": []
+    },
+    "NCT06295731": {
+      "title": "INBRX-106 in Combination With Pembrolizumab in First-line PD-L1 CPS≥20 HNSCC",
+      "url": "https://clinicaltrials.gov/study/NCT06295731",
+      "scope_evidence": []
+    },
+    "NCT04695977": {
+      "title": "CMP-001 in Combination With Nivolumab Compared to Nivolumab Monotherapy in Subjects With Advanced Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT04695977",
+      "scope_evidence": []
+    },
+    "NCT04044651": {
+      "title": "Lenvatinib Plus Nivolumab Versus Lenvatinib for Advanced Hepatocellular Carcinoma With Hepatitis B Virus Infection",
+      "url": "https://clinicaltrials.gov/study/NCT04044651",
+      "scope_evidence": []
+    },
+    "NCT03470922": {
+      "title": "A Study of Relatlimab Plus Nivolumab Versus Nivolumab Alone in Participants With Advanced Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT03470922",
+      "scope_evidence": []
+    },
+    "NCT06581406": {
+      "title": "A Randomized, Phase 2/3 Study to Investigate the Efficacy and Safety of RP2 in Combination With Nivolumab in Immune Checkpoint Inhibitor-Naïve Adult Patients With Metastatic Uveal Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT06581406",
+      "scope_evidence": []
+    },
+    "NCT07392892": {
+      "title": "Symbiotic-GI-16: A Study to Learn About the Study Medicine Called PF-08634404 in Combination With Chemotherapy in Gastroesophageal Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07392892",
+      "scope_evidence": []
+    },
+    "NCT06847334": {
+      "title": "A Study to Compare the Efficacy, Safety, Immunogenicity, and Pharmacokinetic Profile of HLX17 Vs. Keytruda® in the First-Line Treatment of Advanced Non-squamous Non-small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06847334",
+      "scope_evidence": []
+    },
+    "NCT03783078": {
+      "title": "Pembrolizumab (MK-3475) as First-line Therapy for Advanced Merkel Cell Carcinoma (MK-3475-913)",
+      "url": "https://clinicaltrials.gov/study/NCT03783078",
+      "scope_evidence": []
+    },
+    "NCT05986331": {
+      "title": "Clinical Study of the Efficacy and Safety of BCD-201 and Keytruda in Subjects With Advanced Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT05986331",
+      "scope_evidence": []
+    },
+    "NCT06320353": {
+      "title": "Study сomparing the Efficacy and Safety of RPH-075 and Keytruda® in Patients With Unresectable or Metastatic Skin Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT06320353",
+      "scope_evidence": []
+    },
+    "NCT06643117": {
+      "title": "Similar Efficacy, Safety, and Immunogenicity of FYB206 in Comparison to Keytruda as add-on to Chemotherapy in Patients With Non-squamous Non-small Cell Lung Cancer (NSCLC)",
+      "url": "https://clinicaltrials.gov/study/NCT06643117",
+      "scope_evidence": []
+    },
+    "NCT06640530": {
+      "title": "Clinical Study of the Efficacy and Safety of BCD-263 and Opdivo® as Monotherapy in Subjects With Advanced Melanoma of the Skin",
+      "url": "https://clinicaltrials.gov/study/NCT06640530",
+      "scope_evidence": []
+    },
+    "NCT07221734": {
+      "title": "Study to Compare Pharmacokinetics, Efficacy, Safety, and Immunogenicity of MB11 Versus EU-/US-Opdivo® in Subjects With Previously Untreated Advanced [Unresectable or Metastatic] Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT07221734",
+      "scope_evidence": []
+    },
+    "NCT06022861": {
+      "title": "A Study to Compare the Efficacy and Safety of LY01015 and Opdivo® Combined Respectively With Chemotherapy in Advanced or Metastatic Esophageal Squamous Cell Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT06022861",
+      "scope_evidence": []
+    },
+    "NCT06587451": {
+      "title": "Integrated Pharmacokinetics (PK)/Efficacy, Safety, and Immunogenicity Study to Demonstrate Similarity of JPB898, a Proposed Biosimilar to Nivolumab, to Opdivo® in Combination With Yervoy®",
+      "url": "https://clinicaltrials.gov/study/NCT06587451",
+      "scope_evidence": []
+    },
+    "NCT05297565": {
+      "title": "A Study to Compare Nivolumab Administered Subcutaneously vs Intravenous in Melanoma Participants Following Complete Resection",
+      "url": "https://clinicaltrials.gov/study/NCT05297565",
+      "scope_evidence": []
+    },
+    "NCT05235737": {
+      "title": "The Assessment of Immune Response in Newly Diagnosed Glioblastoma Patients Treated With Pembrolizumab",
+      "url": "https://clinicaltrials.gov/study/NCT05235737",
+      "scope_evidence": []
+    },
+    "NCT03715205": {
+      "title": "Study to Evaluate the Safety of Pembrolizumab in Participants With Unresectable or Metastatic Melanoma or Non-small Cell Lung Cancer in India (MK-3475-593/KEYNOTE-593)",
+      "url": "https://clinicaltrials.gov/study/NCT03715205",
+      "scope_evidence": []
+    },
+    "NCT03134456": {
+      "title": "Pembrolizumab for Metastatic NSCLC Patients Expressing PD-L1 Who Have Their Own PDX",
+      "url": "https://clinicaltrials.gov/study/NCT03134456",
+      "scope_evidence": []
+    },
+    "NCT04554524": {
+      "title": "Chemotherapy Combined With Pembrolizumab in Treating Patients With Thymoma and Thymic Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT04554524",
+      "scope_evidence": []
+    },
+    "NCT04489888": {
+      "title": "A Study of Pembrolizumab (MK-3475) Plus Carboplatin and Paclitaxel as First-line Treatment of Recurrent/Metastatic Head and Neck Squamous Cell Carcinoma (MK-3475-B10/KEYNOTE B10)",
+      "url": "https://clinicaltrials.gov/study/NCT04489888",
+      "scope_evidence": []
+    },
+    "NCT02596035": {
+      "title": "An Investigational Immuno-therapy Safety Trial of Nivolumab in Patients With Advanced or Metastatic Renal Cell Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT02596035",
+      "scope_evidence": []
+    },
+    "NCT06116461": {
+      "title": "Nivolumab Dose Optimization in Patients With a Complete, Partial or Stable Response",
+      "url": "https://clinicaltrials.gov/study/NCT06116461",
+      "scope_evidence": []
+    },
+    "NCT03444766": {
+      "title": "Study of Nivolumab for Advanced Cancers in India",
+      "url": "https://clinicaltrials.gov/study/NCT03444766",
+      "scope_evidence": []
+    },
+    "NCT06934057": {
+      "title": "Cabozantinib and Nivolumab Among Older Patients With Renal Cell Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT06934057",
+      "scope_evidence": []
+    },
+    "NCT07459543": {
+      "title": "A Study to Assess the Safety, and Tolerability of Nivolumab + Relatlimab Fixed-Dose Combination (FDC) In Unresectable or Metastatic Melanoma Participants In India",
+      "url": "https://clinicaltrials.gov/study/NCT07459543",
+      "scope_evidence": []
+    },
+    "NCT02658279": {
+      "title": "Pembrolizumab (MK-3475) in Patients With Recurrent Malignant Glioma With a Hypermutator Phenotype",
+      "url": "https://clinicaltrials.gov/study/NCT02658279",
+      "scope_evidence": []
+    },
+    "NCT05368207": {
+      "title": "Pembrolizumab in Small Cell Carcinoma of Ovary - Hypercalcemic Type Patient",
+      "url": "https://clinicaltrials.gov/study/NCT05368207",
+      "scope_evidence": []
+    },
+    "NCT02760225": {
+      "title": "Pembrolizumab-PET Imaging",
+      "url": "https://clinicaltrials.gov/study/NCT02760225",
+      "scope_evidence": []
+    },
+    "NCT05745233": {
+      "title": "Intraperitoneal Immune Checkpoint Inhibitor for Malignant Ascites",
+      "url": "https://clinicaltrials.gov/study/NCT05745233",
+      "scope_evidence": []
+    },
+    "NCT03769129": {
+      "title": "Evaluating the Safety and Efficacy of Pembrolizumab Combined With MWA for Advanced NSCLC",
+      "url": "https://clinicaltrials.gov/study/NCT03769129",
+      "scope_evidence": []
+    },
+    "NCT04845139": {
+      "title": "A Case Study of Nivolumab for Relapsed/Refractory Primary Central Nervous System Lymphoma",
+      "url": "https://clinicaltrials.gov/study/NCT04845139",
+      "scope_evidence": []
+    },
+    "NCT05652673": {
+      "title": "Safe Stop Ipilimumab-nivolumab (IPI-NIVO) Trial",
+      "url": "https://clinicaltrials.gov/study/NCT05652673",
+      "scope_evidence": []
+    },
+    "NCT04603248": {
+      "title": "A Study for Identification of Immune Determinants for Response to Nivolumab in Recurrent and/or Metastatic Head and Neck Squamous Cell Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT04603248",
+      "scope_evidence": []
+    },
+    "NCT07436390": {
+      "title": "IFN-Gamma Expression as a Predictor of Response to Immune Checkpoint Inhibitors in First-Line Metastatic Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT07436390",
+      "scope_evidence": []
+    },
+    "NCT05001360": {
+      "title": "Study of FMT Combined With Nivolumab in Gastric Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT05001360",
+      "scope_evidence": []
+    },
+    "NCT06771674": {
+      "title": "Real-world Study of First Line Pembrolizumab- or Nivolumab-treated HPV-positive Recurrent/Metastatic Oropharyngeal Squamous Cell Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT06771674",
+      "scope_evidence": []
+    },
+    "NCT04740996": {
+      "title": "Study of Pembrolizumab in the First Line Therapy for R/M HNSCC in China",
+      "url": "https://clinicaltrials.gov/study/NCT04740996",
+      "scope_evidence": []
+    },
+    "NCT03311542": {
+      "title": "Expanded Access for Pembrolizumab (MK-3475)",
+      "url": "https://clinicaltrials.gov/study/NCT03311542",
+      "scope_evidence": []
+    },
+    "NCT04076228": {
+      "title": "Biomarkers to Predict the Response to Pembrolizumab in Chinese NSCLC Patients",
+      "url": "https://clinicaltrials.gov/study/NCT04076228",
+      "scope_evidence": []
+    },
+    "NCT04557007": {
+      "title": "Drug Concentration Monitoring of Pembrolizumab in Non-Small Cell Lung Cancer Patients",
+      "url": "https://clinicaltrials.gov/study/NCT04557007",
+      "scope_evidence": []
+    },
+    "NCT03126643": {
+      "title": "Expanded Access to Nivolumab (Opdivo)",
+      "url": "https://clinicaltrials.gov/study/NCT03126643",
+      "scope_evidence": []
+    },
+    "NCT06163170": {
+      "title": "A Study to Evaluate Treatment With Nivolumab Alone and Nivolumab Combined With Ipilimumab in Children With Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT06163170",
+      "scope_evidence": []
+    },
+    "NCT05068609": {
+      "title": "A Study of Nivolumab in Participants With Squamous Cell Carcinoma of the Head & Neck (SCCHN) - Patient Reported Outcomes (PRO)",
+      "url": "https://clinicaltrials.gov/study/NCT05068609",
+      "scope_evidence": []
+    },
+    "NCT04146324": {
+      "title": "An Observational Study of Adjuvant (Post-surgery) Therapy With Nivolumab for Resected (Completely Removed) Melanoma in Australia",
+      "url": "https://clinicaltrials.gov/study/NCT04146324",
+      "scope_evidence": []
+    },
+    "NCT04936399": {
+      "title": "A Study of Participants With Squamous Cell Oesophageal Carcinoma Receiving Nivolumab as Part of an Early Access to Medicines Scheme (EAMS) Program in the United Kingdom",
+      "url": "https://clinicaltrials.gov/study/NCT04936399",
+      "scope_evidence": []
+    }
+  },
+  "meta": {
+    "request_id": "d15c65c1-9a9b-4f8c-9cc3-50be52d43ffd",
+    "generated_at": "2026-10-07T00:59:28.370551Z",
+    "query": "Compare phases for trials involving pembrolizumab vs nivolumab.",
+    "filters": {
+      "drug_name": [],
+      "condition": [],
+      "sponsor": [],
+      "country": [],
+      "term": [],
+      "trial_phase": [],
+      "status": [],
+      "study_type": [],
+      "sponsor_class": [],
+      "intervention_type": [],
+      "start_year": null,
+      "end_year": null,
+      "date_field": "start_date",
+      "compare": {
+        "field": "drug_name",
+        "values": [
+          "pembrolizumab",
+          "nivolumab"
+        ]
+      }
+    },
+    "interpretation": {
+      "summary": "Counting trials by phase for pembrolizumab vs nivolumab.",
+      "analysis": "aggregate",
+      "measure": {
+        "aggregate": "count",
+        "of": "trials"
+      },
+      "group_by": [
+        "phase"
+      ],
+      "compare": {
+        "field": "drug_name",
+        "values": [
+          "pembrolizumab",
+          "nivolumab"
+        ]
+      },
+      "time_granularity": null,
+      "counting_unit": "trial",
+      "entities": [
+        {
+          "kind": "drug",
+          "source": "question",
+          "text": "pembrolizumab",
+          "term_searched": "pembrolizumab",
+          "definition": "intervention_search",
+          "status": "ok",
+          "trials_matched": 2971,
+          "strict_name_matches": 2567,
+          "other_readings": [
+            {
+              "kind": "condition",
+              "trials_matched": 2245
+            }
+          ],
+          "candidates": []
+        },
+        {
+          "kind": "drug",
+          "source": "question",
+          "text": "nivolumab",
+          "term_searched": "nivolumab",
+          "definition": "intervention_search",
+          "status": "ok",
+          "trials_matched": 2029,
+          "strict_name_matches": 1672,
+          "other_readings": [
+            {
+              "kind": "condition",
+              "trials_matched": 1531
+            }
+          ],
+          "candidates": []
+        }
+      ],
+      "adjustments": [],
+      "strategy": [
+        {
+          "series": "pembrolizumab",
+          "name": "count_fan_out",
+          "reason": "2,971 trials is more than one page; the registry counted each group with 18 requests.",
+          "upstream_requests": 9
+        },
+        {
+          "series": "nivolumab",
+          "name": "count_fan_out",
+          "reason": "2,971 trials is more than one page; the registry counted each group with 18 requests.",
+          "upstream_requests": 9
+        }
+      ],
+      "chart_rationale": "Rule 8: one ordinal category, so vertical bars in natural order. Rule 10: the series may share trials, so the bars are grouped, never stacked."
+    },
+    "plan": {
+      "interpretation": "Count trials by phase for pembrolizumab and for nivolumab side by side.",
+      "entities": [
+        {
+          "kind": "drug",
+          "value": "pembrolizumab",
+          "role": "compare"
+        },
+        {
+          "kind": "drug",
+          "value": "nivolumab",
+          "role": "compare"
+        }
+      ],
+      "filters": {
+        "phases": [],
+        "statuses": [],
+        "study_types": [],
+        "sponsor_classes": [],
+        "intervention_types": [],
+        "evidence": [],
+        "date_field": "start_date",
+        "year_from": null,
+        "year_to": null
+      },
+      "analysis": {
+        "kind": "aggregate",
+        "dimension": "phase",
+        "series": null,
+        "time_unit": null,
+        "top_n": 15
+      },
+      "chart_preference": null
+    },
+    "options": {
+      "planner": "llm",
+      "citations_per_datum": 5,
+      "drug_match": "broad",
+      "include_trace": true,
+      "use_cache": true
+    },
+    "planner": {
+      "mode": "llm",
+      "model": "gpt-5.4-mini-2026-03-17",
+      "reasoning_effort": "low",
+      "prompt_version": "plan-v1",
+      "attempts": 1,
+      "is_repaired": false,
+      "is_fallback": false,
+      "usage": {
+        "input_tokens": 4149,
+        "output_tokens": 224,
+        "reasoning_tokens": 86,
+        "cached_tokens": 3840
+      }
+    },
+    "assumptions": [
+      "Matched 'pembrolizumab' with the registry's intervention search (names, other names, arm labels, titles, descriptions and MeSH terms, with synonyms): 2,971 trials. 2,567 of them name it as an intervention.",
+      "Matched 'nivolumab' with the registry's intervention search (names, other names, arm labels, titles, descriptions and MeSH terms, with synonyms): 2,029 trials. 1,672 of them name it as an intervention.",
+      "Phases are nine exclusive groups: a trial listing Phase 1 and Phase 2 is counted once, as Phase 1/Phase 2.",
+      "296 trials involve both pembrolizumab and nivolumab and appear in both groups."
+    ],
+    "warnings": [],
+    "source": {
+      "name": "ClinicalTrials.gov",
+      "url": "https://clinicaltrials.gov",
+      "api_version": "2.0.5",
+      "data_timestamp": "2026-10-06T09:00:05",
+      "retrieved_at": "2026-10-07T00:59:28.370551Z",
+      "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
+      "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
+      "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 66,
+          "total_count": 2971,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BInterventionName%5D%22pembrolizumab%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 64,
+          "total_count": 2567,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=pembrolizumab&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 298,
+          "total_count": 2245,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 299,
+          "total_count": 2029,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BInterventionName%5D%22nivolumab%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 127,
+          "total_count": 1672,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=nivolumab&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 134,
+          "total_count": 1531,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 2971,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "probe"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 2029,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "probe"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5DEARLY_PHASE1&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 100,
+          "total_count": 51,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5D%28PHASE1%20AND%20NOT%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 104,
+          "total_count": 573,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5D%28PHASE1%20AND%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 121,
+          "total_count": 473,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5D%28PHASE2%20AND%20NOT%20PHASE1%20AND%20NOT%20PHASE3%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 122,
+          "total_count": 1259,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5D%28PHASE2%20AND%20PHASE3%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 209,
+          "total_count": 43,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5D%28PHASE3%20AND%20NOT%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 196,
+          "total_count": 324,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5DPHASE4&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 362,
+          "total_count": 19,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5DNA&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 563,
+          "total_count": 54,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BPhase%5DMISSING&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 788,
+          "total_count": 175,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5DEARLY_PHASE1&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 966,
+          "total_count": 34,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5D%28PHASE1%20AND%20NOT%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 1163,
+          "total_count": 391,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5D%28PHASE1%20AND%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 1391,
+          "total_count": 323,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5D%28PHASE2%20AND%20NOT%20PHASE1%20AND%20NOT%20PHASE3%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 1568,
+          "total_count": 813,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5D%28PHASE2%20AND%20PHASE3%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 1763,
+          "total_count": 27,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5D%28PHASE3%20AND%20NOT%20PHASE2%29&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 1993,
+          "total_count": 159,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5DPHASE4&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 2160,
+          "total_count": 17,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5DNA&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 2396,
+          "total_count": 50,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=nivolumab&filter.advanced=AREA%5BPhase%5DMISSING&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,InterventionName,InterventionOtherName,Phase,StudyFirstPostDate,StudyType&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 2598,
+          "total_count": 215,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=%28pembrolizumab%29%20AND%20%28nivolumab%29&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 175,
+          "total_count": 296,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "execution"
+        }
+      ]
+    },
+    "counts": {
+      "data_points": 18,
+      "series": [
+        {
+          "label": "pembrolizumab",
+          "trials_matched": 2971,
+          "trials_analyzed": 2971,
+          "trials_excluded": []
+        },
+        {
+          "label": "nivolumab",
+          "trials_matched": 2029,
+          "trials_analyzed": 2029,
+          "trials_excluded": []
+        }
+      ],
+      "trials_in_several_series": 296
+    },
+    "truncation": {
+      "is_truncated": false,
+      "items": []
+    },
+    "citations": {
+      "is_enabled": true,
+      "max_per_datum": 5,
+      "selection": "most relevant trials by ClinicalTrials.gov's own ranking",
+      "trials_cited": 90
+    },
+    "suggested_followups": [],
+    "cache": {
+      "is_plan_cached": false,
+      "is_response_cached": false,
+      "cached_at": null
+    },
+    "timing": {
+      "total_ms": 5061,
+      "plan_ms": 1981,
+      "resolve_ms": 301,
+      "fetch_ms": 2601,
+      "build_ms": 1
+    },
+    "debug": {
+      "trace": [
+        {
+          "index": 0,
+          "type": "plan",
+          "summary": "Count trials by phase for pembrolizumab and for nivolumab side by side.",
+          "duration_ms": 1981,
+          "request_indexes": [],
+          "detail": {}
+        },
+        {
+          "index": 1,
+          "type": "resolve_entity",
+          "summary": "2 entities",
+          "duration_ms": 301,
+          "request_indexes": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "detail": {}
+        },
+        {
+          "index": 2,
+          "type": "execute",
+          "summary": "18 requests",
+          "duration_ms": 2601,
+          "request_indexes": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25
+          ],
+          "detail": {}
+        }
+      ]
+    }
+  }
+}

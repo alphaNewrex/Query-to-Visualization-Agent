@@ -1,0 +1,28 @@
+{
+  "interpretation": "Link drugs that share an arm with pembrolizumab in combination studies.",
+  "entities": [
+    {
+      "kind": "drug",
+      "value": "pembrolizumab",
+      "role": "filter"
+    }
+  ],
+  "filters": {
+    "phases": [],
+    "statuses": [],
+    "study_types": [],
+    "sponsor_classes": [],
+    "intervention_types": [],
+    "evidence": [],
+    "date_field": "start_date",
+    "year_from": null,
+    "year_to": null
+  },
+  "analysis": {
+    "kind": "network",
+    "source": "drug",
+    "target": "drug",
+    "link": "same_arm"
+  },
+  "chart_preference": null
+}

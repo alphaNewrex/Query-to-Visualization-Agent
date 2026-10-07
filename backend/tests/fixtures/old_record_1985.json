@@ -1,0 +1,120 @@
+{
+  "protocolSection": {
+    "identificationModule": {
+      "nctId": "NCT00209352",
+      "briefTitle": "Long-Term Oral Acyclovir Usage to Prevent Herpes Zoster Virus Infection After Bone Marrow Transplant",
+      "organization": {
+        "fullName": "Fred Hutchinson Cancer Center",
+        "class": "OTHER"
+      }
+    },
+    "statusModule": {
+      "statusVerifiedDate": "2007-12",
+      "overallStatus": "COMPLETED",
+      "expandedAccessInfo": {
+        "hasExpandedAccess": false
+      },
+      "startDateStruct": {
+        "date": "1985-06"
+      },
+      "completionDateStruct": {
+        "date": "2004-07",
+        "type": "ACTUAL"
+      },
+      "studyFirstSubmitDate": "2005-09-13",
+      "studyFirstSubmitQcDate": "2005-09-14",
+      "studyFirstPostDateStruct": {
+        "date": "2005-09-21",
+        "type": "ESTIMATED"
+      },
+      "lastUpdateSubmitDate": "2007-12-17",
+      "lastUpdatePostDateStruct": {
+        "date": "2007-12-21",
+        "type": "ESTIMATED"
+      }
+    },
+    "sponsorCollaboratorsModule": {
+      "leadSponsor": {
+        "name": "Fred Hutchinson Cancer Center",
+        "class": "OTHER"
+      }
+    },
+    "conditionsModule": {
+      "conditions": [
+        "VZV Infection After Bone Marrow Transplantation"
+      ]
+    },
+    "designModule": {
+      "studyType": "INTERVENTIONAL",
+      "phases": [
+        "PHASE3"
+      ],
+      "designInfo": {
+        "allocation": "RANDOMIZED",
+        "interventionModel": "PARALLEL",
+        "maskingInfo": {
+          "masking": "DOUBLE"
+        }
+      },
+      "enrollmentInfo": {
+        "count": 120
+      }
+    },
+    "armsInterventionsModule": {
+      "interventions": [
+        {
+          "type": "DRUG",
+          "name": "Acyclovir"
+        }
+      ]
+    },
+    "eligibilityModule": {
+      "sex": "ALL",
+      "minimumAge": "10 Years",
+      "stdAges": [
+        "CHILD",
+        "ADULT",
+        "OLDER_ADULT"
+      ]
+    },
+    "contactsLocationsModule": {
+      "overallOfficials": [
+        {
+          "name": "Michael Boeckh, MD",
+          "affiliation": "Fred Hutchinson Cancer Center",
+          "role": "PRINCIPAL_INVESTIGATOR"
+        }
+      ],
+      "locations": [
+        {
+          "facility": "Fred Hutchinson Cancer Research Center",
+          "city": "Seattle",
+          "state": "Washington",
+          "zip": "98109",
+          "country": "United States",
+          "geoPoint": {
+            "lat": 47.60621,
+            "lon": -122.33207
+          }
+        }
+      ]
+    }
+  },
+  "derivedSection": {
+    "conditionBrowseModule": {
+      "meshes": [
+        {
+          "term": "Varicella Zoster Virus Infection"
+        }
+      ]
+    },
+    "interventionBrowseModule": {
+      "meshes": [
+        {
+          "term": "Acyclovir"
+        }
+      ]
+    }
+  },
+  "hasResults": false
+}

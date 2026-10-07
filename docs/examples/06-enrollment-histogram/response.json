@@ -1,0 +1,1051 @@
+{
+  "spec_version": "1.0",
+  "kind": "visualization",
+  "message": "The most common size range is 25-49, with 649 trials.",
+  "visualization": {
+    "type": "histogram",
+    "title": "Trials by enrollment size: pembrolizumab",
+    "subtitle": "2,966 trials · ClinicalTrials.gov, data as of 2026-10-06",
+    "encoding": {
+      "x": {
+        "field": "bin_start",
+        "type": "quantitative",
+        "title": "Enrollment",
+        "unit": "participants",
+        "format": ",d",
+        "scale": "linear"
+      },
+      "x2": {
+        "field": "bin_end"
+      },
+      "y": {
+        "field": "trial_count",
+        "type": "quantitative",
+        "title": "Trials",
+        "unit": "trials",
+        "format": ",d",
+        "scale": "linear"
+      },
+      "label": {
+        "field": "bin_label"
+      },
+      "tooltip": []
+    },
+    "data": [
+      {
+        "citations": [
+          {
+            "nct_id": "NCT05204160",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "0"
+          },
+          {
+            "nct_id": "NCT06116578",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "0"
+          },
+          {
+            "nct_id": "NCT04258683",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "0"
+          },
+          {
+            "nct_id": "NCT03448666",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "0"
+          },
+          {
+            "nct_id": "NCT06395090",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "0"
+          }
+        ],
+        "citation_count": 132,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B0,0%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+        "bin_start": 0,
+        "bin_end": 1,
+        "bin_label": "0",
+        "trial_count": 132
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT04317066",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "7"
+          },
+          {
+            "nct_id": "NCT05996445",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "7"
+          },
+          {
+            "nct_id": "NCT03695471",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "9"
+          },
+          {
+            "nct_id": "NCT05119296",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "9"
+          },
+          {
+            "nct_id": "NCT03407170",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "1"
+          }
+        ],
+        "citation_count": 213,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B1,9%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+        "bin_start": 1,
+        "bin_end": 10,
+        "bin_label": "1-9",
+        "trial_count": 213
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT04098068",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "12"
+          },
+          {
+            "nct_id": "NCT05737199",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "21"
+          },
+          {
+            "nct_id": "NCT02422381",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "16"
+          },
+          {
+            "nct_id": "NCT02179918",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "23"
+          },
+          {
+            "nct_id": "NCT02535247",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "17"
+          }
+        ],
+        "citation_count": 462,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B10,24%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+        "bin_start": 10,
+        "bin_end": 25,
+        "bin_label": "10-24",
+        "trial_count": 462
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT03003468",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "35"
+          },
+          {
+            "nct_id": "NCT03110328",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "33"
+          },
+          {
+            "nct_id": "NCT02289209",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "48"
+          },
+          {
+            "nct_id": "NCT02268825",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "39"
+          },
+          {
+            "nct_id": "NCT06643117",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "25"
+          }
+        ],
+        "citation_count": 649,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B25,49%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+        "bin_start": 25,
+        "bin_end": 50,
+        "bin_label": "25-49",
+        "trial_count": 649
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT02852655",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "60"
+          },
+          {
+            "nct_id": "NCT02348008",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "61"
+          },
+          {
+            "nct_id": "NCT02129556",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "58"
+          },
+          {
+            "nct_id": "NCT03783078",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "55"
+          },
+          {
+            "nct_id": "NCT02085070",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "65"
+          }
+        ],
+        "citation_count": 492,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B50,99%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+        "bin_start": 50,
+        "bin_end": 100,
+        "bin_label": "50-99",
+        "trial_count": 492
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT06268613",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "163"
+          },
+          {
+            "nct_id": "NCT02736266",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "174"
+          },
+          {
+            "nct_id": "NCT01876511",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "113"
+          },
+          {
+            "nct_id": "NCT07160335",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "174"
+          },
+          {
+            "nct_id": "NCT06137378",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "140"
+          }
+        ],
+        "citation_count": 495,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B100,249%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+        "bin_start": 100,
+        "bin_end": 250,
+        "bin_label": "100-249",
+        "trial_count": 495
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT06153238",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "322"
+          },
+          {
+            "nct_id": "NCT05986331",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "366"
+          },
+          {
+            "nct_id": "NCT06320353",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "266"
+          },
+          {
+            "nct_id": "NCT02178722",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "444"
+          },
+          {
+            "nct_id": "NCT05669430",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "365"
+          }
+        ],
+        "citation_count": 246,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B250,499%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+        "bin_start": 250,
+        "bin_end": 500,
+        "bin_label": "250-499",
+        "trial_count": 246
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT06847334",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "772"
+          },
+          {
+            "nct_id": "NCT06348199",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "555"
+          },
+          {
+            "nct_id": "NCT06697301",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "740"
+          },
+          {
+            "nct_id": "NCT06771674",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "662"
+          },
+          {
+            "nct_id": "NCT04613596",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "626"
+          }
+        ],
+        "citation_count": 177,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B500,999%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+        "bin_start": 500,
+        "bin_end": 1000,
+        "bin_label": "500-999",
+        "trial_count": 177
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT02628067",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "1609"
+          },
+          {
+            "nct_id": "NCT04738487",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "1264"
+          },
+          {
+            "nct_id": "NCT05665595",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "1594"
+          },
+          {
+            "nct_id": "NCT01295827",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "1260"
+          },
+          {
+            "nct_id": "NCT04736706",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "1688"
+          }
+        ],
+        "citation_count": 93,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B1000,4999%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+        "bin_start": 1000,
+        "bin_end": 5000,
+        "bin_label": "1000-4999",
+        "trial_count": 93
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT05834348",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "5279"
+          },
+          {
+            "nct_id": "NCT02194738",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "7458"
+          },
+          {
+            "nct_id": "NCT01042379",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "5000"
+          }
+        ],
+        "citation_count": 3,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B5000,9999%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+        "bin_start": 5000,
+        "bin_end": 10000,
+        "bin_label": "5000-9999",
+        "trial_count": 3
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT05055908",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "12000"
+          },
+          {
+            "nct_id": "NCT07036016",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "67818"
+          },
+          {
+            "nct_id": "NCT04294771",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "500000"
+          },
+          {
+            "nct_id": "NCT05934214",
+            "field": "protocolSection.designModule.enrollmentInfo.count",
+            "excerpt": "141630"
+          }
+        ],
+        "citation_count": 4,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B10000,MAX%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+        "bin_start": 10000,
+        "bin_end": null,
+        "bin_label": "10000+",
+        "trial_count": 4
+      }
+    ]
+  },
+  "clarification": null,
+  "references": {
+    "NCT05204160": {
+      "title": "Pembrolizumab as Salvage Therapy for the Treatment of Multiple Myeloma in Patients Progressing on CAR-T Cell Therapy",
+      "url": "https://clinicaltrials.gov/study/NCT05204160",
+      "scope_evidence": []
+    },
+    "NCT06116578": {
+      "title": "Study Evaluating Pembrolizumab +/- Olaparib in TLS Positive Selected Resectable STS Followed by Adjuvant Pembrolizumab",
+      "url": "https://clinicaltrials.gov/study/NCT06116578",
+      "scope_evidence": []
+    },
+    "NCT04258683": {
+      "title": "A Study of Pembrolizumab Added to the Standard First-Line Therapy of Cyclophosphamide, Bortezomib, and Dexamethasone (CyBorD) for NDMM NTE",
+      "url": "https://clinicaltrials.gov/study/NCT04258683",
+      "scope_evidence": []
+    },
+    "NCT03448666": {
+      "title": "ECT-Pembrolizumab in Patients With Unresectable Melanoma With Superficial or Superficial and Visceral Metastases",
+      "url": "https://clinicaltrials.gov/study/NCT03448666",
+      "scope_evidence": []
+    },
+    "NCT06395090": {
+      "title": "A Study of Pembrolizumab in Combination With Investigational Agents in Pediatric and Young Adult Participants With Hematologic Malignancies or Solid Tumors (MK-9999-01B/LIGHTBEAM-U01)",
+      "url": "https://clinicaltrials.gov/study/NCT06395090",
+      "scope_evidence": []
+    },
+    "NCT04317066": {
+      "title": "A Study of Pembrolizumab (MK-3475) in Participants With Relapsed or Refractory Primary Mediastinal Large B-cell Lymphoma (rrPMBCL) (MK-3475-A33/KEYNOTE-A33)",
+      "url": "https://clinicaltrials.gov/study/NCT04317066",
+      "scope_evidence": []
+    },
+    "NCT05996445": {
+      "title": "A Study of XmAb®662 as Monotherapy or in Combination With Pembrolizumab in Advanced Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT05996445",
+      "scope_evidence": []
+    },
+    "NCT03695471": {
+      "title": "Pembrolizumab in Treating Patients With Stage IB-IV Mycosis Fungoides",
+      "url": "https://clinicaltrials.gov/study/NCT03695471",
+      "scope_evidence": []
+    },
+    "NCT05119296": {
+      "title": "Phase II Trial of Pembrolizumab in Metastatic or Locally Advanced Anaplastic/Undifferentiated Thyroid Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT05119296",
+      "scope_evidence": []
+    },
+    "NCT03407170": {
+      "title": "Immunologic Determinants of Response to Pembrolizumab (MK-3475) in Advanced Melanoma (MK-3475-161/KEYNOTE-161)",
+      "url": "https://clinicaltrials.gov/study/NCT03407170",
+      "scope_evidence": []
+    },
+    "NCT04098068": {
+      "title": "Study of MK-3475 (Pembrolizumab) in Patients With Microsatellite Unstable (MSI) Tumors (Cohort D)",
+      "url": "https://clinicaltrials.gov/study/NCT04098068",
+      "scope_evidence": []
+    },
+    "NCT05737199": {
+      "title": "Assessment of the Efficacy and Safety of Pembrolizumab for Ovarian Squamous Cell Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT05737199",
+      "scope_evidence": []
+    },
+    "NCT02422381": {
+      "title": "MK-3475 and Gemcitabine in Non-Small Cell Lung Cancer (NSCLC)",
+      "url": "https://clinicaltrials.gov/study/NCT02422381",
+      "scope_evidence": []
+    },
+    "NCT02179918": {
+      "title": "A Study Of 4-1BB Agonist PF-05082566 Plus PD-1 Inhibitor MK-3475 In Patients With Solid Tumors (B1641003/KEYNOTE-0036)",
+      "url": "https://clinicaltrials.gov/study/NCT02179918",
+      "scope_evidence": []
+    },
+    "NCT02535247": {
+      "title": "Study of MK-3475 Alone or in Combination With Copanlisib in Relapsed or Refractory NK and T-cell Non-Hodgkin Lymphoma",
+      "url": "https://clinicaltrials.gov/study/NCT02535247",
+      "scope_evidence": []
+    },
+    "NCT03003468": {
+      "title": "Pembrolizumab + Imprime PGG for Metastatic Non-small Cell Lung Cancer After Progression on First-Line Therapy: Big Ten Cancer Research Consortium BTCRC-LUN15-017",
+      "url": "https://clinicaltrials.gov/study/NCT03003468",
+      "scope_evidence": []
+    },
+    "NCT03110328": {
+      "title": "Study of Pembrolizumab in Metastatic Biliary Tract Cancer as Second-line Treatment After Failing to at Least One Cytotoxic Chemotherapy Regimen: Integration of Genomic Analysis to Identify Predictive Molecular Subtypes",
+      "url": "https://clinicaltrials.gov/study/NCT03110328",
+      "scope_evidence": []
+    },
+    "NCT02289209": {
+      "title": "Reirradiation With Pembrolizumab in Locoregional Inoperable Recurrence or Second Primary Squamous Cell CA of the Head and Neck",
+      "url": "https://clinicaltrials.gov/study/NCT02289209",
+      "scope_evidence": []
+    },
+    "NCT02268825": {
+      "title": "Phase I Study MK-3475 With Chemotherapy in Patients With Advanced GI Cancers",
+      "url": "https://clinicaltrials.gov/study/NCT02268825",
+      "scope_evidence": []
+    },
+    "NCT06643117": {
+      "title": "Similar Efficacy, Safety, and Immunogenicity of FYB206 in Comparison to Keytruda as add-on to Chemotherapy in Patients With Non-squamous Non-small Cell Lung Cancer (NSCLC)",
+      "url": "https://clinicaltrials.gov/study/NCT06643117",
+      "scope_evidence": []
+    },
+    "NCT02852655": {
+      "title": "A Pilot Surgical Trial To Evaluate Early Immunologic Pharmacodynamic Parameters For The PD-1 Checkpoint Inhibitor, Pembrolizumab (MK-3475), In Patients With Surgically Accessible Recurrent/Progressive Glioblastoma",
+      "url": "https://clinicaltrials.gov/study/NCT02852655",
+      "scope_evidence": []
+    },
+    "NCT02348008": {
+      "title": "Phase Ib and Phase II Studies of MK-3475 in Combination + for Renal Cell Carcinoma:",
+      "url": "https://clinicaltrials.gov/study/NCT02348008",
+      "scope_evidence": []
+    },
+    "NCT02129556": {
+      "title": "Anti-PD-1 Monoclonal Antibody in Advanced, Trastuzumab-resistant, HER2-positive Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT02129556",
+      "scope_evidence": []
+    },
+    "NCT03783078": {
+      "title": "Pembrolizumab (MK-3475) as First-line Therapy for Advanced Merkel Cell Carcinoma (MK-3475-913)",
+      "url": "https://clinicaltrials.gov/study/NCT03783078",
+      "scope_evidence": []
+    },
+    "NCT02085070": {
+      "title": "MK-3475 in Melanoma and NSCLC Patients With Brain Metastases",
+      "url": "https://clinicaltrials.gov/study/NCT02085070",
+      "scope_evidence": []
+    },
+    "NCT06268613": {
+      "title": "A Study to Compare the Pharmacokinetics, Efficacy, Safety, and Immunogenicity of Pembrolizumab (SB27, EU Sourced Keytruda, and US Sourced Keytruda) in Subjects With Stage II-IIIA NSCLC Following Complete Resection and Adjuvant Platinum-based Chemotherapy",
+      "url": "https://clinicaltrials.gov/study/NCT06268613",
+      "scope_evidence": []
+    },
+    "NCT02736266": {
+      "title": "Neoadjuvant Pembrolizumab for Muscle-invasive Urothelial Bladder Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT02736266",
+      "scope_evidence": []
+    },
+    "NCT01876511": {
+      "title": "Study of MK-3475 in Patients With Microsatellite Unstable (MSI) Tumors (Cohorts A, B and C)",
+      "url": "https://clinicaltrials.gov/study/NCT01876511",
+      "scope_evidence": []
+    },
+    "NCT07160335": {
+      "title": "A Phase I Clinical Study to Evaluate the PK Profile, Efficacy, Safety and Immunogenicity of HLX17 vs. Keytruda® in Multiple Resected Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07160335",
+      "scope_evidence": []
+    },
+    "NCT06137378": {
+      "title": "European Larynx Organ Preservation Study (ELOS) [MK-3475-C44]",
+      "url": "https://clinicaltrials.gov/study/NCT06137378",
+      "scope_evidence": []
+    },
+    "NCT06153238": {
+      "title": "A PK Study to Compare GME751 (Proposed Pembrolizumab Biosimilar) and US-licensed and EU-authorized Keytruda® in Participants With Stage II and III Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT06153238",
+      "scope_evidence": []
+    },
+    "NCT05986331": {
+      "title": "Clinical Study of the Efficacy and Safety of BCD-201 and Keytruda in Subjects With Advanced Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT05986331",
+      "scope_evidence": []
+    },
+    "NCT06320353": {
+      "title": "Study сomparing the Efficacy and Safety of RPH-075 and Keytruda® in Patients With Unresectable or Metastatic Skin Melanoma",
+      "url": "https://clinicaltrials.gov/study/NCT06320353",
+      "scope_evidence": []
+    },
+    "NCT02178722": {
+      "title": "Study to Explore the Safety, Tolerability and Efficacy of MK-3475 in Combination With INCB024360 in Participants With Selected Cancers",
+      "url": "https://clinicaltrials.gov/study/NCT02178722",
+      "scope_evidence": []
+    },
+    "NCT05669430": {
+      "title": "A Study of GV20-0251 Monotherapy and GV20-0251 in Combination With Pembrolizumab in Participants With Solid Tumor Malignancies",
+      "url": "https://clinicaltrials.gov/study/NCT05669430",
+      "scope_evidence": []
+    },
+    "NCT06847334": {
+      "title": "A Study to Compare the Efficacy, Safety, Immunogenicity, and Pharmacokinetic Profile of HLX17 Vs. Keytruda® in the First-Line Treatment of Advanced Non-squamous Non-small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06847334",
+      "scope_evidence": []
+    },
+    "NCT06348199": {
+      "title": "A Study to Compare the Efficacy, Safety, Pharmacokinetics, and Immunogenicity Between SB27 and Keytruda in Subjects With Metastatic Non-squamous Non-small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT06348199",
+      "scope_evidence": []
+    },
+    "NCT06697301": {
+      "title": "Safety and Efficacy of EIK1001 in Combo With Pembro Versus Placebo and Pembro as First-Line Therapy in Patients With Advanced Melanoma.",
+      "url": "https://clinicaltrials.gov/study/NCT06697301",
+      "scope_evidence": []
+    },
+    "NCT06771674": {
+      "title": "Real-world Study of First Line Pembrolizumab- or Nivolumab-treated HPV-positive Recurrent/Metastatic Oropharyngeal Squamous Cell Carcinoma",
+      "url": "https://clinicaltrials.gov/study/NCT06771674",
+      "scope_evidence": []
+    },
+    "NCT04613596": {
+      "title": "Phase 2 Trial of Adagrasib Monotherapy and in Combination With Pembrolizumab and a Phase 3 Trial of Adagrasib in Combination in Patients With a KRAS G12C Mutation KRYSTAL-7",
+      "url": "https://clinicaltrials.gov/study/NCT04613596",
+      "scope_evidence": []
+    },
+    "NCT02628067": {
+      "title": "Study of Pembrolizumab (MK-3475) in Participants With Advanced Solid Tumors (MK-3475-158/KEYNOTE-158)",
+      "url": "https://clinicaltrials.gov/study/NCT02628067",
+      "scope_evidence": []
+    },
+    "NCT04738487": {
+      "title": "Coformulation of Pembrolizumab/Vibostolimab (MK-7684A) Versus Pembrolizumab (MK-3475) Monotherapy for Programmed Cell Death 1 Ligand 1 (PD-L1) Positive Metastatic Non-Small Cell Lung Cancer (MK-7684A-003, KEYVIBE-003)",
+      "url": "https://clinicaltrials.gov/study/NCT04738487",
+      "scope_evidence": []
+    },
+    "NCT05665595": {
+      "title": "A Study of Adjuvant Pembrolizumab/Vibostolimab (MK-7684A) Versus Pembrolizumab for Resected High-Risk Melanoma in Participants With High-Risk Stage II-IV Melanoma (MK-7684A-010/KEYVIBE-010)",
+      "url": "https://clinicaltrials.gov/study/NCT05665595",
+      "scope_evidence": []
+    },
+    "NCT01295827": {
+      "title": "Study of Pembrolizumab (MK-3475) in Participants With Progressive Locally Advanced or Metastatic Carcinoma, Melanoma, or Non-small Cell Lung Carcinoma (P07990/MK-3475-001/KEYNOTE-001)",
+      "url": "https://clinicaltrials.gov/study/NCT01295827",
+      "scope_evidence": []
+    },
+    "NCT04736706": {
+      "title": "A Study of Pembrolizumab (MK-3475) in Combination With Belzutifan (MK-6482) and Lenvatinib (MK-7902), or Pembrolizumab/Quavonlimab (MK-1308A) in Combination With Lenvatinib, Versus Pembrolizumab and Lenvatinib, for Treatment of Advanced Clear Cell Renal Cell Carcinoma (MK-6482-012)",
+      "url": "https://clinicaltrials.gov/study/NCT04736706",
+      "scope_evidence": []
+    },
+    "NCT05834348": {
+      "title": "A Study to Learn About the Effectiveness of Cancer Medicines in Patients With Metastatic Non-small Cell Lung Cancer in Norway.",
+      "url": "https://clinicaltrials.gov/study/NCT05834348",
+      "scope_evidence": []
+    },
+    "NCT02194738": {
+      "title": "Genetic Testing in Screening Patients With Stage IB-IIIA Non-small Cell Lung Cancer That Has Been or Will Be Removed by Surgery (The ALCHEMIST Screening Trial)",
+      "url": "https://clinicaltrials.gov/study/NCT02194738",
+      "scope_evidence": []
+    },
+    "NCT01042379": {
+      "title": "I-SPY TRIAL: Neoadjuvant and Personalized Adaptive Novel Agents to Treat Breast Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT01042379",
+      "scope_evidence": []
+    },
+    "NCT05055908": {
+      "title": "Efficacy and Biomarker Development for Lung Cancer Treated With Immune Checkpoint Inhibitors",
+      "url": "https://clinicaltrials.gov/study/NCT05055908",
+      "scope_evidence": []
+    },
+    "NCT07036016": {
+      "title": "Interstitial Pneumonitis Associated With EGFR-TKI and Combined With PD-1/PD-L1",
+      "url": "https://clinicaltrials.gov/study/NCT07036016",
+      "scope_evidence": []
+    },
+    "NCT04294771": {
+      "title": "JOint Use of Database to Identify Risk Factors of CARDio-vascular Toxicity Induced by Immune Checkpoint Inhibitors",
+      "url": "https://clinicaltrials.gov/study/NCT04294771",
+      "scope_evidence": []
+    },
+    "NCT05934214": {
+      "title": "EXploring Immune-related Adverse Events of Immune checkpoinT Inhibitors Using VigiBase, the WHO Pharmacovigilance Database",
+      "url": "https://clinicaltrials.gov/study/NCT05934214",
+      "scope_evidence": []
+    }
+  },
+  "meta": {
+    "request_id": "1df8e37d-efed-46e3-a98b-3fe491eea600",
+    "generated_at": "2026-10-07T00:59:40.026143Z",
+    "query": "What is the distribution of enrollment sizes for pembrolizumab trials?",
+    "filters": {
+      "drug_name": [
+        "pembrolizumab"
+      ],
+      "condition": [],
+      "sponsor": [],
+      "country": [],
+      "term": [],
+      "trial_phase": [],
+      "status": [],
+      "study_type": [],
+      "sponsor_class": [],
+      "intervention_type": [],
+      "start_year": null,
+      "end_year": null,
+      "date_field": "start_date",
+      "compare": null
+    },
+    "interpretation": {
+      "summary": "Counting trials by enrollment for pembrolizumab.",
+      "analysis": "aggregate",
+      "measure": {
+        "aggregate": "count",
+        "of": "trials"
+      },
+      "group_by": [
+        "enrollment"
+      ],
+      "compare": null,
+      "time_granularity": null,
+      "counting_unit": "trial",
+      "entities": [
+        {
+          "kind": "drug",
+          "source": "question",
+          "text": "pembrolizumab",
+          "term_searched": "pembrolizumab",
+          "definition": "intervention_search",
+          "status": "ok",
+          "trials_matched": 2971,
+          "strict_name_matches": 2567,
+          "other_readings": [
+            {
+              "kind": "condition",
+              "trials_matched": 2245
+            }
+          ],
+          "candidates": []
+        }
+      ],
+      "adjustments": [],
+      "strategy": [
+        {
+          "series": null,
+          "name": "count_fan_out",
+          "reason": "2,971 trials is more than one page; the registry counted each group with 12 requests.",
+          "upstream_requests": 12
+        }
+      ],
+      "chart_rationale": "Rule 6: enrollment for one scope without a series, so a histogram."
+    },
+    "plan": {
+      "interpretation": "Count pembrolizumab trials by enrollment size.",
+      "entities": [
+        {
+          "kind": "drug",
+          "value": "pembrolizumab",
+          "role": "filter"
+        }
+      ],
+      "filters": {
+        "phases": [],
+        "statuses": [],
+        "study_types": [],
+        "sponsor_classes": [],
+        "intervention_types": [],
+        "evidence": [],
+        "date_field": "start_date",
+        "year_from": null,
+        "year_to": null
+      },
+      "analysis": {
+        "kind": "aggregate",
+        "dimension": "enrollment",
+        "series": null,
+        "time_unit": null,
+        "top_n": null
+      },
+      "chart_preference": "histogram"
+    },
+    "options": {
+      "planner": "llm",
+      "citations_per_datum": 5,
+      "drug_match": "broad",
+      "include_trace": true,
+      "use_cache": true
+    },
+    "planner": {
+      "mode": "llm",
+      "model": "gpt-5.4-mini-2026-03-17",
+      "reasoning_effort": "low",
+      "prompt_version": "plan-v1",
+      "attempts": 1,
+      "is_repaired": false,
+      "is_fallback": false,
+      "usage": {
+        "input_tokens": 4149,
+        "output_tokens": 146,
+        "reasoning_tokens": 28,
+        "cached_tokens": 3840
+      }
+    },
+    "assumptions": [
+      "Matched 'pembrolizumab' with the registry's intervention search (names, other names, arm labels, titles, descriptions and MeSH terms, with synonyms): 2,971 trials. 2,567 of them name it as an intervention.",
+      "Enrollment counts, estimated and actual, are grouped into fixed bins."
+    ],
+    "warnings": [],
+    "source": {
+      "name": "ClinicalTrials.gov",
+      "url": "https://clinicaltrials.gov",
+      "api_version": "2.0.5",
+      "data_timestamp": "2026-10-06T09:00:05",
+      "retrieved_at": "2026-10-07T00:59:40.026143Z",
+      "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
+      "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
+      "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 2971,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?filter.advanced=AREA%5BInterventionName%5D%22pembrolizumab%22&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 2567,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=pembrolizumab&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 2245,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 2971,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "probe"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B0,0%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 78,
+          "total_count": 132,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B1,9%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 205,
+          "total_count": 213,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B10,24%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 203,
+          "total_count": 462,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B25,49%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 207,
+          "total_count": 649,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B50,99%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 170,
+          "total_count": 492,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B100,249%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 235,
+          "total_count": 495,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B250,499%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 310,
+          "total_count": 246,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B500,999%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 308,
+          "total_count": 177,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B1000,4999%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 328,
+          "total_count": 93,
+          "records_returned": 5,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B5000,9999%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 329,
+          "total_count": 3,
+          "records_returned": 3,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DRANGE%5B10000,MAX%5D&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,EnrollmentCount,EnrollmentType,InterventionName,InterventionOtherName,StudyFirstPostDate&sort=%40relevance",
+          "status": 200,
+          "duration_ms": 408,
+          "total_count": 4,
+          "records_returned": 4,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=pembrolizumab&filter.advanced=AREA%5BEnrollmentCount%5DMISSING&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 56,
+          "total_count": 5,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "execution"
+        }
+      ]
+    },
+    "counts": {
+      "data_points": 11,
+      "series": [
+        {
+          "label": null,
+          "trials_matched": 2971,
+          "trials_analyzed": 2966,
+          "trials_excluded": [
+            {
+              "reason": "no_enrollment",
+              "count": 5,
+              "message": "No enrollment on record"
+            }
+          ]
+        }
+      ],
+      "trials_in_several_series": null
+    },
+    "truncation": {
+      "is_truncated": false,
+      "items": []
+    },
+    "citations": {
+      "is_enabled": true,
+      "max_per_datum": 5,
+      "selection": "most relevant trials by ClinicalTrials.gov's own ranking",
+      "trials_cited": 52
+    },
+    "suggested_followups": [],
+    "cache": {
+      "is_plan_cached": false,
+      "is_response_cached": false,
+      "cached_at": null
+    },
+    "timing": {
+      "total_ms": 1744,
+      "plan_ms": 1274,
+      "resolve_ms": 1,
+      "fetch_ms": 467,
+      "build_ms": 1
+    },
+    "debug": {
+      "trace": [
+        {
+          "index": 0,
+          "type": "plan",
+          "summary": "Count pembrolizumab trials by enrollment size.",
+          "duration_ms": 1274,
+          "request_indexes": [],
+          "detail": {}
+        },
+        {
+          "index": 1,
+          "type": "resolve_entity",
+          "summary": "1 entities",
+          "duration_ms": 1,
+          "request_indexes": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "detail": {}
+        },
+        {
+          "index": 2,
+          "type": "execute",
+          "summary": "12 requests",
+          "duration_ms": 467,
+          "request_indexes": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "detail": {}
+        }
+      ]
+    }
+  }
+}

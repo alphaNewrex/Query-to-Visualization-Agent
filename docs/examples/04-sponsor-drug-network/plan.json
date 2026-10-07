@@ -1,0 +1,28 @@
+{
+  "interpretation": "Link sponsors to drugs across Duchenne muscular dystrophy trials.",
+  "entities": [
+    {
+      "kind": "condition",
+      "value": "Duchenne muscular dystrophy",
+      "role": "filter"
+    }
+  ],
+  "filters": {
+    "phases": [],
+    "statuses": [],
+    "study_types": [],
+    "sponsor_classes": [],
+    "intervention_types": [],
+    "evidence": [],
+    "date_field": "start_date",
+    "year_from": null,
+    "year_to": null
+  },
+  "analysis": {
+    "kind": "network",
+    "source": "sponsor",
+    "target": "drug",
+    "link": "same_trial"
+  },
+  "chart_preference": "network_graph"
+}

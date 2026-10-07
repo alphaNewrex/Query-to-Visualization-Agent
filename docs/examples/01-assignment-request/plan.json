@@ -1,0 +1,29 @@
+{
+  "interpretation": "Count Pembrolizumab trials by start year over time.",
+  "entities": [
+    {
+      "kind": "drug",
+      "value": "Pembrolizumab",
+      "role": "filter"
+    }
+  ],
+  "filters": {
+    "phases": [],
+    "statuses": [],
+    "study_types": [],
+    "sponsor_classes": [],
+    "intervention_types": [],
+    "evidence": [],
+    "date_field": "start_date",
+    "year_from": null,
+    "year_to": null
+  },
+  "analysis": {
+    "kind": "aggregate",
+    "dimension": "start_date",
+    "series": null,
+    "time_unit": "year",
+    "top_n": null
+  },
+  "chart_preference": null
+}

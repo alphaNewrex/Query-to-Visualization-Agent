@@ -1,0 +1,242 @@
+{
+  "protocolSection": {
+    "identificationModule": {
+      "nctId": "NCT02578680",
+      "briefTitle": "Study of Pemetrexed+Platinum Chemotherapy With or Without Pembrolizumab (MK-3475) in Participants With First Line Metastatic Nonsquamous Non-small Cell Lung Cancer (MK-3475-189/KEYNOTE-189)",
+      "organization": {
+        "fullName": "Merck Sharp & Dohme LLC",
+        "class": "INDUSTRY"
+      }
+    },
+    "statusModule": {
+      "statusVerifiedDate": "2024-09",
+      "overallStatus": "COMPLETED",
+      "expandedAccessInfo": {
+        "hasExpandedAccess": false
+      },
+      "startDateStruct": {
+        "date": "2016-01-15",
+        "type": "ACTUAL"
+      },
+      "primaryCompletionDateStruct": {
+        "date": "2017-11-08",
+        "type": "ACTUAL"
+      },
+      "completionDateStruct": {
+        "date": "2023-06-22",
+        "type": "ACTUAL"
+      },
+      "studyFirstSubmitDate": "2015-10-15",
+      "studyFirstSubmitQcDate": "2015-10-15",
+      "studyFirstPostDateStruct": {
+        "date": "2015-10-19",
+        "type": "ESTIMATED"
+      },
+      "resultsFirstSubmitDate": "2018-09-11",
+      "resultsFirstSubmitQcDate": "2018-10-29",
+      "resultsFirstPostDateStruct": {
+        "date": "2018-11-28",
+        "type": "ACTUAL"
+      },
+      "lastUpdateSubmitDate": "2024-09-05",
+      "lastUpdatePostDateStruct": {
+        "date": "2024-09-20",
+        "type": "ACTUAL"
+      }
+    },
+    "sponsorCollaboratorsModule": {
+      "leadSponsor": {
+        "name": "Merck Sharp & Dohme LLC",
+        "class": "INDUSTRY"
+      }
+    },
+    "conditionsModule": {
+      "conditions": [
+        "Non-Small-Cell Lung Carcinoma"
+      ]
+    },
+    "designModule": {
+      "studyType": "INTERVENTIONAL",
+      "phases": [
+        "PHASE3"
+      ],
+      "designInfo": {
+        "allocation": "RANDOMIZED",
+        "interventionModel": "PARALLEL",
+        "primaryPurpose": "TREATMENT",
+        "maskingInfo": {
+          "masking": "QUADRUPLE",
+          "whoMasked": [
+            "PARTICIPANT",
+            "CARE_PROVIDER",
+            "INVESTIGATOR",
+            "OUTCOMES_ASSESSOR"
+          ]
+        }
+      },
+      "enrollmentInfo": {
+        "count": 616,
+        "type": "ACTUAL"
+      }
+    },
+    "armsInterventionsModule": {
+      "armGroups": [
+        {
+          "label": "Pembrolizumab+Pemetrexed+Platinum Chemotherapy Followed by Pembrolizumab+Pemetrexed",
+          "type": "EXPERIMENTAL",
+          "description": "Participants receive pembrolizumab 200 mg intravenously (IV) PLUS pemetrexed 500 mg/m\\^2 IV (with vitamin supplementation) PLUS cisplatin 75 mg/m\\^2 IV OR carboplatin Area Under the Curve (AUC) 5 IV on Day 1 of every 3-week cycle (Q3W) for 4 cycles followed by pembrolizumab 200 mg IV PLUS pemetrexed 500 mg/m\\^2 IV Q3W until progression. (Participants who receive pembrolizumab 200 mg IV Q3W for up to 2 years but experience disease progression, will be eligible to receive a second course of pembrolizumab monotherapy 200 mg IV Q3W, at the investigator's discretion, for up to 1 additional year.)",
+          "interventionNames": [
+            "Biological: Pembrolizumab 200 mg",
+            "Drug: Cisplatin",
+            "Drug: Carboplatin",
+            "Drug: Pemetrexed",
+            "Dietary Supplement: Folic acid 350-1000 μg",
+            "Dietary Supplement: Vitamin B12 1000 μg",
+            "Drug: Dexamethasone 4 mg"
+          ]
+        },
+        {
+          "label": "Control",
+          "type": "ACTIVE_COMPARATOR",
+          "description": "Participants receive saline placebo IV PLUS pemetrexed 500 mg/m\\^2 IV (with vitamin supplementation) PLUS cisplatin 75 mg/m\\^2 IV OR carboplatin AUC 5 IV on Day 1 of every 3-week cycle (Q3W) for 4 cycles followed by saline placebo IV PLUS pemetrexed 500 mg/m\\^2 IV Q3W until progression. (Effective 23-Dec-2019, participants will discontinue saline placebo. If documented progression occurs, participants may be able to receive pembrolizumab monotherapy Q3W for the remainder of the study.)",
+          "interventionNames": [
+            "Drug: Cisplatin",
+            "Drug: Carboplatin",
+            "Drug: Pemetrexed",
+            "Dietary Supplement: Folic acid 350-1000 μg",
+            "Dietary Supplement: Vitamin B12 1000 μg",
+            "Drug: Dexamethasone 4 mg",
+            "Drug: Saline solution"
+          ]
+        }
+      ],
+      "interventions": [
+        {
+          "type": "BIOLOGICAL",
+          "name": "Pembrolizumab 200 mg",
+          "description": "IV infusion",
+          "armGroupLabels": [
+            "Pembrolizumab+Pemetrexed+Platinum Chemotherapy Followed by Pembrolizumab+Pemetrexed"
+          ]
+        },
+        {
+          "type": "DRUG",
+          "name": "Cisplatin",
+          "description": "IV infusion",
+          "armGroupLabels": [
+            "Control",
+            "Pembrolizumab+Pemetrexed+Platinum Chemotherapy Followed by Pembrolizumab+Pemetrexed"
+          ]
+        },
+        {
+          "type": "DRUG",
+          "name": "Carboplatin",
+          "description": "IV infusion",
+          "armGroupLabels": [
+            "Control",
+            "Pembrolizumab+Pemetrexed+Platinum Chemotherapy Followed by Pembrolizumab+Pemetrexed"
+          ]
+        },
+        {
+          "type": "DRUG",
+          "name": "Pemetrexed",
+          "description": "IV infusion",
+          "armGroupLabels": [
+            "Control",
+            "Pembrolizumab+Pemetrexed+Platinum Chemotherapy Followed by Pembrolizumab+Pemetrexed"
+          ]
+        },
+        {
+          "type": "DIETARY_SUPPLEMENT",
+          "name": "Folic acid 350-1000 μg",
+          "description": "Orally; at least 5 doses of folic acid must be taken during the 7 days preceding the first dose of pemetrexed, and folic acid dosing must continue during the full course of therapy and for 21 days after the last dose of pemetrexed.",
+          "armGroupLabels": [
+            "Control",
+            "Pembrolizumab+Pemetrexed+Platinum Chemotherapy Followed by Pembrolizumab+Pemetrexed"
+          ]
+        },
+        {
+          "type": "DIETARY_SUPPLEMENT",
+          "name": "Vitamin B12 1000 μg",
+          "description": "Intramuscular injection in the week preceding the first dose of pemetrexed and once every 3 cycles thereafter. Subsequent vitamin B12 injections may be given the same day as pemetrexed administration.",
+          "armGroupLabels": [
+            "Control",
+            "Pembrolizumab+Pemetrexed+Platinum Chemotherapy Followed by Pembrolizumab+Pemetrexed"
+          ]
+        },
+        {
+          "type": "DRUG",
+          "name": "Dexamethasone 4 mg",
+          "description": "For prophylaxis; orally twice per day (or equivalent). Taken the day before, day of, and day after pemetrexed administration.",
+          "armGroupLabels": [
+            "Control",
+            "Pembrolizumab+Pemetrexed+Platinum Chemotherapy Followed by Pembrolizumab+Pemetrexed"
+          ]
+        },
+        {
+          "type": "DRUG",
+          "name": "Saline solution",
+          "description": "IV infusion",
+          "armGroupLabels": [
+            "Control"
+          ]
+        }
+      ]
+    },
+    "eligibilityModule": {
+      "sex": "ALL",
+      "minimumAge": "18 Years",
+      "stdAges": [
+        "ADULT",
+        "OLDER_ADULT"
+      ]
+    },
+    "contactsLocationsModule": {
+      "overallOfficials": [
+        {
+          "name": "Medical Director",
+          "affiliation": "Merck Sharp & Dohme LLC",
+          "role": "STUDY_DIRECTOR"
+        }
+      ]
+    }
+  },
+  "derivedSection": {
+    "conditionBrowseModule": {
+      "meshes": [
+        {
+          "term": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ]
+    },
+    "interventionBrowseModule": {
+      "meshes": [
+        {
+          "term": "pembrolizumab"
+        },
+        {
+          "term": "Cisplatin"
+        },
+        {
+          "term": "Carboplatin"
+        },
+        {
+          "term": "Pemetrexed"
+        },
+        {
+          "term": "Folic Acid"
+        },
+        {
+          "term": "Vitamin B 12"
+        },
+        {
+          "term": "Dexamethasone"
+        },
+        {
+          "term": "Saline Solution"
+        }
+      ]
+    }
+  },
+  "hasResults": true
+}

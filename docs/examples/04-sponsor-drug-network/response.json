@@ -1,0 +1,2318 @@
+{
+  "spec_version": "1.0",
+  "kind": "visualization",
+  "message": "24 nodes and 15 links; the strongest link joins PTC Therapeutics and Ataluren in 13 trials.",
+  "visualization": {
+    "type": "network_graph",
+    "title": "Sponsors and drugs that occur together: Duchenne muscular dystrophy",
+    "subtitle": "279 trials · ClinicalTrials.gov, data as of 2026-10-06",
+    "is_directed": false,
+    "layout": "bipartite",
+    "encoding": {
+      "nodes": {
+        "label": {
+          "field": "label"
+        },
+        "color": {
+          "field": "entity_type",
+          "type": "nominal",
+          "title": "Node type",
+          "domain": [
+            "sponsor",
+            "drug"
+          ],
+          "sort": null,
+          "is_exclusive": true
+        },
+        "size": {
+          "field": "trial_count",
+          "type": "quantitative",
+          "title": "Trials (all analysed trials of this node)",
+          "unit": "trials",
+          "format": ",d",
+          "scale": "linear"
+        },
+        "tooltip": []
+      },
+      "edges": {
+        "weight": {
+          "field": "trial_count",
+          "type": "quantitative",
+          "title": "Trials that include both",
+          "unit": "trials",
+          "format": ",d",
+          "scale": "linear"
+        },
+        "tooltip": []
+      }
+    },
+    "data": {
+      "nodes": [
+        {
+          "citations": [
+            {
+              "nct_id": "NCT07542314",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT06606340",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT06597656",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT06270719",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT06241950",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            }
+          ],
+          "citation_count": 27,
+          "source_url": null,
+          "id": "sponsor:Sarepta Therapeutics, Inc.",
+          "label": "Sarepta Therapeutics, Inc.",
+          "entity_type": "sponsor",
+          "trial_count": 27
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT04336826",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT03796637",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT03648827",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT03642145",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT02819557",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            }
+          ],
+          "citation_count": 18,
+          "source_url": null,
+          "id": "sponsor:PTC Therapeutics",
+          "label": "PTC Therapeutics",
+          "entity_type": "sponsor",
+          "trial_count": 18
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT07573631",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "BioMarin Pharmaceutical"
+            },
+            {
+              "nct_id": "NCT06280209",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "BioMarin Pharmaceutical"
+            },
+            {
+              "nct_id": "NCT02958202",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "BioMarin Pharmaceutical"
+            },
+            {
+              "nct_id": "NCT02636686",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "BioMarin Pharmaceutical"
+            },
+            {
+              "nct_id": "NCT02329769",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "BioMarin Pharmaceutical"
+            }
+          ],
+          "citation_count": 10,
+          "source_url": null,
+          "id": "sponsor:BioMarin Pharmaceutical",
+          "label": "BioMarin Pharmaceutical",
+          "entity_type": "sponsor",
+          "trial_count": 10
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT06053814",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "NS Pharma, Inc."
+            },
+            {
+              "nct_id": "NCT05996003",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "NS Pharma, Inc."
+            },
+            {
+              "nct_id": "NCT04956289",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "NS Pharma, Inc."
+            },
+            {
+              "nct_id": "NCT04768062",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "NS Pharma, Inc."
+            },
+            {
+              "nct_id": "NCT04687020",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "NS Pharma, Inc."
+            }
+          ],
+          "citation_count": 9,
+          "source_url": null,
+          "id": "sponsor:NS Pharma, Inc.",
+          "label": "NS Pharma, Inc.",
+          "entity_type": "sponsor",
+          "trial_count": 9
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT06713135",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            },
+            {
+              "nct_id": "NCT05185622",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            },
+            {
+              "nct_id": "NCT03863119",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            },
+            {
+              "nct_id": "NCT03603288",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            },
+            {
+              "nct_id": "NCT03433807",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            }
+          ],
+          "citation_count": 9,
+          "source_url": null,
+          "id": "sponsor:Santhera Pharmaceuticals",
+          "label": "Santhera Pharmaceuticals",
+          "entity_type": "sponsor",
+          "trial_count": 9
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT01126697",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cooperative International Neuromuscular Research Group"
+            },
+            {
+              "nct_id": "NCT00308113",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cooperative International Neuromuscular Research Group"
+            },
+            {
+              "nct_id": "NCT00110669",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cooperative International Neuromuscular Research Group"
+            },
+            {
+              "nct_id": "NCT00243789",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cooperative International Neuromuscular Research Group"
+            },
+            {
+              "nct_id": "NCT00102453",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cooperative International Neuromuscular Research Group"
+            }
+          ],
+          "citation_count": 8,
+          "source_url": null,
+          "id": "sponsor:Cooperative International Neuromuscular Research Group",
+          "label": "Cooperative International Neuromuscular Research Group",
+          "entity_type": "sponsor",
+          "trial_count": 8
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT06769633",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Italfarmaco"
+            },
+            {
+              "nct_id": "NCT05933057",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Italfarmaco"
+            },
+            {
+              "nct_id": "NCT03373968",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Italfarmaco"
+            },
+            {
+              "nct_id": "NCT02851797",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Italfarmaco"
+            },
+            {
+              "nct_id": "NCT01761292",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Italfarmaco"
+            }
+          ],
+          "citation_count": 7,
+          "source_url": null,
+          "id": "sponsor:Italfarmaco",
+          "label": "Italfarmaco",
+          "entity_type": "sponsor",
+          "trial_count": 7
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT01890798",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "GlaxoSmithKline"
+            },
+            {
+              "nct_id": "NCT01480245",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "GlaxoSmithKline"
+            },
+            {
+              "nct_id": "NCT01462292",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "GlaxoSmithKline"
+            },
+            {
+              "nct_id": "NCT01254019",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "GlaxoSmithKline"
+            },
+            {
+              "nct_id": "NCT01153932",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "GlaxoSmithKline"
+            }
+          ],
+          "citation_count": 6,
+          "source_url": null,
+          "id": "sponsor:GlaxoSmithKline",
+          "label": "GlaxoSmithKline",
+          "entity_type": "sponsor",
+          "trial_count": 6
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT01580501",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cedars-Sinai Medical Center"
+            },
+            {
+              "nct_id": "NCT01359670",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cedars-Sinai Medical Center"
+            },
+            {
+              "nct_id": "NCT02653833",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cedars-Sinai Medical Center"
+            },
+            {
+              "nct_id": "NCT02434627",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cedars-Sinai Medical Center"
+            },
+            {
+              "nct_id": "NCT01070511",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cedars-Sinai Medical Center"
+            }
+          ],
+          "citation_count": 5,
+          "source_url": null,
+          "id": "sponsor:Cedars-Sinai Medical Center",
+          "label": "Cedars-Sinai Medical Center",
+          "entity_type": "sponsor",
+          "trial_count": 5
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT03439670",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "ReveraGen BioPharma, Inc."
+            },
+            {
+              "nct_id": "NCT03038399",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "ReveraGen BioPharma, Inc."
+            },
+            {
+              "nct_id": "NCT02760277",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "ReveraGen BioPharma, Inc."
+            },
+            {
+              "nct_id": "NCT02760264",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "ReveraGen BioPharma, Inc."
+            },
+            {
+              "nct_id": "NCT05166109",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "ReveraGen BioPharma, Inc."
+            }
+          ],
+          "citation_count": 5,
+          "source_url": null,
+          "id": "sponsor:ReveraGen BioPharma, Inc.",
+          "label": "ReveraGen BioPharma, Inc.",
+          "entity_type": "sponsor",
+          "trial_count": 5
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT04336826",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Ataluren"
+            },
+            {
+              "nct_id": "NCT03796637",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Ataluren"
+            },
+            {
+              "nct_id": "NCT03648827",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Ataluren"
+            },
+            {
+              "nct_id": "NCT02819557",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Ataluren"
+            },
+            {
+              "nct_id": "NCT01557400",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Ataluren"
+            }
+          ],
+          "citation_count": 13,
+          "source_url": null,
+          "id": "drug:ataluren",
+          "label": "Ataluren",
+          "entity_type": "drug",
+          "trial_count": 13
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT06597656",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "delandistrogene moxeparvovec"
+            },
+            {
+              "nct_id": "NCT06270719",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Delandistrogene Moxeparvovec"
+            },
+            {
+              "nct_id": "NCT06241950",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "delandistrogene moxeparvovec"
+            },
+            {
+              "nct_id": "NCT06128564",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "delandistrogene moxeparvovec"
+            },
+            {
+              "nct_id": "NCT05967351",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "delandistrogene moxeparvovec"
+            }
+          ],
+          "citation_count": 10,
+          "source_url": null,
+          "id": "drug:delandistrogene moxeparvovec",
+          "label": "delandistrogene moxeparvovec",
+          "entity_type": "drug",
+          "trial_count": 10
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT06713135",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "vamorolone 40 mg/mL oral suspension"
+            },
+            {
+              "nct_id": "NCT06564974",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Vamorolone"
+            },
+            {
+              "nct_id": "NCT05185622",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Vamorolone"
+            },
+            {
+              "nct_id": "NCT03863119",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Vamorolone"
+            },
+            {
+              "nct_id": "NCT03439670",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Vamorolone"
+            }
+          ],
+          "citation_count": 9,
+          "source_url": null,
+          "id": "drug:vamorolone",
+          "label": "Vamorolone",
+          "entity_type": "drug",
+          "trial_count": 9
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT04322357",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Prednisone"
+            },
+            {
+              "nct_id": "NCT03439670",
+              "field": "protocolSection.armsInterventionsModule.interventions[1].name",
+              "excerpt": "Prednisone"
+            },
+            {
+              "nct_id": "NCT02036463",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Prednisone"
+            },
+            {
+              "nct_id": "NCT01603407",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Prednisone"
+            },
+            {
+              "nct_id": "NCT00308113",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Prednisone"
+            }
+          ],
+          "citation_count": 8,
+          "source_url": null,
+          "id": "drug:prednisone",
+          "label": "Prednisone",
+          "entity_type": "drug",
+          "trial_count": 8
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT06606340",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Eteplirsen"
+            },
+            {
+              "nct_id": "NCT03985878",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Eteplirsen"
+            },
+            {
+              "nct_id": "NCT03218995",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Eteplirsen"
+            },
+            {
+              "nct_id": "NCT02420379",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "eteplirsen"
+            },
+            {
+              "nct_id": "NCT02255552",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "eteplirsen"
+            }
+          ],
+          "citation_count": 7,
+          "source_url": null,
+          "id": "drug:eteplirsen",
+          "label": "Eteplirsen",
+          "entity_type": "drug",
+          "trial_count": 7
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT06290713",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Tadalafil"
+            },
+            {
+              "nct_id": "NCT05195775",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Tadalafil"
+            },
+            {
+              "nct_id": "NCT01580501",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Tadalafil and Sildenafil"
+            },
+            {
+              "nct_id": "NCT01359670",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Tadalafil"
+            },
+            {
+              "nct_id": "NCT02653833",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Tadalafil 20 MG"
+            }
+          ],
+          "citation_count": 7,
+          "source_url": null,
+          "id": "drug:tadalafil",
+          "label": "Tadalafil",
+          "entity_type": "drug",
+          "trial_count": 7
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT03642145",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Deflazacort"
+            },
+            {
+              "nct_id": "NCT02592941",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Deflazacort"
+            },
+            {
+              "nct_id": "NCT02295748",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Deflazacort"
+            },
+            {
+              "nct_id": "NCT02251600",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Deflazacort"
+            },
+            {
+              "nct_id": "NCT01603407",
+              "field": "protocolSection.armsInterventionsModule.interventions[2].name",
+              "excerpt": "Deflazacort"
+            }
+          ],
+          "citation_count": 5,
+          "source_url": null,
+          "id": "drug:deflazacort",
+          "label": "Deflazacort",
+          "entity_type": "drug",
+          "trial_count": 5
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT05933057",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Givinostat"
+            },
+            {
+              "nct_id": "NCT03373968",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Givinostat"
+            },
+            {
+              "nct_id": "NCT02851797",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "givinostat"
+            },
+            {
+              "nct_id": "NCT01761292",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Givinostat"
+            },
+            {
+              "nct_id": "NCT03238235",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Givinostat"
+            }
+          ],
+          "citation_count": 5,
+          "source_url": null,
+          "id": "drug:givinostat",
+          "label": "Givinostat",
+          "entity_type": "drug",
+          "trial_count": 5
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT01480245",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "GSK2402968"
+            },
+            {
+              "nct_id": "NCT01462292",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "GSK2402968 3mg/kg/week"
+            },
+            {
+              "nct_id": "NCT01254019",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "GSK2402968 6mg/kg/week"
+            },
+            {
+              "nct_id": "NCT01153932",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "GSK2402968"
+            },
+            {
+              "nct_id": "NCT01128855",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "3 mg/kg GSK2402968"
+            }
+          ],
+          "citation_count": 5,
+          "source_url": null,
+          "id": "drug:gsk2402968",
+          "label": "GSK2402968",
+          "entity_type": "drug",
+          "trial_count": 5
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT01580501",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Tadalafil and Sildenafil"
+            },
+            {
+              "nct_id": "NCT01359670",
+              "field": "protocolSection.armsInterventionsModule.interventions[1].name",
+              "excerpt": "Sildenafil"
+            },
+            {
+              "nct_id": "NCT01168908",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Sildenafil"
+            },
+            {
+              "nct_id": "NCT03633565",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Sildenafil (Phosphodiesterase inhibitors)"
+            },
+            {
+              "nct_id": "NCT01350154",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Sildenafil"
+            }
+          ],
+          "citation_count": 5,
+          "source_url": null,
+          "id": "drug:sildenafil",
+          "label": "Sildenafil",
+          "entity_type": "drug",
+          "trial_count": 5
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT04956289",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Viltolarsen"
+            },
+            {
+              "nct_id": "NCT04768062",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Viltolarsen"
+            },
+            {
+              "nct_id": "NCT04687020",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Viltolarsen"
+            },
+            {
+              "nct_id": "NCT04060199",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Viltolarsen"
+            },
+            {
+              "nct_id": "NCT04337112",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "viltolarsen"
+            }
+          ],
+          "citation_count": 5,
+          "source_url": null,
+          "id": "drug:viltolarsen",
+          "label": "Viltolarsen",
+          "entity_type": "drug",
+          "trial_count": 5
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT01540409",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "AVI-4658 (Eteplirsen)"
+            },
+            {
+              "nct_id": "NCT01396239",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "AVI-4658 (Eteplirsen)"
+            },
+            {
+              "nct_id": "NCT00844597",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "AVI-4658 for Injection"
+            },
+            {
+              "nct_id": "NCT00159250",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "AVI-4658 (PMO)"
+            }
+          ],
+          "citation_count": 4,
+          "source_url": null,
+          "id": "drug:avi-4658",
+          "label": "AVI-4658 (Eteplirsen)",
+          "entity_type": "drug",
+          "trial_count": 4
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT02636686",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Drisapersen"
+            },
+            {
+              "nct_id": "NCT01910649",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Drisapersen"
+            },
+            {
+              "nct_id": "NCT01890798",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Drisapersen"
+            },
+            {
+              "nct_id": "NCT01803412",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Drisapersen"
+            }
+          ],
+          "citation_count": 4,
+          "source_url": null,
+          "id": "drug:drisapersen",
+          "label": "Drisapersen",
+          "entity_type": "drug",
+          "trial_count": 4
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT03433807",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Idebenone"
+            },
+            {
+              "nct_id": "NCT00758225",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Idebenone"
+            },
+            {
+              "nct_id": "NCT00654784",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "idebenone"
+            },
+            {
+              "nct_id": "NCT01027884",
+              "field": "protocolSection.armsInterventionsModule.interventions[1].name",
+              "excerpt": "Idebenone"
+            }
+          ],
+          "citation_count": 4,
+          "source_url": null,
+          "id": "drug:idebenone",
+          "label": "Idebenone",
+          "entity_type": "drug",
+          "trial_count": 4
+        }
+      ],
+      "edges": [
+        {
+          "citations": [
+            {
+              "nct_id": "NCT04336826",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT04336826",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Ataluren"
+            },
+            {
+              "nct_id": "NCT03796637",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT03796637",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Ataluren"
+            },
+            {
+              "nct_id": "NCT03648827",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT03648827",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Ataluren"
+            },
+            {
+              "nct_id": "NCT02819557",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT02819557",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Ataluren"
+            },
+            {
+              "nct_id": "NCT01557400",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT01557400",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Ataluren"
+            }
+          ],
+          "citation_count": 13,
+          "source_url": null,
+          "id": "sponsor:PTC Therapeutics|drug:ataluren",
+          "source": "sponsor:PTC Therapeutics",
+          "target": "drug:ataluren",
+          "trial_count": 13
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT06597656",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT06597656",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "delandistrogene moxeparvovec"
+            },
+            {
+              "nct_id": "NCT06270719",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT06270719",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Delandistrogene Moxeparvovec"
+            },
+            {
+              "nct_id": "NCT06241950",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT06241950",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "delandistrogene moxeparvovec"
+            },
+            {
+              "nct_id": "NCT05967351",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT05967351",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "delandistrogene moxeparvovec"
+            },
+            {
+              "nct_id": "NCT05881408",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT05881408",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "delandistrogene moxeparvovec"
+            }
+          ],
+          "citation_count": 9,
+          "source_url": null,
+          "id": "sponsor:Sarepta Therapeutics, Inc.|drug:delandistrogene moxeparvovec",
+          "source": "sponsor:Sarepta Therapeutics, Inc.",
+          "target": "drug:delandistrogene moxeparvovec",
+          "trial_count": 9
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT06606340",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT06606340",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Eteplirsen"
+            },
+            {
+              "nct_id": "NCT03985878",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT03985878",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Eteplirsen"
+            },
+            {
+              "nct_id": "NCT03218995",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT03218995",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Eteplirsen"
+            },
+            {
+              "nct_id": "NCT02420379",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT02420379",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "eteplirsen"
+            },
+            {
+              "nct_id": "NCT02255552",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT02255552",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "eteplirsen"
+            }
+          ],
+          "citation_count": 7,
+          "source_url": null,
+          "id": "sponsor:Sarepta Therapeutics, Inc.|drug:eteplirsen",
+          "source": "sponsor:Sarepta Therapeutics, Inc.",
+          "target": "drug:eteplirsen",
+          "trial_count": 7
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT01480245",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "GlaxoSmithKline"
+            },
+            {
+              "nct_id": "NCT01480245",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "GSK2402968"
+            },
+            {
+              "nct_id": "NCT01462292",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "GlaxoSmithKline"
+            },
+            {
+              "nct_id": "NCT01462292",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "GSK2402968 3mg/kg/week"
+            },
+            {
+              "nct_id": "NCT01254019",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "GlaxoSmithKline"
+            },
+            {
+              "nct_id": "NCT01254019",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "GSK2402968 6mg/kg/week"
+            },
+            {
+              "nct_id": "NCT01153932",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "GlaxoSmithKline"
+            },
+            {
+              "nct_id": "NCT01153932",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "GSK2402968"
+            },
+            {
+              "nct_id": "NCT01128855",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "GlaxoSmithKline"
+            },
+            {
+              "nct_id": "NCT01128855",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "3 mg/kg GSK2402968"
+            }
+          ],
+          "citation_count": 5,
+          "source_url": null,
+          "id": "sponsor:GlaxoSmithKline|drug:gsk2402968",
+          "source": "sponsor:GlaxoSmithKline",
+          "target": "drug:gsk2402968",
+          "trial_count": 5
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT05933057",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Italfarmaco"
+            },
+            {
+              "nct_id": "NCT05933057",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Givinostat"
+            },
+            {
+              "nct_id": "NCT03373968",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Italfarmaco"
+            },
+            {
+              "nct_id": "NCT03373968",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Givinostat"
+            },
+            {
+              "nct_id": "NCT02851797",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Italfarmaco"
+            },
+            {
+              "nct_id": "NCT02851797",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "givinostat"
+            },
+            {
+              "nct_id": "NCT01761292",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Italfarmaco"
+            },
+            {
+              "nct_id": "NCT01761292",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Givinostat"
+            },
+            {
+              "nct_id": "NCT03238235",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Italfarmaco"
+            },
+            {
+              "nct_id": "NCT03238235",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Givinostat"
+            }
+          ],
+          "citation_count": 5,
+          "source_url": null,
+          "id": "sponsor:Italfarmaco|drug:givinostat",
+          "source": "sponsor:Italfarmaco",
+          "target": "drug:givinostat",
+          "trial_count": 5
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT04956289",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "NS Pharma, Inc."
+            },
+            {
+              "nct_id": "NCT04956289",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Viltolarsen"
+            },
+            {
+              "nct_id": "NCT04768062",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "NS Pharma, Inc."
+            },
+            {
+              "nct_id": "NCT04768062",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Viltolarsen"
+            },
+            {
+              "nct_id": "NCT04687020",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "NS Pharma, Inc."
+            },
+            {
+              "nct_id": "NCT04687020",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Viltolarsen"
+            },
+            {
+              "nct_id": "NCT04060199",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "NS Pharma, Inc."
+            },
+            {
+              "nct_id": "NCT04060199",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Viltolarsen"
+            },
+            {
+              "nct_id": "NCT04337112",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "NS Pharma, Inc."
+            },
+            {
+              "nct_id": "NCT04337112",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "viltolarsen"
+            }
+          ],
+          "citation_count": 5,
+          "source_url": null,
+          "id": "sponsor:NS Pharma, Inc.|drug:viltolarsen",
+          "source": "sponsor:NS Pharma, Inc.",
+          "target": "drug:viltolarsen",
+          "trial_count": 5
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT03439670",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "ReveraGen BioPharma, Inc."
+            },
+            {
+              "nct_id": "NCT03439670",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Vamorolone"
+            },
+            {
+              "nct_id": "NCT03038399",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "ReveraGen BioPharma, Inc."
+            },
+            {
+              "nct_id": "NCT03038399",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Vamorolone 0.25 mg/day/day"
+            },
+            {
+              "nct_id": "NCT02760277",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "ReveraGen BioPharma, Inc."
+            },
+            {
+              "nct_id": "NCT02760277",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Vamorolone 0.25 mg/day/day"
+            },
+            {
+              "nct_id": "NCT02760264",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "ReveraGen BioPharma, Inc."
+            },
+            {
+              "nct_id": "NCT02760264",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Vamorolone 0.25 mg/kg/day"
+            },
+            {
+              "nct_id": "NCT05166109",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "ReveraGen BioPharma, Inc."
+            },
+            {
+              "nct_id": "NCT05166109",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Vamorolone"
+            }
+          ],
+          "citation_count": 5,
+          "source_url": null,
+          "id": "sponsor:ReveraGen BioPharma, Inc.|drug:vamorolone",
+          "source": "sponsor:ReveraGen BioPharma, Inc.",
+          "target": "drug:vamorolone",
+          "trial_count": 5
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT01580501",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cedars-Sinai Medical Center"
+            },
+            {
+              "nct_id": "NCT01580501",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Tadalafil and Sildenafil"
+            },
+            {
+              "nct_id": "NCT01359670",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cedars-Sinai Medical Center"
+            },
+            {
+              "nct_id": "NCT01359670",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Tadalafil"
+            },
+            {
+              "nct_id": "NCT02653833",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cedars-Sinai Medical Center"
+            },
+            {
+              "nct_id": "NCT02653833",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Tadalafil 20 MG"
+            },
+            {
+              "nct_id": "NCT01070511",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cedars-Sinai Medical Center"
+            },
+            {
+              "nct_id": "NCT01070511",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Tadalafil"
+            }
+          ],
+          "citation_count": 4,
+          "source_url": null,
+          "id": "sponsor:Cedars-Sinai Medical Center|drug:tadalafil",
+          "source": "sponsor:Cedars-Sinai Medical Center",
+          "target": "drug:tadalafil",
+          "trial_count": 4
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT03642145",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT03642145",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Deflazacort"
+            },
+            {
+              "nct_id": "NCT02592941",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT02592941",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Deflazacort"
+            },
+            {
+              "nct_id": "NCT02295748",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT02295748",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Deflazacort"
+            },
+            {
+              "nct_id": "NCT02251600",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "PTC Therapeutics"
+            },
+            {
+              "nct_id": "NCT02251600",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Deflazacort"
+            }
+          ],
+          "citation_count": 4,
+          "source_url": null,
+          "id": "sponsor:PTC Therapeutics|drug:deflazacort",
+          "source": "sponsor:PTC Therapeutics",
+          "target": "drug:deflazacort",
+          "trial_count": 4
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT03433807",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            },
+            {
+              "nct_id": "NCT03433807",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Idebenone"
+            },
+            {
+              "nct_id": "NCT00758225",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            },
+            {
+              "nct_id": "NCT00758225",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Idebenone"
+            },
+            {
+              "nct_id": "NCT00654784",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            },
+            {
+              "nct_id": "NCT00654784",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "idebenone"
+            },
+            {
+              "nct_id": "NCT01027884",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            },
+            {
+              "nct_id": "NCT01027884",
+              "field": "protocolSection.armsInterventionsModule.interventions[1].name",
+              "excerpt": "Idebenone"
+            }
+          ],
+          "citation_count": 4,
+          "source_url": null,
+          "id": "sponsor:Santhera Pharmaceuticals|drug:idebenone",
+          "source": "sponsor:Santhera Pharmaceuticals",
+          "target": "drug:idebenone",
+          "trial_count": 4
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT02636686",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "BioMarin Pharmaceutical"
+            },
+            {
+              "nct_id": "NCT02636686",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Drisapersen"
+            },
+            {
+              "nct_id": "NCT01910649",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "BioMarin Pharmaceutical"
+            },
+            {
+              "nct_id": "NCT01910649",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Drisapersen"
+            },
+            {
+              "nct_id": "NCT01803412",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "BioMarin Pharmaceutical"
+            },
+            {
+              "nct_id": "NCT01803412",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Drisapersen"
+            }
+          ],
+          "citation_count": 3,
+          "source_url": null,
+          "id": "sponsor:BioMarin Pharmaceutical|drug:drisapersen",
+          "source": "sponsor:BioMarin Pharmaceutical",
+          "target": "drug:drisapersen",
+          "trial_count": 3
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT06713135",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            },
+            {
+              "nct_id": "NCT06713135",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "vamorolone 40 mg/mL oral suspension"
+            },
+            {
+              "nct_id": "NCT05185622",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            },
+            {
+              "nct_id": "NCT05185622",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Vamorolone"
+            },
+            {
+              "nct_id": "NCT03863119",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Santhera Pharmaceuticals"
+            },
+            {
+              "nct_id": "NCT03863119",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Vamorolone"
+            }
+          ],
+          "citation_count": 3,
+          "source_url": null,
+          "id": "sponsor:Santhera Pharmaceuticals|drug:vamorolone",
+          "source": "sponsor:Santhera Pharmaceuticals",
+          "target": "drug:vamorolone",
+          "trial_count": 3
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT01540409",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT01540409",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "AVI-4658 (Eteplirsen)"
+            },
+            {
+              "nct_id": "NCT01396239",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT01396239",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "AVI-4658 (Eteplirsen)"
+            },
+            {
+              "nct_id": "NCT00844597",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Sarepta Therapeutics, Inc."
+            },
+            {
+              "nct_id": "NCT00844597",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "AVI-4658 for Injection"
+            }
+          ],
+          "citation_count": 3,
+          "source_url": null,
+          "id": "sponsor:Sarepta Therapeutics, Inc.|drug:avi-4658",
+          "source": "sponsor:Sarepta Therapeutics, Inc.",
+          "target": "drug:avi-4658",
+          "trial_count": 3
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT01580501",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cedars-Sinai Medical Center"
+            },
+            {
+              "nct_id": "NCT01580501",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Tadalafil and Sildenafil"
+            },
+            {
+              "nct_id": "NCT01359670",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cedars-Sinai Medical Center"
+            },
+            {
+              "nct_id": "NCT01359670",
+              "field": "protocolSection.armsInterventionsModule.interventions[1].name",
+              "excerpt": "Sildenafil"
+            }
+          ],
+          "citation_count": 2,
+          "source_url": null,
+          "id": "sponsor:Cedars-Sinai Medical Center|drug:sildenafil",
+          "source": "sponsor:Cedars-Sinai Medical Center",
+          "target": "drug:sildenafil",
+          "trial_count": 2
+        },
+        {
+          "citations": [
+            {
+              "nct_id": "NCT00308113",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cooperative International Neuromuscular Research Group"
+            },
+            {
+              "nct_id": "NCT00308113",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Prednisone"
+            },
+            {
+              "nct_id": "NCT00110669",
+              "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+              "excerpt": "Cooperative International Neuromuscular Research Group"
+            },
+            {
+              "nct_id": "NCT00110669",
+              "field": "protocolSection.armsInterventionsModule.interventions[0].name",
+              "excerpt": "Prednisone"
+            }
+          ],
+          "citation_count": 2,
+          "source_url": null,
+          "id": "sponsor:Cooperative International Neuromuscular Research Group|drug:prednisone",
+          "source": "sponsor:Cooperative International Neuromuscular Research Group",
+          "target": "drug:prednisone",
+          "trial_count": 2
+        }
+      ]
+    }
+  },
+  "clarification": null,
+  "references": {
+    "NCT07542314": {
+      "title": "Study to Evaluate the Safety and Effectiveness of ELEVIDYS in Participants With Duchenne Muscular Dystrophy Treated in a Post-Marketing Setting",
+      "url": "https://clinicaltrials.gov/study/NCT07542314",
+      "scope_evidence": []
+    },
+    "NCT06606340": {
+      "title": "A Long-term Observational Study Evaluating Eteplirsen, Golodirsen, or Casimersen in Routine Clinical Practice",
+      "url": "https://clinicaltrials.gov/study/NCT06606340",
+      "scope_evidence": []
+    },
+    "NCT06597656": {
+      "title": "A Gene Transfer Therapy to Evaluate the Safety and Efficacy of Delandistrogene Moxeparvovec (SRP-9001) Following Therapeutic Plasma Exchange (Plasmapheresis) in Participants With Duchenne Muscular Dystrophy (DMD) and Pre-existing Antibodies to AAVrh74",
+      "url": "https://clinicaltrials.gov/study/NCT06597656",
+      "scope_evidence": []
+    },
+    "NCT06270719": {
+      "title": "An Observational Study Comparing Delandistrogene Moxeparvovec (ELEVIDYS) With Standard of Care in Participants With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT06270719",
+      "scope_evidence": []
+    },
+    "NCT06241950": {
+      "title": "A Gene Transfer Therapy Study to Evaluate the Safety and Efficacy of Delandistrogene Moxeparvovec (SRP-9001) Following Imlifidase Infusion in Participants With Duchenne Muscular Dystrophy (DMD) Determined to Have Pre-existing Antibodies to Recombinant Adeno-Associated Virus Serotype (rAAVrh74)",
+      "url": "https://clinicaltrials.gov/study/NCT06241950",
+      "scope_evidence": []
+    },
+    "NCT04336826": {
+      "title": "A Study to Evaluate the Safety and Pharmacokinetics of Ataluren in Participants From ≥6 Months to <2 Years of Age With Nonsense Mutation Duchenne Muscular Dystrophy (nmDMD)",
+      "url": "https://clinicaltrials.gov/study/NCT04336826",
+      "scope_evidence": []
+    },
+    "NCT03796637": {
+      "title": "A Study to Assess Dystrophin Levels in Participants With Nonsense Mutation Duchenne Muscular Dystrophy (nmDMD) Who Have Been Treated With Ataluren",
+      "url": "https://clinicaltrials.gov/study/NCT03796637",
+      "scope_evidence": []
+    },
+    "NCT03648827": {
+      "title": "A Study to Assess Dystrophin Levels in Participants With Nonsense Mutation Duchenne Muscular Dystrophy (nmDMD)",
+      "url": "https://clinicaltrials.gov/study/NCT03648827",
+      "scope_evidence": []
+    },
+    "NCT03642145": {
+      "title": "A Study of Deflazacort (Emflaza®) in Participants With Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT03642145",
+      "scope_evidence": []
+    },
+    "NCT02819557": {
+      "title": "Study of Ataluren in ≥2 to <5 Year-Old Male Participants With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT02819557",
+      "scope_evidence": []
+    },
+    "NCT07573631": {
+      "title": "An Open-Label Extension Study to Evaluate the Long-term Safety and Efficacy of BMN 351 in Participants With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT07573631",
+      "scope_evidence": []
+    },
+    "NCT06280209": {
+      "title": "A Phase 1/2 Study to Assess the Safety, Tolerability, Pharmacokinetics, and Pharmacodynamics of BMN 351 in Participants With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT06280209",
+      "scope_evidence": []
+    },
+    "NCT02958202": {
+      "title": "Extension Study of BMN 044 in Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT02958202",
+      "scope_evidence": []
+    },
+    "NCT02636686": {
+      "title": "Extension Study of Drisapersen in DMD Subjects",
+      "url": "https://clinicaltrials.gov/study/NCT02636686",
+      "scope_evidence": []
+    },
+    "NCT02329769": {
+      "title": "Open Label, Extension Study of PRO044 in Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT02329769",
+      "scope_evidence": []
+    },
+    "NCT06053814": {
+      "title": "NS-050/NCNP-03 in Boys With DMD (Meteor50)",
+      "url": "https://clinicaltrials.gov/study/NCT06053814",
+      "scope_evidence": []
+    },
+    "NCT05996003": {
+      "title": "NS-089/NCNP-02-201 in Boys With Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT05996003",
+      "scope_evidence": []
+    },
+    "NCT04956289": {
+      "title": "Study to Assess the Safety, Tolerability, and Efficacy of Viltolarsen in Ambulant and Non-Ambulant Boys With DMD (Galactic53)",
+      "url": "https://clinicaltrials.gov/study/NCT04956289",
+      "scope_evidence": []
+    },
+    "NCT04768062": {
+      "title": "Study to Assess the Safety and Efficacy of Viltolarsen in Ambulant Boys With DMD (RACER53-X)",
+      "url": "https://clinicaltrials.gov/study/NCT04768062",
+      "scope_evidence": []
+    },
+    "NCT04687020": {
+      "title": "Long-term Use of Viltolarsen in Boys With Duchenne Muscular Dystrophy in Clinical Practice (VILT-502)",
+      "url": "https://clinicaltrials.gov/study/NCT04687020",
+      "scope_evidence": []
+    },
+    "NCT06713135": {
+      "title": "A Study on Safety and Effectiveness of Long-term Treatment With Vamorolone in Boys With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT06713135",
+      "scope_evidence": []
+    },
+    "NCT05185622": {
+      "title": "A Study to Assess Vamorolone in Boys Ages 2 to <4 Years and 7 to <18 Years With Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT05185622",
+      "scope_evidence": []
+    },
+    "NCT03863119": {
+      "title": "Expanded Access Protocol for Boys With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT03863119",
+      "scope_evidence": []
+    },
+    "NCT03603288": {
+      "title": "Phase III Study With Idebenone in Patients With Duchenne Muscular Dystrophy (SIDEROS-E)",
+      "url": "https://clinicaltrials.gov/study/NCT03603288",
+      "scope_evidence": []
+    },
+    "NCT03433807": {
+      "title": "Expanded Access Program for Idebenone in Participants With Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT03433807",
+      "scope_evidence": []
+    },
+    "NCT01126697": {
+      "title": "Clinical Trial of Coenzyme Q10 and Lisinopril in Muscular Dystrophies",
+      "url": "https://clinicaltrials.gov/study/NCT01126697",
+      "scope_evidence": []
+    },
+    "NCT00308113": {
+      "title": "CoQ10 and Prednisone in Non-Ambulatory DMD",
+      "url": "https://clinicaltrials.gov/study/NCT00308113",
+      "scope_evidence": []
+    },
+    "NCT00110669": {
+      "title": "High-dose Prednisone in Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT00110669",
+      "scope_evidence": []
+    },
+    "NCT00243789": {
+      "title": "Study of Daily Pentoxifylline as a Rescue Treatment in Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT00243789",
+      "scope_evidence": []
+    },
+    "NCT00102453": {
+      "title": "Pentoxifylline in Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT00102453",
+      "scope_evidence": []
+    },
+    "NCT06769633": {
+      "title": "Pharmacokinetics and Safety of Givinostat in DMD Patients Ages From at Least 2 Years to Less Then 6 Years Old",
+      "url": "https://clinicaltrials.gov/study/NCT06769633",
+      "scope_evidence": []
+    },
+    "NCT05933057": {
+      "title": "Efficacy, Safety and Tolerability of Givinostat in Non-ambulant Patients With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT05933057",
+      "scope_evidence": []
+    },
+    "NCT03373968": {
+      "title": "Givinostat in Duchenne's Muscular Dystrophy Long-term Safety and Tolerability Study",
+      "url": "https://clinicaltrials.gov/study/NCT03373968",
+      "scope_evidence": []
+    },
+    "NCT02851797": {
+      "title": "Clinical Study to Evaluate the Efficacy and Safety of Givinostat in Ambulant Patients With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT02851797",
+      "scope_evidence": []
+    },
+    "NCT01761292": {
+      "title": "A Study to Assess Safety/Tolerability, pk, Effects on Histology, Clinical Parameters of Givinostat in Children With DMD",
+      "url": "https://clinicaltrials.gov/study/NCT01761292",
+      "scope_evidence": []
+    },
+    "NCT01890798": {
+      "title": "Drisapersen Duchenne Muscular Dystrophy (DMD) Treatment Protocol",
+      "url": "https://clinicaltrials.gov/study/NCT01890798",
+      "scope_evidence": []
+    },
+    "NCT01480245": {
+      "title": "Open Label Study of GSK2402968 in Subjects With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT01480245",
+      "scope_evidence": []
+    },
+    "NCT01462292": {
+      "title": "A Clinical Study to Assess Two Doses of GSK2402968 in Subjects With Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT01462292",
+      "scope_evidence": []
+    },
+    "NCT01254019": {
+      "title": "A Clinical Study to Assess the Efficacy and Safety of GSK2402968 in Subjects With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT01254019",
+      "scope_evidence": []
+    },
+    "NCT01153932": {
+      "title": "Phase II Doubleblind Exploratory Study of GSK2402968 in Ambulant Subjects With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT01153932",
+      "scope_evidence": []
+    },
+    "NCT01580501": {
+      "title": "PDE Inhibitors in DMD Study (Acute Dosing Study)",
+      "url": "https://clinicaltrials.gov/study/NCT01580501",
+      "scope_evidence": []
+    },
+    "NCT01359670": {
+      "title": "Tadalafil and Sildenafil for Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT01359670",
+      "scope_evidence": []
+    },
+    "NCT02653833": {
+      "title": "The Study of Skeletal Muscle Blood Flow in Becker Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT02653833",
+      "scope_evidence": []
+    },
+    "NCT02434627": {
+      "title": "Sodium Nitrate for Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT02434627",
+      "scope_evidence": []
+    },
+    "NCT01070511": {
+      "title": "Tadalafil in Becker Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT01070511",
+      "scope_evidence": []
+    },
+    "NCT03439670": {
+      "title": "A Study to Assess the Efficacy and Safety of Vamorolone in Boys With Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT03439670",
+      "scope_evidence": []
+    },
+    "NCT03038399": {
+      "title": "Long-term Extension Study to Assess Vamorolone in Boys With Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT03038399",
+      "scope_evidence": []
+    },
+    "NCT02760277": {
+      "title": "An Extension Study to Assess Vamorolone in Boys With Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT02760277",
+      "scope_evidence": []
+    },
+    "NCT02760264": {
+      "title": "A Study to Assess Vamorolone in Boys With Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT02760264",
+      "scope_evidence": []
+    },
+    "NCT05166109": {
+      "title": "A Study to Assess Vamorolone in Becker Muscular Dystrophy (BMD)",
+      "url": "https://clinicaltrials.gov/study/NCT05166109",
+      "scope_evidence": []
+    },
+    "NCT01557400": {
+      "title": "Study of Ataluren for Previously Treated Participants With Nonsense Mutation Duchenne/Becker Muscular Dystrophy (nmDBMD) in Europe, Israel, Australia, and Canada",
+      "url": "https://clinicaltrials.gov/study/NCT01557400",
+      "scope_evidence": []
+    },
+    "NCT06128564": {
+      "title": "A Gene Delivery Study to Evaluate the Safety and Expression of Delandistrogene Moxeparvovec in Participants Under the Age of Four With Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT06128564",
+      "scope_evidence": []
+    },
+    "NCT05967351": {
+      "title": "A Long-term Follow-up Study of Participants Who Received Delandistrogene Moxeparvovec (SRP-9001) in a Previous Clinical Study",
+      "url": "https://clinicaltrials.gov/study/NCT05967351",
+      "scope_evidence": []
+    },
+    "NCT06564974": {
+      "title": "Registry Study to Observe Long-term Safety of Vamorolone (AGAMREE®) in Patients With Duchenne Muscular Dystrophy-SUMMIT",
+      "url": "https://clinicaltrials.gov/study/NCT06564974",
+      "scope_evidence": []
+    },
+    "NCT04322357": {
+      "title": "Twice Weekly Steroids and Exercise as Therapy for DMD",
+      "url": "https://clinicaltrials.gov/study/NCT04322357",
+      "scope_evidence": []
+    },
+    "NCT02036463": {
+      "title": "A Trial of Chronotherapy of Corticosteroids in Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT02036463",
+      "scope_evidence": []
+    },
+    "NCT01603407": {
+      "title": "Finding the Optimum Regimen for Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT01603407",
+      "scope_evidence": []
+    },
+    "NCT03985878": {
+      "title": "A Study to Evaluate Safety, Tolerability, and Efficacy of Eteplirsen in Participants With Duchenne Muscular Dystrophy (DMD) Who Have Completed Study 4658-102 (NCT03218995)",
+      "url": "https://clinicaltrials.gov/study/NCT03985878",
+      "scope_evidence": []
+    },
+    "NCT03218995": {
+      "title": "Study of Eteplirsen in Young Participants With Duchenne Muscular Dystrophy (DMD) Amenable to Exon 51 Skipping",
+      "url": "https://clinicaltrials.gov/study/NCT03218995",
+      "scope_evidence": []
+    },
+    "NCT02420379": {
+      "title": "Safety Study of Eteplirsen to Treat Early Stage Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT02420379",
+      "scope_evidence": []
+    },
+    "NCT02255552": {
+      "title": "Study of Eteplirsen in DMD Patients",
+      "url": "https://clinicaltrials.gov/study/NCT02255552",
+      "scope_evidence": []
+    },
+    "NCT06290713": {
+      "title": "Vasodilator and Exercise Study for DMD (VASO-REx)",
+      "url": "https://clinicaltrials.gov/study/NCT06290713",
+      "scope_evidence": []
+    },
+    "NCT05195775": {
+      "title": "Tadalafil as Adjuvant Therapy for DMD",
+      "url": "https://clinicaltrials.gov/study/NCT05195775",
+      "scope_evidence": []
+    },
+    "NCT02592941": {
+      "title": "Deflazacort Expanded Access Program for Children, Adolescents and Adults With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT02592941",
+      "scope_evidence": []
+    },
+    "NCT02295748": {
+      "title": "An Open-Label, Long-Term Extension Study to Evaluate the Safety and Tolerability Deflazacort",
+      "url": "https://clinicaltrials.gov/study/NCT02295748",
+      "scope_evidence": []
+    },
+    "NCT02251600": {
+      "title": "A Pharmacokinetic Study of Oral Deflazacort in Children and Adolescent Subjects With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT02251600",
+      "scope_evidence": []
+    },
+    "NCT03238235": {
+      "title": "Clinical Study to Evaluate the Efficacy and Safety of Givinostat in Ambulant Patients With Becker Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT03238235",
+      "scope_evidence": []
+    },
+    "NCT01128855": {
+      "title": "A Double-blind, Escalating Dose, Randomized, Placebo-controlled Study Assessing PK, Safety, Tolerability in Non-ambulant DMD Subjects",
+      "url": "https://clinicaltrials.gov/study/NCT01128855",
+      "scope_evidence": []
+    },
+    "NCT01168908": {
+      "title": "Revatio for Heart Disease in Duchenne Muscular Dystrophy and Becker Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT01168908",
+      "scope_evidence": []
+    },
+    "NCT03633565": {
+      "title": "Comparative Study of Strategies for Management of Duchenne Myopathy (DM)",
+      "url": "https://clinicaltrials.gov/study/NCT03633565",
+      "scope_evidence": []
+    },
+    "NCT01350154": {
+      "title": "Effect of Modulating the nNOS System on Cardiac, Muscular and Cognitive Function in Becker Muscular Dystrophy Patients",
+      "url": "https://clinicaltrials.gov/study/NCT01350154",
+      "scope_evidence": []
+    },
+    "NCT04060199": {
+      "title": "Study to Assess the Efficacy and Safety of Viltolarsen in Ambulant Boys With DMD (RACER53)",
+      "url": "https://clinicaltrials.gov/study/NCT04060199",
+      "scope_evidence": []
+    },
+    "NCT04337112": {
+      "title": "The Expanded Access Use of Viltolarsen in Duchenne Muscular Dystrophy With Confirmed Exon 53 Amenable Mutation",
+      "url": "https://clinicaltrials.gov/study/NCT04337112",
+      "scope_evidence": []
+    },
+    "NCT01540409": {
+      "title": "Efficacy, Safety, and Tolerability Rollover Study of Eteplirsen in Subjects With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT01540409",
+      "scope_evidence": []
+    },
+    "NCT01396239": {
+      "title": "Efficacy Study of AVI-4658 to Induce Dystrophin Expression in Selected Duchenne Muscular Dystrophy Patients",
+      "url": "https://clinicaltrials.gov/study/NCT01396239",
+      "scope_evidence": []
+    },
+    "NCT00844597": {
+      "title": "Dose-Ranging Study of AVI-4658 to Induce Dystrophin Expression in Selected Duchenne Muscular Dystrophy (DMD) Patients",
+      "url": "https://clinicaltrials.gov/study/NCT00844597",
+      "scope_evidence": []
+    },
+    "NCT00159250": {
+      "title": "Safety and Efficacy Study of Antisense Oligonucleotides in Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT00159250",
+      "scope_evidence": []
+    },
+    "NCT01910649": {
+      "title": "A Phase I/II, Open Label, Escalating Dose, Pilot Study to Assess Effect, Safety, Tolerability and PK of Multiple SC Doses of Drisapersen in Patients With Duchenne Muscular Dystrophy and to Assess the Potential for IV Dosing as an Alternative Route of Administration",
+      "url": "https://clinicaltrials.gov/study/NCT01910649",
+      "scope_evidence": []
+    },
+    "NCT01803412": {
+      "title": "A Study of the Safety, Tolerability & Efficacy of Long-term Administration of Drisapersen in US & Canadian Subjects",
+      "url": "https://clinicaltrials.gov/study/NCT01803412",
+      "scope_evidence": []
+    },
+    "NCT00758225": {
+      "title": "Long-term Safety, Tolerability and Efficacy of Idebenone in Duchenne Muscular Dystrophy (DELPHI Extension)",
+      "url": "https://clinicaltrials.gov/study/NCT00758225",
+      "scope_evidence": []
+    },
+    "NCT00654784": {
+      "title": "Efficacy and Tolerability of Idebenone in Boys With Cardiac Dysfunction Associated With Duchenne Muscular Dystrophy",
+      "url": "https://clinicaltrials.gov/study/NCT00654784",
+      "scope_evidence": []
+    },
+    "NCT01027884": {
+      "title": "Phase III Study of Idebenone in Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT01027884",
+      "scope_evidence": []
+    },
+    "NCT05881408": {
+      "title": "A Gene Transfer Therapy Study to Evaluate the Safety and Efficacy of Delandistrogene Moxeparvovec (SRP-9001) in Non-Ambulatory and Ambulatory Participants With Duchenne Muscular Dystrophy (DMD)",
+      "url": "https://clinicaltrials.gov/study/NCT05881408",
+      "scope_evidence": []
+    }
+  },
+  "meta": {
+    "request_id": "2c1f6344-9d09-40d8-8cf4-de46335ea525",
+    "generated_at": "2026-10-07T00:59:33.949866Z",
+    "query": "Show a network of sponsors and drugs for Duchenne muscular dystrophy trials.",
+    "filters": {
+      "drug_name": [],
+      "condition": [
+        "Duchenne muscular dystrophy"
+      ],
+      "sponsor": [],
+      "country": [],
+      "term": [],
+      "trial_phase": [],
+      "status": [],
+      "study_type": [],
+      "sponsor_class": [],
+      "intervention_type": [],
+      "start_year": null,
+      "end_year": null,
+      "date_field": "start_date",
+      "compare": null
+    },
+    "interpretation": {
+      "summary": "Counting trials in which sponsor and drug occur together, for Duchenne muscular dystrophy.",
+      "analysis": "network",
+      "measure": {
+        "aggregate": "count",
+        "of": "trials"
+      },
+      "group_by": [
+        "sponsor",
+        "drug"
+      ],
+      "compare": null,
+      "time_granularity": null,
+      "counting_unit": "trial",
+      "entities": [
+        {
+          "kind": "condition",
+          "source": "question",
+          "text": "Duchenne muscular dystrophy",
+          "term_searched": "Duchenne muscular dystrophy",
+          "definition": "condition_search",
+          "status": "ok",
+          "trials_matched": 499,
+          "strict_name_matches": null,
+          "other_readings": [
+            {
+              "kind": "drug",
+              "trials_matched": 462
+            }
+          ],
+          "candidates": []
+        }
+      ],
+      "adjustments": [],
+      "strategy": [
+        {
+          "series": null,
+          "name": "walk",
+          "reason": "All 499 trials were read and grouped here.",
+          "upstream_requests": 1
+        }
+      ],
+      "chart_rationale": "Rule 12: two different kinds of node, so a bipartite network."
+    },
+    "plan": {
+      "interpretation": "Link sponsors to drugs across Duchenne muscular dystrophy trials.",
+      "entities": [
+        {
+          "kind": "condition",
+          "value": "Duchenne muscular dystrophy",
+          "role": "filter"
+        }
+      ],
+      "filters": {
+        "phases": [],
+        "statuses": [],
+        "study_types": [],
+        "sponsor_classes": [],
+        "intervention_types": [],
+        "evidence": [],
+        "date_field": "start_date",
+        "year_from": null,
+        "year_to": null
+      },
+      "analysis": {
+        "kind": "network",
+        "source": "sponsor",
+        "target": "drug",
+        "link": "same_trial"
+      },
+      "chart_preference": "network_graph"
+    },
+    "options": {
+      "planner": "llm",
+      "citations_per_datum": 5,
+      "drug_match": "broad",
+      "include_trace": true,
+      "use_cache": true
+    },
+    "planner": {
+      "mode": "llm",
+      "model": "gpt-5.4-mini-2026-03-17",
+      "reasoning_effort": "low",
+      "prompt_version": "plan-v1",
+      "attempts": 1,
+      "is_repaired": false,
+      "is_fallback": false,
+      "usage": {
+        "input_tokens": 4150,
+        "output_tokens": 171,
+        "reasoning_tokens": 56,
+        "cached_tokens": 3840
+      }
+    },
+    "assumptions": [
+      "Matched 'Duchenne muscular dystrophy' with the registry's condition search (conditions, titles, keywords and MeSH terms, with synonyms).",
+      "Sponsors are the lead sponsor's name as registered; variants of one name are not merged.",
+      "Drug names are normalised from free text: doses and forms are removed, placebos and non-drug care are left out, and a combination is split only when each part is a known drug.",
+      "A sponsor and a drug are linked when one trial lists both. The sponsor of a trial is its lead sponsor."
+    ],
+    "warnings": [
+      {
+        "code": "names_partly_normalised",
+        "message": "Drug names are free text and only partly normalised: one compound under a code name and a generic name can appear as two entries."
+      }
+    ],
+    "source": {
+      "name": "ClinicalTrials.gov",
+      "url": "https://clinicaltrials.gov",
+      "api_version": "2.0.5",
+      "data_timestamp": "2026-10-06T09:00:05",
+      "retrieved_at": "2026-10-07T00:59:33.949866Z",
+      "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
+      "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
+      "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 63,
+          "total_count": 499,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 73,
+          "total_count": 462,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 0,
+          "total_count": 499,
+          "records_returned": 1,
+          "is_cached": true,
+          "origin": "probe"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=Duchenne%20muscular%20dystrophy&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,Condition,InterventionArmGroupLabel,InterventionMeshTerm,InterventionName,InterventionOtherName,InterventionType,LeadSponsorClass,LeadSponsorName,StudyFirstPostDate",
+          "status": 200,
+          "duration_ms": 407,
+          "total_count": 499,
+          "records_returned": 499,
+          "is_cached": false,
+          "origin": "execution"
+        }
+      ]
+    },
+    "counts": {
+      "data_points": 39,
+      "series": [
+        {
+          "label": null,
+          "trials_matched": 499,
+          "trials_analyzed": 279,
+          "trials_excluded": [
+            {
+              "reason": "no_drug",
+              "count": 220,
+              "message": "No drug on record"
+            }
+          ]
+        }
+      ],
+      "trials_in_several_series": null
+    },
+    "truncation": {
+      "is_truncated": true,
+      "items": [
+        {
+          "scope": "nodes",
+          "shown": 24,
+          "total": 301,
+          "rule": "The 15 largest per side, by trials, that have a link."
+        },
+        {
+          "scope": "edges",
+          "shown": 15,
+          "total": 224,
+          "rule": "Links of at least 2 trials, the 60 heaviest."
+        }
+      ]
+    },
+    "citations": {
+      "is_enabled": true,
+      "max_per_datum": 5,
+      "selection": "trials naming the searched entity first, then most recently first-posted, then by NCT ID",
+      "trials_cited": 83
+    },
+    "suggested_followups": [],
+    "cache": {
+      "is_plan_cached": false,
+      "is_response_cached": false,
+      "cached_at": null
+    },
+    "timing": {
+      "total_ms": 2013,
+      "plan_ms": 1516,
+      "resolve_ms": 74,
+      "fetch_ms": 420,
+      "build_ms": 1
+    },
+    "debug": {
+      "trace": [
+        {
+          "index": 0,
+          "type": "plan",
+          "summary": "Link sponsors to drugs across Duchenne muscular dystrophy trials.",
+          "duration_ms": 1516,
+          "request_indexes": [],
+          "detail": {}
+        },
+        {
+          "index": 1,
+          "type": "resolve_entity",
+          "summary": "1 entities",
+          "duration_ms": 74,
+          "request_indexes": [
+            0,
+            1,
+            2
+          ],
+          "detail": {}
+        },
+        {
+          "index": 2,
+          "type": "execute",
+          "summary": "1 requests",
+          "duration_ms": 420,
+          "request_indexes": [
+            3
+          ],
+          "detail": {}
+        }
+      ]
+    }
+  }
+}

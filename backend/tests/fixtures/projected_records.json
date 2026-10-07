@@ -1,0 +1,192 @@
+{
+  "design_module_empty": {
+    "protocolSection": {
+      "identificationModule": {
+        "nctId": "NCT06781450"
+      },
+      "statusModule": {
+        "startDateStruct": {
+          "date": "2022-04-23"
+        }
+      },
+      "designModule": {}
+    }
+  },
+  "locations_module_empty": {
+    "protocolSection": {
+      "identificationModule": {
+        "nctId": "NCT05110885"
+      },
+      "statusModule": {
+        "overallStatus": "UNKNOWN"
+      },
+      "contactsLocationsModule": {}
+    }
+  },
+  "locations_module_absent": {
+    "protocolSection": {
+      "identificationModule": {
+        "nctId": "NCT06833931"
+      },
+      "statusModule": {
+        "overallStatus": "WITHDRAWN"
+      }
+    }
+  },
+  "location_item_empty": {
+    "protocolSection": {
+      "identificationModule": {
+        "nctId": "NCT00387374",
+        "briefTitle": "Radiation Therapy, Bevacizumab, Paclitaxel, and Carboplatin in Treating Patients With Unresectable Stage IIIB or Stage IV Non-Small Cell Lung Cancer at High Risk for Hemoptysis Caused by Bevacizumab"
+      },
+      "statusModule": {
+        "overallStatus": "COMPLETED",
+        "startDateStruct": {
+          "date": "2006-10"
+        },
+        "primaryCompletionDateStruct": {
+          "date": "2007-06",
+          "type": "ACTUAL"
+        },
+        "studyFirstPostDateStruct": {
+          "date": "2006-10-13"
+        }
+      },
+      "sponsorCollaboratorsModule": {
+        "leadSponsor": {
+          "name": "National Cancer Institute (NCI)",
+          "class": "NIH"
+        }
+      },
+      "conditionsModule": {
+        "conditions": [
+          "Adenosquamous Cell Lung Cancer",
+          "Drug/Agent Toxicity by Tissue/Organ",
+          "Hemoptysis",
+          "Squamous Cell Lung Cancer",
+          "Stage IIIB Non-small Cell Lung Cancer",
+          "Stage IV Non-small Cell Lung Cancer"
+        ]
+      },
+      "designModule": {
+        "studyType": "INTERVENTIONAL",
+        "phases": [
+          "PHASE2"
+        ],
+        "designInfo": {
+          "allocation": "NON_RANDOMIZED",
+          "primaryPurpose": "TREATMENT",
+          "maskingInfo": {
+            "masking": "NONE"
+          }
+        },
+        "enrollmentInfo": {
+          "count": 72,
+          "type": "ACTUAL"
+        }
+      },
+      "armsInterventionsModule": {
+        "interventions": [
+          {
+            "type": "BIOLOGICAL",
+            "name": "bevacizumab",
+            "otherNames": [
+              "anti-VEGF humanized monoclonal antibody",
+              "anti-VEGF monoclonal antibody",
+              "Avastin",
+              "rhuMAb VEGF"
+            ]
+          },
+          {
+            "type": "DRUG",
+            "name": "paclitaxel",
+            "otherNames": [
+              "Anzatax",
+              "Asotax",
+              "TAX",
+              "Taxol"
+            ]
+          }
+        ]
+      },
+      "eligibilityModule": {
+        "sex": "ALL",
+        "stdAges": [
+          "ADULT",
+          "OLDER_ADULT"
+        ]
+      },
+      "contactsLocationsModule": {
+        "locations": [
+          {}
+        ]
+      }
+    },
+    "derivedSection": {
+      "conditionBrowseModule": {
+        "meshes": [
+          {
+            "term": "Drug-Related Side Effects and Adverse Reactions"
+          },
+          {
+            "term": "Hemoptysis"
+          },
+          {
+            "term": "Carcinoma, Non-Small-Cell Lung"
+          }
+        ]
+      },
+      "interventionBrowseModule": {
+        "meshes": [
+          {
+            "term": "Bevacizumab"
+          },
+          {
+            "term": "Paclitaxel"
+          },
+          {
+            "term": "Taxes"
+          },
+          {
+            "term": "Carboplatin"
+          },
+          {
+            "term": "Radiotherapy"
+          },
+          {
+            "term": "Radiation"
+          }
+        ]
+      }
+    },
+    "hasResults": false
+  },
+  "intervention_item_empty": {
+    "protocolSection": {
+      "identificationModule": {
+        "nctId": "NCT02130466"
+      },
+      "armsInterventionsModule": {
+        "interventions": [
+          {
+            "otherNames": [
+              "MK-3475",
+              "KEYTRUDA®"
+            ]
+          },
+          {
+            "otherNames": [
+              "TAFINLAR®"
+            ]
+          },
+          {
+            "otherNames": [
+              "MEKINIST®"
+            ]
+          },
+          {}
+        ]
+      }
+    }
+  }
+}

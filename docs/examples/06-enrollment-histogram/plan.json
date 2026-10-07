@@ -1,0 +1,29 @@
+{
+  "interpretation": "Count pembrolizumab trials by enrollment size.",
+  "entities": [
+    {
+      "kind": "drug",
+      "value": "pembrolizumab",
+      "role": "filter"
+    }
+  ],
+  "filters": {
+    "phases": [],
+    "statuses": [],
+    "study_types": [],
+    "sponsor_classes": [],
+    "intervention_types": [],
+    "evidence": [],
+    "date_field": "start_date",
+    "year_from": null,
+    "year_to": null
+  },
+  "analysis": {
+    "kind": "aggregate",
+    "dimension": "enrollment",
+    "series": null,
+    "time_unit": null,
+    "top_n": null
+  },
+  "chart_preference": "histogram"
+}

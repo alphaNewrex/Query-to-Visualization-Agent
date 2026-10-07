@@ -1,0 +1,120 @@
+{
+  "spec_version": "1.0",
+  "kind": "clarification",
+  "message": "The question needs a drug name that it does not give. Add it to the question or its field.",
+  "visualization": null,
+  "clarification": {
+    "reason": "missing_entity",
+    "missing_fields": [
+      "drug_name"
+    ],
+    "options": []
+  },
+  "references": {},
+  "meta": {
+    "request_id": "83604f32-d1b1-4483-86ea-79ef1779d957",
+    "generated_at": "2026-10-07T00:59:46.699843Z",
+    "query": "How has the number of trials for this drug changed over time?",
+    "filters": {
+      "drug_name": [],
+      "condition": [],
+      "sponsor": [],
+      "country": [],
+      "term": [],
+      "trial_phase": [],
+      "status": [],
+      "study_type": [],
+      "sponsor_class": [],
+      "intervention_type": [],
+      "start_year": null,
+      "end_year": null,
+      "date_field": null,
+      "compare": null
+    },
+    "interpretation": null,
+    "plan": {
+      "interpretation": "Count trials for an unnamed drug by time.",
+      "entities": [],
+      "filters": {
+        "phases": [],
+        "statuses": [],
+        "study_types": [],
+        "sponsor_classes": [],
+        "intervention_types": [],
+        "evidence": [],
+        "date_field": null,
+        "year_from": null,
+        "year_to": null
+      },
+      "analysis": {
+        "kind": "clarify",
+        "reason": "missing_entity",
+        "missing": [
+          "drug_name"
+        ]
+      },
+      "chart_preference": null
+    },
+    "options": {
+      "planner": "llm",
+      "citations_per_datum": 5,
+      "drug_match": "broad",
+      "include_trace": true,
+      "use_cache": true
+    },
+    "planner": {
+      "mode": "llm",
+      "model": "gpt-5.4-mini-2026-03-17",
+      "reasoning_effort": "low",
+      "prompt_version": "plan-v1",
+      "attempts": 1,
+      "is_repaired": false,
+      "is_fallback": false,
+      "usage": {
+        "input_tokens": 4148,
+        "output_tokens": 102,
+        "reasoning_tokens": 10,
+        "cached_tokens": 3840
+      }
+    },
+    "assumptions": [],
+    "warnings": [],
+    "source": null,
+    "counts": null,
+    "truncation": {
+      "is_truncated": false,
+      "items": []
+    },
+    "citations": {
+      "is_enabled": true,
+      "max_per_datum": 5,
+      "selection": "no trials are cited",
+      "trials_cited": 0
+    },
+    "suggested_followups": [],
+    "cache": {
+      "is_plan_cached": false,
+      "is_response_cached": false,
+      "cached_at": null
+    },
+    "timing": {
+      "total_ms": 1201,
+      "plan_ms": 1201,
+      "resolve_ms": 0,
+      "fetch_ms": 0,
+      "build_ms": 0
+    },
+    "debug": {
+      "trace": [
+        {
+          "index": 0,
+          "type": "plan",
+          "summary": "Count trials for an unnamed drug by time.",
+          "duration_ms": 1201,
+          "request_indexes": [],
+          "detail": {}
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,294 @@
+{
+  "OrgStudyIdType": {
+    "NIH": "U.S. NIH Grant/Contract",
+    "FDA": "U.S. FDA Grant/Contract",
+    "VA": "U.S. VA Grant/Contract",
+    "CDC": "U.S. CDC Grant/Contract",
+    "AHRQ": "U.S. AHRQ Grant/Contract",
+    "SAMHSA": "U.S. SAMHSA Grant/Contract"
+  },
+  "SecondaryIdType": {
+    "NIH": "U.S. NIH Grant/Contract",
+    "FDA": "U.S. FDA Grant/Contract",
+    "VA": "U.S. VA Grant/Contract",
+    "CDC": "U.S. CDC Grant/Contract",
+    "AHRQ": "U.S. AHRQ Grant/Contract",
+    "SAMHSA": "U.S. SAMHSA Grant/Contract",
+    "OTHER_GRANT": "Other Grant/Funding Number",
+    "EUDRACT_NUMBER": "EudraCT Number",
+    "CTIS": "EU Trial (CTIS) Number",
+    "REGISTRY": "Registry Identifier",
+    "OTHER": "Other Identifier"
+  },
+  "AgencyClass": {
+    "NIH": "NIH",
+    "FED": "FED",
+    "OTHER_GOV": "OTHER_GOV",
+    "INDIV": "INDIV",
+    "INDUSTRY": "INDUSTRY",
+    "NETWORK": "NETWORK",
+    "AMBIG": "AMBIG",
+    "OTHER": "OTHER",
+    "UNKNOWN": "UNKNOWN"
+  },
+  "Status": {
+    "ACTIVE_NOT_RECRUITING": "Active, not recruiting",
+    "COMPLETED": "Completed",
+    "ENROLLING_BY_INVITATION": "Enrolling by invitation",
+    "NOT_YET_RECRUITING": "Not yet recruiting",
+    "RECRUITING": "Recruiting",
+    "SUSPENDED": "Suspended",
+    "TERMINATED": "Terminated",
+    "WITHDRAWN": "Withdrawn",
+    "AVAILABLE": "Available",
+    "NO_LONGER_AVAILABLE": "No longer available",
+    "TEMPORARILY_NOT_AVAILABLE": "Temporarily not available",
+    "APPROVED_FOR_MARKETING": "Approved for marketing",
+    "WITHHELD": "Withheld",
+    "UNKNOWN": "Unknown status"
+  },
+  "ExpandedAccessStatus": {
+    "AVAILABLE": "Available",
+    "NO_LONGER_AVAILABLE": "No longer available",
+    "TEMPORARILY_NOT_AVAILABLE": "Temporarily not available",
+    "APPROVED_FOR_MARKETING": "Approved for marketing"
+  },
+  "DateType": {
+    "ACTUAL": "Actual",
+    "ESTIMATED": "Estimated"
+  },
+  "ResponsiblePartyType": {
+    "SPONSOR": "Sponsor",
+    "PRINCIPAL_INVESTIGATOR": "Principal Investigator",
+    "SPONSOR_INVESTIGATOR": "Sponsor-Investigator"
+  },
+  "StudyType": {
+    "EXPANDED_ACCESS": "Expanded Access",
+    "INTERVENTIONAL": "Interventional",
+    "OBSERVATIONAL": "Observational"
+  },
+  "Phase": {
+    "NA": "Not Applicable",
+    "EARLY_PHASE1": "Early Phase 1",
+    "PHASE1": "Phase 1",
+    "PHASE2": "Phase 2",
+    "PHASE3": "Phase 3",
+    "PHASE4": "Phase 4"
+  },
+  "DesignAllocation": {
+    "RANDOMIZED": "Randomized",
+    "NON_RANDOMIZED": "Non-Randomized",
+    "NA": "N/A"
+  },
+  "InterventionalAssignment": {
+    "SINGLE_GROUP": "Single Group Assignment",
+    "PARALLEL": "Parallel Assignment",
+    "CROSSOVER": "Crossover Assignment",
+    "FACTORIAL": "Factorial Assignment",
+    "SEQUENTIAL": "Sequential Assignment"
+  },
+  "PrimaryPurpose": {
+    "TREATMENT": "Treatment",
+    "PREVENTION": "Prevention",
+    "DIAGNOSTIC": "Diagnostic",
+    "ECT": "Educational/Counseling/Training",
+    "SUPPORTIVE_CARE": "Supportive Care",
+    "SCREENING": "Screening",
+    "HEALTH_SERVICES_RESEARCH": "Health Services Research",
+    "BASIC_SCIENCE": "Basic Science",
+    "DEVICE_FEASIBILITY": "Device Feasibility",
+    "OTHER": "Other"
+  },
+  "ObservationalModel": {
+    "COHORT": "Cohort",
+    "CASE_CONTROL": "Case-Control",
+    "CASE_ONLY": "Case-Only",
+    "CASE_CROSSOVER": "Case-Crossover",
+    "ECOLOGIC_OR_COMMUNITY": "Ecologic or Community",
+    "FAMILY_BASED": "Family-Based",
+    "DEFINED_POPULATION": "Defined Population",
+    "NATURAL_HISTORY": "Natural History",
+    "OTHER": "Other"
+  },
+  "DesignTimePerspective": {
+    "RETROSPECTIVE": "Retrospective",
+    "PROSPECTIVE": "Prospective",
+    "CROSS_SECTIONAL": "Cross-Sectional",
+    "OTHER": "Other"
+  },
+  "DesignMasking": {
+    "NONE": "None (Open Label)",
+    "SINGLE": "Single",
+    "DOUBLE": "Double",
+    "TRIPLE": "Triple",
+    "QUADRUPLE": "Quadruple"
+  },
+  "WhoMasked": {
+    "PARTICIPANT": "Participant",
+    "CARE_PROVIDER": "Care Provider",
+    "INVESTIGATOR": "Investigator",
+    "OUTCOMES_ASSESSOR": "Outcomes Assessor"
+  },
+  "BioSpecRetention": {
+    "NONE_RETAINED": "None Retained",
+    "SAMPLES_WITH_DNA": "Samples With DNA",
+    "SAMPLES_WITHOUT_DNA": "Samples Without DNA"
+  },
+  "EnrollmentType": {
+    "ACTUAL": "Actual",
+    "ESTIMATED": "Estimated"
+  },
+  "ArmGroupType": {
+    "EXPERIMENTAL": "Experimental",
+    "ACTIVE_COMPARATOR": "Active Comparator",
+    "PLACEBO_COMPARATOR": "Placebo Comparator",
+    "SHAM_COMPARATOR": "Sham Comparator",
+    "NO_INTERVENTION": "No Intervention",
+    "OTHER": "Other"
+  },
+  "InterventionType": {
+    "BEHAVIORAL": "Behavioral",
+    "BIOLOGICAL": "Biological",
+    "COMBINATION_PRODUCT": "Combination Product",
+    "DEVICE": "Device",
+    "DIAGNOSTIC_TEST": "Diagnostic Test",
+    "DIETARY_SUPPLEMENT": "Dietary Supplement",
+    "DRUG": "Drug",
+    "GENETIC": "Genetic",
+    "PROCEDURE": "Procedure",
+    "RADIATION": "Radiation",
+    "OTHER": "Other"
+  },
+  "Sex": {
+    "FEMALE": "Female",
+    "MALE": "Male",
+    "ALL": "All"
+  },
+  "StandardAge": {
+    "CHILD": "Child",
+    "ADULT": "Adult",
+    "OLDER_ADULT": "Older Adult"
+  },
+  "SamplingMethod": {
+    "PROBABILITY_SAMPLE": "Probability Sample",
+    "NON_PROBABILITY_SAMPLE": "Non-Probability Sample"
+  },
+  "ContactRole": {
+    "STUDY_CHAIR": "Study Chair",
+    "STUDY_DIRECTOR": "Study Director",
+    "PRINCIPAL_INVESTIGATOR": "Principal Investigator",
+    "SUB_INVESTIGATOR": "Sub-Investigator",
+    "CONTACT": "Contact"
+  },
+  "OfficialRole": {
+    "STUDY_CHAIR": "Study Chair",
+    "STUDY_DIRECTOR": "Study Director",
+    "PRINCIPAL_INVESTIGATOR": "Principal Investigator",
+    "SUB_INVESTIGATOR": "Sub-Investigator"
+  },
+  "RecruitmentStatus": {
+    "ACTIVE_NOT_RECRUITING": "Active, not recruiting",
+    "COMPLETED": "Completed",
+    "ENROLLING_BY_INVITATION": "Enrolling by invitation",
+    "NOT_YET_RECRUITING": "Not yet recruiting",
+    "RECRUITING": "Recruiting",
+    "SUSPENDED": "Suspended",
+    "TERMINATED": "Terminated",
+    "WITHDRAWN": "Withdrawn",
+    "AVAILABLE": "Available"
+  },
+  "ReferenceType": {
+    "BACKGROUND": "background",
+    "RESULT": "result",
+    "DERIVED": "derived"
+  },
+  "IpdSharing": {
+    "YES": "Yes",
+    "NO": "No",
+    "UNDECIDED": "Undecided"
+  },
+  "IpdSharingInfoType": {
+    "STUDY_PROTOCOL": "Study Protocol",
+    "SAP": "Statistical Analysis Plan (SAP)",
+    "ICF": "Informed Consent Form (ICF)",
+    "CSR": "Clinical Study Report (CSR)",
+    "ANALYTIC_CODE": "Analytic Code"
+  },
+  "MeasureParam": {
+    "GEOMETRIC_MEAN": "Geometric Mean",
+    "GEOMETRIC_LEAST_SQUARES_MEAN": "Geometric Least Squares Mean",
+    "LEAST_SQUARES_MEAN": "Least Squares Mean",
+    "LOG_MEAN": "Log Mean",
+    "MEAN": "Mean",
+    "MEDIAN": "Median",
+    "NUMBER": "Number",
+    "COUNT_OF_PARTICIPANTS": "Count of Participants",
+    "COUNT_OF_UNITS": "Count of Units"
+  },
+  "MeasureDispersionType": {
+    "NA": "Not Applicable",
+    "STANDARD_DEVIATION": "Standard Deviation",
+    "STANDARD_ERROR": "Standard Error",
+    "INTER_QUARTILE_RANGE": "Inter-Quartile Range",
+    "FULL_RANGE": "Full Range",
+    "CONFIDENCE_80": "80% Confidence Interval",
+    "CONFIDENCE_90": "90% Confidence Interval",
+    "CONFIDENCE_95": "95% Confidence Interval",
+    "CONFIDENCE_975": "97.5% Confidence Interval",
+    "CONFIDENCE_99": "99% Confidence Interval",
+    "CONFIDENCE_OTHER": "Other Confidence Interval Level",
+    "GEOMETRIC_COEFFICIENT": "Geometric Coefficient of Variation"
+  },
+  "OutcomeMeasureType": {
+    "PRIMARY": "Primary",
+    "SECONDARY": "Secondary",
+    "OTHER_PRE_SPECIFIED": "Other Pre-specified",
+    "POST_HOC": "Post-Hoc"
+  },
+  "ReportingStatus": {
+    "NOT_POSTED": "Not Posted",
+    "POSTED": "Posted"
+  },
+  "AnalysisDispersionType": {
+    "STANDARD_DEVIATION": "Standard Deviation",
+    "STANDARD_ERROR_OF_MEAN": "Standard Error of the Mean"
+  },
+  "ConfidenceIntervalNumSides": {
+    "ONE_SIDED": "1-Sided",
+    "TWO_SIDED": "2-Sided"
+  },
+  "NonInferiorityType": {
+    "SUPERIORITY": "Superiority",
+    "NON_INFERIORITY": "Non-Inferiority",
+    "EQUIVALENCE": "Equivalence",
+    "OTHER": "Other",
+    "NON_INFERIORITY_OR_EQUIVALENCE": "Non-Inferiority or Equivalence",
+    "SUPERIORITY_OR_OTHER": "Superiority or Other",
+    "NON_INFERIORITY_OR_EQUIVALENCE_LEGACY": "Non-Inferiority or Equivalence (legacy)",
+    "SUPERIORITY_OR_OTHER_LEGACY": "Superiority or Other (legacy)"
+  },
+  "EventAssessment": {
+    "NON_SYSTEMATIC_ASSESSMENT": "Non-systematic Assessment",
+    "SYSTEMATIC_ASSESSMENT": "Systematic Assessment"
+  },
+  "AgreementRestrictionType": {
+    "LTE60": "LTE60",
+    "GT60": "GT60",
+    "OTHER": "OTHER"
+  },
+  "UnpostedEventType": {
+    "RESET": "Reset",
+    "RELEASE": "Release",
+    "UNRELEASE": "Unrelease"
+  },
+  "ViolationEventType": {
+    "VIOLATION_IDENTIFIED": "Violation Identified by FDA",
+    "CORRECTION_CONFIRMED": "Correction Confirmed by FDA",
+    "PENALTY_IMPOSED": "Penalty Imposed by FDA",
+    "ISSUES_IN_LETTER_ADDRESSED_CONFIRMED": "Issues in letter addressed; confirmed by FDA."
+  },
+  "BrowseLeafRelevance": {
+    "LOW": "low",
+    "HIGH": "high"
+  }
+}

@@ -1,0 +1,1173 @@
+{
+  "spec_version": "1.0",
+  "kind": "visualization",
+  "message": "China is the largest group: 903 of 2,298 trials (39.3%).",
+  "visualization": {
+    "type": "bar_chart",
+    "title": "Trials by country: lung cancer",
+    "subtitle": "Status: Recruiting · 2,298 trials · ClinicalTrials.gov, data as of 2026-10-06",
+    "orientation": "horizontal",
+    "stack": "none",
+    "encoding": {
+      "x": {
+        "field": "country",
+        "type": "nominal",
+        "title": "Country",
+        "domain": [
+          "China",
+          "United States",
+          "France",
+          "Spain",
+          "Italy",
+          "Australia",
+          "South Korea",
+          "United Kingdom",
+          "Canada",
+          "Germany",
+          "Taiwan",
+          "Japan",
+          "Netherlands",
+          "Belgium",
+          "Poland"
+        ],
+        "sort": {
+          "by": "value",
+          "order": "descending"
+        },
+        "is_exclusive": false
+      },
+      "y": {
+        "field": "trial_count",
+        "type": "quantitative",
+        "title": "Trials",
+        "unit": "trials",
+        "format": ",d",
+        "scale": "linear"
+      },
+      "series": null,
+      "tooltip": [
+        {
+          "field": "share",
+          "title": "Share of trials",
+          "type": "quantitative",
+          "unit": null,
+          "format": ".1%",
+          "href_field": null
+        }
+      ]
+    },
+    "data": [
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07848243",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "China"
+          },
+          {
+            "nct_id": "NCT07841249",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "China"
+          },
+          {
+            "nct_id": "NCT07837739",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "China"
+          },
+          {
+            "nct_id": "NCT07827183",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "China"
+          },
+          {
+            "nct_id": "NCT07823855",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "China"
+          }
+        ],
+        "citation_count": 903,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22China%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "China",
+        "trial_count": 903,
+        "share": 0.393,
+        "iso_alpha3": "CHN"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07824583",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "United States"
+          },
+          {
+            "nct_id": "NCT07814248",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "United States"
+          },
+          {
+            "nct_id": "NCT07795411",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "United States"
+          },
+          {
+            "nct_id": "NCT07784959",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "United States"
+          },
+          {
+            "nct_id": "NCT07783477",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "United States"
+          }
+        ],
+        "citation_count": 876,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22United%20States%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "United States",
+        "trial_count": 876,
+        "share": 0.3812,
+        "iso_alpha3": "USA"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07699328",
+            "field": "protocolSection.contactsLocationsModule.locations[3].country",
+            "excerpt": "France"
+          },
+          {
+            "nct_id": "NCT07680764",
+            "field": "protocolSection.contactsLocationsModule.locations[35].country",
+            "excerpt": "France"
+          },
+          {
+            "nct_id": "NCT07636148",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "France"
+          },
+          {
+            "nct_id": "NCT07625644",
+            "field": "protocolSection.contactsLocationsModule.locations[21].country",
+            "excerpt": "France"
+          },
+          {
+            "nct_id": "NCT07608835",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "France"
+          }
+        ],
+        "citation_count": 245,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22France%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "France",
+        "trial_count": 245,
+        "share": 0.1066,
+        "iso_alpha3": "FRA"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07818135",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Spain"
+          },
+          {
+            "nct_id": "NCT07704658",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Spain"
+          },
+          {
+            "nct_id": "NCT07699328",
+            "field": "protocolSection.contactsLocationsModule.locations[18].country",
+            "excerpt": "Spain"
+          },
+          {
+            "nct_id": "NCT07680764",
+            "field": "protocolSection.contactsLocationsModule.locations[62].country",
+            "excerpt": "Spain"
+          },
+          {
+            "nct_id": "NCT07652736",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Spain"
+          }
+        ],
+        "citation_count": 213,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22Spain%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "Spain",
+        "trial_count": 213,
+        "share": 0.0927,
+        "iso_alpha3": "ESP"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07817329",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Italy"
+          },
+          {
+            "nct_id": "NCT07790406",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Italy"
+          },
+          {
+            "nct_id": "NCT07707245",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Italy"
+          },
+          {
+            "nct_id": "NCT07680764",
+            "field": "protocolSection.contactsLocationsModule.locations[49].country",
+            "excerpt": "Italy"
+          },
+          {
+            "nct_id": "NCT07649629",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Italy"
+          }
+        ],
+        "citation_count": 210,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22Italy%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "Italy",
+        "trial_count": 210,
+        "share": 0.0914,
+        "iso_alpha3": "ITA"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07778316",
+            "field": "protocolSection.contactsLocationsModule.locations[3].country",
+            "excerpt": "Australia"
+          },
+          {
+            "nct_id": "NCT07713732",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Australia"
+          },
+          {
+            "nct_id": "NCT07699328",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Australia"
+          },
+          {
+            "nct_id": "NCT07680764",
+            "field": "protocolSection.contactsLocationsModule.locations[15].country",
+            "excerpt": "Australia"
+          },
+          {
+            "nct_id": "NCT07670312",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Australia"
+          }
+        ],
+        "citation_count": 154,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22Australia%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "Australia",
+        "trial_count": 154,
+        "share": 0.067,
+        "iso_alpha3": "AUS"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07774520",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "South Korea"
+          },
+          {
+            "nct_id": "NCT07699328",
+            "field": "protocolSection.contactsLocationsModule.locations[13].country",
+            "excerpt": "South Korea"
+          },
+          {
+            "nct_id": "NCT07564401",
+            "field": "protocolSection.contactsLocationsModule.locations[5].country",
+            "excerpt": "South Korea"
+          },
+          {
+            "nct_id": "NCT07554339",
+            "field": "protocolSection.contactsLocationsModule.locations[51].country",
+            "excerpt": "South Korea"
+          },
+          {
+            "nct_id": "NCT07541170",
+            "field": "protocolSection.contactsLocationsModule.locations[16].country",
+            "excerpt": "South Korea"
+          }
+        ],
+        "citation_count": 149,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22South%20Korea%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "South Korea",
+        "trial_count": 149,
+        "share": 0.0648,
+        "iso_alpha3": "KOR"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07761351",
+            "field": "protocolSection.contactsLocationsModule.locations[2].country",
+            "excerpt": "United Kingdom"
+          },
+          {
+            "nct_id": "NCT07718243",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "United Kingdom"
+          },
+          {
+            "nct_id": "NCT07680764",
+            "field": "protocolSection.contactsLocationsModule.locations[70].country",
+            "excerpt": "United Kingdom"
+          },
+          {
+            "nct_id": "NCT07673861",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "United Kingdom"
+          },
+          {
+            "nct_id": "NCT07613723",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "United Kingdom"
+          }
+        ],
+        "citation_count": 147,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22United%20Kingdom%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "United Kingdom",
+        "trial_count": 147,
+        "share": 0.064,
+        "iso_alpha3": "GBR"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07699328",
+            "field": "protocolSection.contactsLocationsModule.locations[2].country",
+            "excerpt": "Canada"
+          },
+          {
+            "nct_id": "NCT07660055",
+            "field": "protocolSection.contactsLocationsModule.locations[2].country",
+            "excerpt": "Canada"
+          },
+          {
+            "nct_id": "NCT07625644",
+            "field": "protocolSection.contactsLocationsModule.locations[16].country",
+            "excerpt": "Canada"
+          },
+          {
+            "nct_id": "NCT07524114",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Canada"
+          },
+          {
+            "nct_id": "NCT07513376",
+            "field": "protocolSection.contactsLocationsModule.locations[25].country",
+            "excerpt": "Canada"
+          }
+        ],
+        "citation_count": 142,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22Canada%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "Canada",
+        "trial_count": 142,
+        "share": 0.0618,
+        "iso_alpha3": "CAN"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07803848",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Germany"
+          },
+          {
+            "nct_id": "NCT07788729",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Germany"
+          },
+          {
+            "nct_id": "NCT07761351",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Germany"
+          },
+          {
+            "nct_id": "NCT07680764",
+            "field": "protocolSection.contactsLocationsModule.locations[43].country",
+            "excerpt": "Germany"
+          },
+          {
+            "nct_id": "NCT07625644",
+            "field": "protocolSection.contactsLocationsModule.locations[32].country",
+            "excerpt": "Germany"
+          }
+        ],
+        "citation_count": 139,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22Germany%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "Germany",
+        "trial_count": 139,
+        "share": 0.0605,
+        "iso_alpha3": "DEU"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07806682",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Taiwan"
+          },
+          {
+            "nct_id": "NCT07795580",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Taiwan"
+          },
+          {
+            "nct_id": "NCT07755020",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Taiwan"
+          },
+          {
+            "nct_id": "NCT07751783",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Taiwan"
+          },
+          {
+            "nct_id": "NCT07738172",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Taiwan"
+          }
+        ],
+        "citation_count": 132,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22Taiwan%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "Taiwan",
+        "trial_count": 132,
+        "share": 0.0574,
+        "iso_alpha3": "TWN"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07801508",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Japan"
+          },
+          {
+            "nct_id": "NCT07778316",
+            "field": "protocolSection.contactsLocationsModule.locations[7].country",
+            "excerpt": "Japan"
+          },
+          {
+            "nct_id": "NCT07660055",
+            "field": "protocolSection.contactsLocationsModule.locations[4].country",
+            "excerpt": "Japan"
+          },
+          {
+            "nct_id": "NCT07630961",
+            "field": "protocolSection.contactsLocationsModule.locations[1].country",
+            "excerpt": "Japan"
+          },
+          {
+            "nct_id": "NCT07617337",
+            "field": "protocolSection.contactsLocationsModule.locations[1].country",
+            "excerpt": "Japan"
+          }
+        ],
+        "citation_count": 130,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22Japan%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "Japan",
+        "trial_count": 130,
+        "share": 0.0566,
+        "iso_alpha3": "JPN"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07782164",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Netherlands"
+          },
+          {
+            "nct_id": "NCT07636148",
+            "field": "protocolSection.contactsLocationsModule.locations[2].country",
+            "excerpt": "Netherlands"
+          },
+          {
+            "nct_id": "NCT07554339",
+            "field": "protocolSection.contactsLocationsModule.locations[47].country",
+            "excerpt": "Netherlands"
+          },
+          {
+            "nct_id": "NCT07513376",
+            "field": "protocolSection.contactsLocationsModule.locations[61].country",
+            "excerpt": "Netherlands"
+          },
+          {
+            "nct_id": "NCT07511933",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Netherlands"
+          }
+        ],
+        "citation_count": 105,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22Netherlands%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "Netherlands",
+        "trial_count": 105,
+        "share": 0.0457,
+        "iso_alpha3": "NLD"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07799974",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Belgium"
+          },
+          {
+            "nct_id": "NCT07631624",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Belgium"
+          },
+          {
+            "nct_id": "NCT07531095",
+            "field": "protocolSection.contactsLocationsModule.locations[8].country",
+            "excerpt": "Belgium"
+          },
+          {
+            "nct_id": "NCT07472517",
+            "field": "protocolSection.contactsLocationsModule.locations[28].country",
+            "excerpt": "Belgium"
+          },
+          {
+            "nct_id": "NCT07384897",
+            "field": "protocolSection.contactsLocationsModule.locations[0].country",
+            "excerpt": "Belgium"
+          }
+        ],
+        "citation_count": 96,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22Belgium%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "Belgium",
+        "trial_count": 96,
+        "share": 0.0418,
+        "iso_alpha3": "BEL"
+      },
+      {
+        "citations": [
+          {
+            "nct_id": "NCT07625644",
+            "field": "protocolSection.contactsLocationsModule.locations[48].country",
+            "excerpt": "Poland"
+          },
+          {
+            "nct_id": "NCT07554339",
+            "field": "protocolSection.contactsLocationsModule.locations[50].country",
+            "excerpt": "Poland"
+          },
+          {
+            "nct_id": "NCT07531095",
+            "field": "protocolSection.contactsLocationsModule.locations[16].country",
+            "excerpt": "Poland"
+          },
+          {
+            "nct_id": "NCT07513376",
+            "field": "protocolSection.contactsLocationsModule.locations[69].country",
+            "excerpt": "Poland"
+          },
+          {
+            "nct_id": "NCT07489066",
+            "field": "protocolSection.contactsLocationsModule.locations[18].country",
+            "excerpt": "Poland"
+          }
+        ],
+        "citation_count": 89,
+        "source_url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=AREA%5BLocationCountry%5D%22Poland%22&countTotal=true&pageSize=5&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&sort=%40relevance",
+        "country": "Poland",
+        "trial_count": 89,
+        "share": 0.0387,
+        "iso_alpha3": "POL"
+      }
+    ]
+  },
+  "clarification": null,
+  "references": {
+    "NCT07848243": {
+      "title": "Clinical Investigator-Initiated Trial (IIT) of PD-L1-Targeted Radionuclide Probes",
+      "url": "https://clinicaltrials.gov/study/NCT07848243",
+      "scope_evidence": []
+    },
+    "NCT07841249": {
+      "title": "Cardiorespiratory Fitness After Lobectomy Versus Sublobar Resection",
+      "url": "https://clinicaltrials.gov/study/NCT07841249",
+      "scope_evidence": []
+    },
+    "NCT07837739": {
+      "title": "Adjuvant EGFR-TKI Therapy After Surgery for EGFR-Mutant High-Risk Stage IA2-IIB NSCLC",
+      "url": "https://clinicaltrials.gov/study/NCT07837739",
+      "scope_evidence": []
+    },
+    "NCT07827183": {
+      "title": "AI-Personalized Discharge Education for Patients After Lung Cancer Surgery",
+      "url": "https://clinicaltrials.gov/study/NCT07827183",
+      "scope_evidence": []
+    },
+    "NCT07823855": {
+      "title": "SIB Accelerated Hyperfractionated RT for High-Proliferation NSCLC",
+      "url": "https://clinicaltrials.gov/study/NCT07823855",
+      "scope_evidence": []
+    },
+    "NCT07824583": {
+      "title": "A Study Evaluating a New Radiation Treatment Workflow (NGDS)",
+      "url": "https://clinicaltrials.gov/study/NCT07824583",
+      "scope_evidence": []
+    },
+    "NCT07814248": {
+      "title": "A Phase 1, First-in-Human (FIH), Open-Label, Dose-Escalation and Dose Expansion Study of the Peptide Drug Conjugate (PDC), TS-104, as a Monotherapy in Subjects With Select Advanced Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07814248",
+      "scope_evidence": []
+    },
+    "NCT07795411": {
+      "title": "Prospective Multiomic Analysis in Small-Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07795411",
+      "scope_evidence": []
+    },
+    "NCT07784959": {
+      "title": "Study of NXP900 With Lorlatinib in ALK+ Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07784959",
+      "scope_evidence": []
+    },
+    "NCT07783477": {
+      "title": "A Study of Armored CAR T Cells in People With Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07783477",
+      "scope_evidence": []
+    },
+    "NCT07699328": {
+      "title": "A Study of VRN110755 in Patients With EGFR-Mutant Non-Small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07699328",
+      "scope_evidence": []
+    },
+    "NCT07680764": {
+      "title": "A Study To Assess the Safety, Tolerability, and Efficacy of Imzokitug in Combination With Pumitamig and Platinum-Doublet Chemotherapy (PDCT) Versus Pumitamig and PDCT as First-line Treatment for Participants With Locally Advanced or Metastatic Non-Small Cell Lung Cancer (NSCLC)",
+      "url": "https://clinicaltrials.gov/study/NCT07680764",
+      "scope_evidence": []
+    },
+    "NCT07636148": {
+      "title": "Registry of Minimally Invasive Cancer Treatment Using Spectral Angio-CT Image Guidance",
+      "url": "https://clinicaltrials.gov/study/NCT07636148",
+      "scope_evidence": []
+    },
+    "NCT07625644": {
+      "title": "BL-M14D1 Plus Atezolizumab vs Standard of Care in First-Line Extensive-Stage Small Cell Lung Cancer (BrenDeLL-Lung01)",
+      "url": "https://clinicaltrials.gov/study/NCT07625644",
+      "scope_evidence": []
+    },
+    "NCT07608835": {
+      "title": "IMMUNO-LUNG : Identification of Biomarkers and Therapeutic Targets for Pulmonary Immunotherapy",
+      "url": "https://clinicaltrials.gov/study/NCT07608835",
+      "scope_evidence": []
+    },
+    "NCT07818135": {
+      "title": "Comparison of Biportal Versus Multiportal Robotic Approaches for Pulmonary Resection in NSCLC",
+      "url": "https://clinicaltrials.gov/study/NCT07818135",
+      "scope_evidence": []
+    },
+    "NCT07704658": {
+      "title": "Pralsetinib DDI Study in Patients With Advanced or Metastatic Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07704658",
+      "scope_evidence": []
+    },
+    "NCT07652736": {
+      "title": "A Study to Investigate Treatment Patterns and Effectiveness of Tislelizumab in European Patients With Resectable or Advanced Non-Small Cell Lung Cancer (NSCLC) and Small Cell Lung Cancer (SCLC)",
+      "url": "https://clinicaltrials.gov/study/NCT07652736",
+      "scope_evidence": []
+    },
+    "NCT07817329": {
+      "title": "NUT Project: Nutritional Support in Thoracic Oncology",
+      "url": "https://clinicaltrials.gov/study/NCT07817329",
+      "scope_evidence": []
+    },
+    "NCT07790406": {
+      "title": "Surgical Outcome Of da Vinci Single-port Surgical System In Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07790406",
+      "scope_evidence": []
+    },
+    "NCT07707245": {
+      "title": "Identification of Diagnostic and Prognostic Biomarkers in the Pathological Continuum of Bronco Chronic Obstructive Pulmonary Disease, Idiopathic Pulmonary Fibrosis and Pulmonary Neoplasia",
+      "url": "https://clinicaltrials.gov/study/NCT07707245",
+      "scope_evidence": []
+    },
+    "NCT07649629": {
+      "title": "Impact of Liquid Biopsy on the Therapeutic Pathway for Lung Cancer: Advancing the Molecular Characterization of Patients With Advanced Lung Adenocarcinoma by Integrating Liquid Biopsy Into the Early Stages of the Diagnostic and Therapeutic Pathway",
+      "url": "https://clinicaltrials.gov/study/NCT07649629",
+      "scope_evidence": []
+    },
+    "NCT07778316": {
+      "title": "Phase 3 Trial of Tarlatamab (SC vs IV) in Extensive-Stage Small Cell Lung Cancer After Platinum Based First-line Chemotherapy (ES-SCLC)",
+      "url": "https://clinicaltrials.gov/study/NCT07778316",
+      "scope_evidence": []
+    },
+    "NCT07713732": {
+      "title": "TLN-499 in Combination With Venetoclax in Patients With Relapsed/Refractory Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07713732",
+      "scope_evidence": []
+    },
+    "NCT07670312": {
+      "title": "Evaluation of XYA02 in Patients With Advanced Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07670312",
+      "scope_evidence": []
+    },
+    "NCT07774520": {
+      "title": "A Randomized Study to Evaluate the Efficacy of a Reduced Starting Dose of Lazertinib (Leclaza) and Preemtive Magnesium Supplementation to Prevent Lazertinib(Leclaza)-Induced Peripheral Neuropathy",
+      "url": "https://clinicaltrials.gov/study/NCT07774520",
+      "scope_evidence": []
+    },
+    "NCT07564401": {
+      "title": "A Study to Evaluate DJI136, a DLL3-targeted CAR-T Therapy",
+      "url": "https://clinicaltrials.gov/study/NCT07564401",
+      "scope_evidence": []
+    },
+    "NCT07554339": {
+      "title": "A Clinical Trial of Calderasib (MK-1084) and Durvalumab in People With Non-Small Cell Lung Cancer (MK-1084-015/KANDLELIT-015)",
+      "url": "https://clinicaltrials.gov/study/NCT07554339",
+      "scope_evidence": []
+    },
+    "NCT07541170": {
+      "title": "A Study to Evaluate the Efficacy and Safety of Divarasib Compared With Investigator's Choice of Immunotherapy or Observation in Participants With Resected Stage II-III KRAS G12C-Positive Non-Small Cell Lung Cancer (NSCLC)",
+      "url": "https://clinicaltrials.gov/study/NCT07541170",
+      "scope_evidence": []
+    },
+    "NCT07761351": {
+      "title": "A Randomized Controlled Trial Comparing Percutaneous CT-Guided Biopsy and Shape-Sensing Robotic-Assisted Bronchoscopy",
+      "url": "https://clinicaltrials.gov/study/NCT07761351",
+      "scope_evidence": []
+    },
+    "NCT07718243": {
+      "title": "Investigating the Combination of Bexmarilimab and Nivolumab in Solid Tumours, Melanoma and NSCLC",
+      "url": "https://clinicaltrials.gov/study/NCT07718243",
+      "scope_evidence": []
+    },
+    "NCT07673861": {
+      "title": "Clinical Utility of ctDNA in Detecting Resistance Mechanisms and Delivering Precision Medicine to Cancer Patients",
+      "url": "https://clinicaltrials.gov/study/NCT07673861",
+      "scope_evidence": []
+    },
+    "NCT07613723": {
+      "title": "A Study to Test the Safety, Tolerability and Effect of ZI-MA4-1 for Patients With Locally Advanced or Metastatic Solid Malignancies",
+      "url": "https://clinicaltrials.gov/study/NCT07613723",
+      "scope_evidence": []
+    },
+    "NCT07660055": {
+      "title": "Study of [177Lu]Lu-DWJ155 and [68Ga]Ga-DWJ155 in Patients With Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07660055",
+      "scope_evidence": []
+    },
+    "NCT07524114": {
+      "title": "Study of High-Precision Evaluation of Molecular ResiduaL Disease Through a PlatfOrm for Cancer TracKing and Interception (SHERLOCK)",
+      "url": "https://clinicaltrials.gov/study/NCT07524114",
+      "scope_evidence": []
+    },
+    "NCT07513376": {
+      "title": "A Clinical Trial of Adjuvant Intismeran (V940) With or Without Pembrolizumab Coformulated With Berahyaluronidase Alfa (MK-3475A) in High-Risk Stage I Non-Small Cell Lung Cancer (V940-014)",
+      "url": "https://clinicaltrials.gov/study/NCT07513376",
+      "scope_evidence": []
+    },
+    "NCT07803848": {
+      "title": "Study to Confirm Efficacy and Feasibility of Tarlatamab Treatment in Patients With Extensive Stage Small-cell Lung Cancer With Poor Performance Status",
+      "url": "https://clinicaltrials.gov/study/NCT07803848",
+      "scope_evidence": []
+    },
+    "NCT07788729": {
+      "title": "Social Prescriptions and Micro-Learning to Improve Care for Cancer Patients and Their Support Persons",
+      "url": "https://clinicaltrials.gov/study/NCT07788729",
+      "scope_evidence": []
+    },
+    "NCT07806682": {
+      "title": "The Effects of Low Intensity Endurance Exercise on Improving Mitochondrial Function, Cell Bioelectrical Impedance Phase Angle, Fatigue and Quality of Life in Lung Cancer Patients With Cancer-related Fatigue",
+      "url": "https://clinicaltrials.gov/study/NCT07806682",
+      "scope_evidence": []
+    },
+    "NCT07795580": {
+      "title": "The Effects of Low-Intensity Endurance Exercise on Improving Fatigue, Sleep, Quality of Life, Mitochondrial Function, Cellular Bioelectrical Impedance Phase Angle, and Predictors of Exercise Adherence in Patients With Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07795580",
+      "scope_evidence": []
+    },
+    "NCT07755020": {
+      "title": "Nitride-Based Raman Biochip for Lung Cancer Diagnosis and Monitoring",
+      "url": "https://clinicaltrials.gov/study/NCT07755020",
+      "scope_evidence": []
+    },
+    "NCT07751783": {
+      "title": "Development and Dissemination of Exercise Prescription and Intervention for Cancer Populations",
+      "url": "https://clinicaltrials.gov/study/NCT07751783",
+      "scope_evidence": []
+    },
+    "NCT07738172": {
+      "title": "Osimertinib With or Without Primary Lung Tumor Resection for EGFR-Mutant Oligometastatic Non-Small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07738172",
+      "scope_evidence": []
+    },
+    "NCT07801508": {
+      "title": "A Study of [68Ga]Ga-DWJ155 in Adult Patients With Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07801508",
+      "scope_evidence": []
+    },
+    "NCT07630961": {
+      "title": "Phase I Study of JFI447 [68Ga]Ga-DFC413 and Comparison to FFG233 [68Ga]Ga-NNS309 in Patients With Solid Tumors",
+      "url": "https://clinicaltrials.gov/study/NCT07630961",
+      "scope_evidence": []
+    },
+    "NCT07617337": {
+      "title": "AQUA07 in Patients With ALK-Positive Non-Small Cell Lung Cancer",
+      "url": "https://clinicaltrials.gov/study/NCT07617337",
+      "scope_evidence": []
+    },
+    "NCT07782164": {
+      "title": "Irreversible Electroporation (IRE) for Treating Recurrent Pelvic Tumors (PELFIRE Study)",
+      "url": "https://clinicaltrials.gov/study/NCT07782164",
+      "scope_evidence": []
+    },
+    "NCT07511933": {
+      "title": "Novel Ga68-PSMA PET/CT-tracer to Differentiate Between Radiation Necrosis and Tumor Progression in Brain Metastases",
+      "url": "https://clinicaltrials.gov/study/NCT07511933",
+      "scope_evidence": []
+    },
+    "NCT07799974": {
+      "title": "Identification of Changes in Cancer-related Fatigue and Physical Activity and Their Association in Patients With Inoperable Lung Cancer: a Longitudinal Observational Study",
+      "url": "https://clinicaltrials.gov/study/NCT07799974",
+      "scope_evidence": []
+    },
+    "NCT07631624": {
+      "title": "Methylated Biomarkers of Smoking as a Selection Tool in Participants for Lung Cancer Screening",
+      "url": "https://clinicaltrials.gov/study/NCT07631624",
+      "scope_evidence": []
+    },
+    "NCT07531095": {
+      "title": "Study of Tarlatamab + ZL-1310 +/- Anti-programmed Death Ligand 1 (Anti-PD-L1) in Small Cell Lung Cancer (SCLC)",
+      "url": "https://clinicaltrials.gov/study/NCT07531095",
+      "scope_evidence": []
+    },
+    "NCT07472517": {
+      "title": "DAREON ® -Lung-1: A Study in People With Advanced Small Cell Lung Cancer to Compare Obrixtamig Plus Atezolizumab, Carboplatin, and Etoposide Treatment With Standard Chemoimmunotherapy",
+      "url": "https://clinicaltrials.gov/study/NCT07472517",
+      "scope_evidence": []
+    },
+    "NCT07384897": {
+      "title": "Immune Cells Role in Lung Cancer and Their Use in Anticancer Immunotherapies and Inflammatory Lung Disease",
+      "url": "https://clinicaltrials.gov/study/NCT07384897",
+      "scope_evidence": []
+    },
+    "NCT07489066": {
+      "title": "Symbiotic-Lung-10: A Study to Learn About PF-08634404 Alone or in Combination in Early-stage or Locally Advanced NSCLC",
+      "url": "https://clinicaltrials.gov/study/NCT07489066",
+      "scope_evidence": []
+    }
+  },
+  "meta": {
+    "request_id": "b631ecab-e4e8-4745-b48d-8891a54185dc",
+    "generated_at": "2026-10-07T00:59:31.935666Z",
+    "query": "Which countries have the most recruiting trials for lung cancer?",
+    "filters": {
+      "drug_name": [],
+      "condition": [
+        "lung cancer"
+      ],
+      "sponsor": [],
+      "country": [],
+      "term": [],
+      "trial_phase": [],
+      "status": [
+        "RECRUITING"
+      ],
+      "study_type": [],
+      "sponsor_class": [],
+      "intervention_type": [],
+      "start_year": null,
+      "end_year": null,
+      "date_field": "start_date",
+      "compare": null
+    },
+    "interpretation": {
+      "summary": "Counting trials by country for lung cancer (Status: Recruiting).",
+      "analysis": "aggregate",
+      "measure": {
+        "aggregate": "count",
+        "of": "trials"
+      },
+      "group_by": [
+        "country"
+      ],
+      "compare": null,
+      "time_granularity": null,
+      "counting_unit": "trial",
+      "entities": [
+        {
+          "kind": "condition",
+          "source": "question",
+          "text": "lung cancer",
+          "term_searched": "lung cancer",
+          "definition": "condition_search",
+          "status": "ok",
+          "trials_matched": 14604,
+          "strict_name_matches": null,
+          "other_readings": [
+            {
+              "kind": "drug",
+              "trials_matched": 11628
+            }
+          ],
+          "candidates": []
+        }
+      ],
+      "adjustments": [],
+      "strategy": [
+        {
+          "series": null,
+          "name": "walk",
+          "reason": "All 2,298 trials were read and grouped here.",
+          "upstream_requests": 3
+        }
+      ],
+      "chart_rationale": "Rule 9: one nominal category, so horizontal bars sorted by value."
+    },
+    "plan": {
+      "interpretation": "Count recruiting lung cancer trials by country.",
+      "entities": [
+        {
+          "kind": "condition",
+          "value": "lung cancer",
+          "role": "filter"
+        }
+      ],
+      "filters": {
+        "phases": [],
+        "statuses": [
+          "RECRUITING"
+        ],
+        "study_types": [],
+        "sponsor_classes": [],
+        "intervention_types": [],
+        "evidence": [
+          {
+            "family": "statuses",
+            "phrase": "recruiting"
+          }
+        ],
+        "date_field": "start_date",
+        "year_from": null,
+        "year_to": null
+      },
+      "analysis": {
+        "kind": "aggregate",
+        "dimension": "country",
+        "series": null,
+        "time_unit": null,
+        "top_n": 15
+      },
+      "chart_preference": null
+    },
+    "options": {
+      "planner": "llm",
+      "citations_per_datum": 5,
+      "drug_match": "broad",
+      "include_trace": true,
+      "use_cache": true
+    },
+    "planner": {
+      "mode": "llm",
+      "model": "gpt-5.4-mini-2026-03-17",
+      "reasoning_effort": "low",
+      "prompt_version": "plan-v1",
+      "attempts": 1,
+      "is_repaired": false,
+      "is_fallback": false,
+      "usage": {
+        "input_tokens": 4146,
+        "output_tokens": 194,
+        "reasoning_tokens": 67,
+        "cached_tokens": 3840
+      }
+    },
+    "assumptions": [
+      "Matched 'lung cancer' with the registry's condition search (conditions, titles, keywords and MeSH terms, with synonyms).",
+      "A trial counts once for each country with a site, so the bars can overlap. Trials whose locations were removed after completion are not attributed to a country."
+    ],
+    "warnings": [],
+    "source": {
+      "name": "ClinicalTrials.gov",
+      "url": "https://clinicaltrials.gov",
+      "api_version": "2.0.5",
+      "data_timestamp": "2026-10-06T09:00:05",
+      "retrieved_at": "2026-10-07T00:59:31.935666Z",
+      "study_url_template": "https://clinicaltrials.gov/study/{nct_id}",
+      "record_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
+      "fhir_url_template": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 101,
+          "total_count": 14604,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.intr=lung%20cancer&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 107,
+          "total_count": 11628,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "resolution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&countTotal=true&pageSize=1&fields=NCTId",
+          "status": 200,
+          "duration_ms": 79,
+          "total_count": 2298,
+          "records_returned": 1,
+          "is_cached": false,
+          "origin": "probe"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=NOT%20%28AREA%5BLocationCountry%5DMISSING%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate",
+          "status": 200,
+          "duration_ms": 653,
+          "total_count": 2298,
+          "records_returned": 1000,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=NOT%20%28AREA%5BLocationCountry%5DMISSING%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&pageToken=ZVNj7o2Elu8o3lpwS9785unumpOQJJxubfWn3_YfkA",
+          "status": 200,
+          "duration_ms": 668,
+          "total_count": null,
+          "records_returned": 1000,
+          "is_cached": false,
+          "origin": "execution"
+        },
+        {
+          "method": "GET",
+          "url": "https://clinicaltrials.gov/api/v2/studies?query.cond=lung%20cancer&filter.overallStatus=RECRUITING&filter.advanced=NOT%20%28AREA%5BLocationCountry%5DMISSING%29&countTotal=true&pageSize=1000&fields=NCTId,BriefTitle,Condition,LocationCountry,StudyFirstPostDate&pageToken=ZVNj7o2Elu8o3lpwS9785unumpOQJJxsY_Gk2_MckA",
+          "status": 200,
+          "duration_ms": 293,
+          "total_count": null,
+          "records_returned": 298,
+          "is_cached": false,
+          "origin": "execution"
+        }
+      ]
+    },
+    "counts": {
+      "data_points": 15,
+      "series": [
+        {
+          "label": null,
+          "trials_matched": 2298,
+          "trials_analyzed": 2298,
+          "trials_excluded": []
+        }
+      ],
+      "trials_in_several_series": null
+    },
+    "truncation": {
+      "is_truncated": true,
+      "items": [
+        {
+          "scope": "categories",
+          "shown": 15,
+          "total": 77,
+          "rule": "The 15 largest by trials."
+        }
+      ]
+    },
+    "citations": {
+      "is_enabled": true,
+      "max_per_datum": 5,
+      "selection": "trials naming the searched entity first, then most recently first-posted, then by NCT ID",
+      "trials_cited": 54
+    },
+    "suggested_followups": [
+      {
+        "label": "Show the top 30",
+        "request": {
+          "query": "Which countries have the most recruiting trials for lung cancer?",
+          "drug_name": null,
+          "condition": null,
+          "sponsor": null,
+          "country": null,
+          "term": null,
+          "trial_phase": null,
+          "status": null,
+          "study_type": null,
+          "sponsor_class": null,
+          "intervention_type": null,
+          "start_year": null,
+          "end_year": null,
+          "date_field": null,
+          "compare": null,
+          "group_by": null,
+          "time_unit": null,
+          "top_n": 30,
+          "chart_type": null,
+          "options": {
+            "planner": "llm",
+            "citations_per_datum": 5,
+            "drug_match": "broad",
+            "include_trace": true,
+            "use_cache": true
+          }
+        }
+      }
+    ],
+    "cache": {
+      "is_plan_cached": false,
+      "is_response_cached": false,
+      "cached_at": null
+    },
+    "timing": {
+      "total_ms": 3554,
+      "plan_ms": 1732,
+      "resolve_ms": 188,
+      "fetch_ms": 1634,
+      "build_ms": 0
+    },
+    "debug": {
+      "trace": [
+        {
+          "index": 0,
+          "type": "plan",
+          "summary": "Count recruiting lung cancer trials by country.",
+          "duration_ms": 1732,
+          "request_indexes": [],
+          "detail": {}
+        },
+        {
+          "index": 1,
+          "type": "resolve_entity",
+          "summary": "1 entities",
+          "duration_ms": 188,
+          "request_indexes": [
+            0,
+            1,
+            2
+          ],
+          "detail": {}
+        },
+        {
+          "index": 2,
+          "type": "execute",
+          "summary": "3 requests",
+          "duration_ms": 1634,
+          "request_indexes": [
+            3,
+            4,
+            5
+          ],
+          "detail": {}
+        }
+      ]
+    }
+  }
+}

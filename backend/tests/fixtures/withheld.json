@@ -1,0 +1,48 @@
+{
+  "protocolSection": {
+    "identificationModule": {
+      "nctId": "NCT01660113",
+      "orgStudyIdInfo": {
+        "id": "TRIA-FAN-064"
+      },
+      "organization": {
+        "fullName": "[Redacted]"
+      },
+      "briefTitle": "[Trial of device that is not approved or cleared by the U.S. FDA]",
+      "officialTitle": "[Trial of device that is not approved or cleared by the U.S. FDA]"
+    },
+    "statusModule": {
+      "overallStatus": "WITHHELD",
+      "delayedPosting": true,
+      "expandedAccessInfo": {
+        "hasExpandedAccess": false
+      },
+      "studyFirstSubmitDate": "2012-07-25",
+      "studyFirstSubmitQcDate": "2012-08-03",
+      "studyFirstPostDateStruct": {
+        "date": "2012-08-08",
+        "type": "ESTIMATED"
+      },
+      "lastUpdateSubmitDate": "2013-02-05",
+      "lastUpdatePostDateStruct": {
+        "date": "2013-02-06",
+        "type": "ESTIMATED"
+      }
+    },
+    "sponsorCollaboratorsModule": {
+      "responsibleParty": {
+        "oldNameTitle": "[Redacted]",
+        "oldOrganization": "[Redacted]"
+      },
+      "leadSponsor": {
+        "name": "[Redacted]"
+      }
+    }
+  },
+  "derivedSection": {
+    "miscInfoModule": {
+      "versionHolder": "2026-10-06"
+    }
+  },
+  "hasResults": false
+}

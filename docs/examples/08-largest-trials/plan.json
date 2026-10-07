@@ -1,0 +1,28 @@
+{
+  "interpretation": "List lung cancer trials by enrollment, largest first.",
+  "entities": [
+    {
+      "kind": "condition",
+      "value": "lung cancer",
+      "role": "filter"
+    }
+  ],
+  "filters": {
+    "phases": [],
+    "statuses": [],
+    "study_types": [],
+    "sponsor_classes": [],
+    "intervention_types": [],
+    "evidence": [],
+    "date_field": "start_date",
+    "year_from": null,
+    "year_to": null
+  },
+  "analysis": {
+    "kind": "trial_list",
+    "sort_by": "enrollment",
+    "order": "desc",
+    "limit": 10
+  },
+  "chart_preference": null
+}

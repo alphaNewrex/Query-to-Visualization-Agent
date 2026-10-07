@@ -1,0 +1,221 @@
+{
+  "protocolSection": {
+    "identificationModule": {
+      "nctId": "NCT04355806",
+      "briefTitle": "Impact of Inactivated Trivalent Influenza Vaccine on NSCLC Patients Receiving PD-1 / PD-L1 Inhibitors",
+      "organization": {
+        "fullName": "Shanghai Pulmonary Hospital, Shanghai, China",
+        "class": "OTHER"
+      }
+    },
+    "statusModule": {
+      "statusVerifiedDate": "2020-04",
+      "overallStatus": "UNKNOWN",
+      "lastKnownStatus": "NOT_YET_RECRUITING",
+      "expandedAccessInfo": {
+        "hasExpandedAccess": false
+      },
+      "startDateStruct": {
+        "date": "2020-06-01",
+        "type": "ESTIMATED"
+      },
+      "primaryCompletionDateStruct": {
+        "date": "2022-12-31",
+        "type": "ESTIMATED"
+      },
+      "completionDateStruct": {
+        "date": "2023-05-31",
+        "type": "ESTIMATED"
+      },
+      "studyFirstSubmitDate": "2020-04-09",
+      "studyFirstSubmitQcDate": "2020-04-20",
+      "studyFirstPostDateStruct": {
+        "date": "2020-04-21",
+        "type": "ACTUAL"
+      },
+      "lastUpdateSubmitDate": "2020-04-20",
+      "lastUpdatePostDateStruct": {
+        "date": "2020-04-21",
+        "type": "ACTUAL"
+      }
+    },
+    "sponsorCollaboratorsModule": {
+      "leadSponsor": {
+        "name": "Shanghai Pulmonary Hospital, Shanghai, China",
+        "class": "OTHER"
+      }
+    },
+    "conditionsModule": {
+      "conditions": [
+        "Non Small Cell Lung Cancer",
+        "Influenza Vaccine"
+      ]
+    },
+    "designModule": {
+      "studyType": "OBSERVATIONAL",
+      "patientRegistry": false,
+      "designInfo": {
+        "observationalModel": "COHORT",
+        "timePerspective": "PROSPECTIVE"
+      },
+      "bioSpec": {
+        "retention": "SAMPLES_WITHOUT_DNA",
+        "description": "Biospecimen includes the peripheral blood samples collected on day0, 12h, day1, 2, 7, 21, 30, 60 and 6 months after vaccination."
+      },
+      "enrollmentInfo": {
+        "count": 160,
+        "type": "ESTIMATED"
+      }
+    },
+    "armsInterventionsModule": {
+      "armGroups": [
+        {
+          "label": "Vaccinated NSCLC group",
+          "description": "This group contains 100 NSCLC patients receiving PD-1/PD-L1 inhibitors for more than 6 months, who will be intramuscularly injected one dose of inactivated trivalent influenza vaccine in influenza seasons 2020-21 or 2021-22 (November-May).",
+          "interventionNames": [
+            "Drug: PD-1/PD-L1 inhibitors",
+            "Biological: Inactivated trivalent influenza vaccine"
+          ]
+        },
+        {
+          "label": "Vaccinated Health group",
+          "description": "This group contains 30 healthy participants without immunosuppressive diseases, who will be intramuscularly injected one dose of inactivated trivalent influenza vaccine in influenza seasons 2020-21 or 2021-22 (November-May).",
+          "interventionNames": [
+            "Biological: Inactivated trivalent influenza vaccine"
+          ]
+        },
+        {
+          "label": "Unvaccinated NSCLC group",
+          "description": "This group contains 30 NSCLC patients receiving PD-1/PD-L1 inhibitors for more than 6 months without intramuscular injection of any inactivated trivalent influenza vaccine in influenza seasons 2020-21 or 2021-22 (November-May).",
+          "interventionNames": [
+            "Drug: PD-1/PD-L1 inhibitors"
+          ]
+        }
+      ],
+      "interventions": [
+        {
+          "type": "DRUG",
+          "name": "PD-1/PD-L1 inhibitors",
+          "description": "Including nivolumab, pembrolizumab, atezolizumab, and durvalumab, et al.",
+          "armGroupLabels": [
+            "Unvaccinated NSCLC group",
+            "Vaccinated NSCLC group"
+          ],
+          "otherNames": [
+            "PD-1/PD-L1 blockades",
+            "PD-1 monoclonal antibodies",
+            "PD-L1 monoclonal antibodies"
+          ]
+        },
+        {
+          "type": "BIOLOGICAL",
+          "name": "Inactivated trivalent influenza vaccine",
+          "description": "Including two type A viruses, H1N1 and H3N2, and one type B virus, B/Brisbane.",
+          "armGroupLabels": [
+            "Vaccinated Health group",
+            "Vaccinated NSCLC group"
+          ],
+          "otherNames": [
+            "Flu Vaccines",
+            "Influenza Virus Vaccines",
+            "Influenza Vaccine, Trivalent",
+            "Vaccine, Trivalent Influenza",
+            "Flu Shot"
+          ]
+        }
+      ]
+    },
+    "eligibilityModule": {
+      "sex": "ALL",
+      "minimumAge": "18 Years",
+      "maximumAge": "75 Years",
+      "stdAges": [
+        "ADULT",
+        "OLDER_ADULT"
+      ]
+    },
+    "contactsLocationsModule": {
+      "centralContacts": [
+        {
+          "name": "Yayi He",
+          "role": "CONTACT",
+          "phone": "8613818828623",
+          "email": "2250601@qq.com"
+        }
+      ],
+      "overallOfficials": [
+        {
+          "name": "Yayi He, PhD, MD",
+          "affiliation": "Shanghai Pulmonary Hospital, Shanghai, China",
+          "role": "PRINCIPAL_INVESTIGATOR"
+        }
+      ],
+      "locations": [
+        {
+          "facility": "School of Public Health, Li Ka Shing Faculty of Medicine, University of Hong Kong",
+          "city": "Hong Kong",
+          "state": "Hong Kong",
+          "country": "China",
+          "contacts": [
+            {
+              "name": "Lit Man Leo Poon, PhD.",
+              "role": "CONTACT",
+              "phone": "852-3917 9943",
+              "email": "llmpoon@hkucc.hku.hk"
+            }
+          ],
+          "geoPoint": {
+            "lat": 22.27832,
+            "lon": 114.17469
+          }
+        },
+        {
+          "facility": "Shanghai Pulmonary Hospital",
+          "city": "Shanghai",
+          "state": "Shanghai Municipality",
+          "zip": "200433",
+          "country": "China",
+          "contacts": [
+            {
+              "name": "Yayi He",
+              "role": "CONTACT",
+              "phone": "8613818828623",
+              "email": "2250601@qq.com"
+            },
+            {
+              "name": "Yayi He, PhD, MD",
+              "role": "PRINCIPAL_INVESTIGATOR"
+            }
+          ],
+          "geoPoint": {
+            "lat": 31.22222,
+            "lon": 121.45806
+          }
+        }
+      ]
+    }
+  },
+  "derivedSection": {
+    "conditionBrowseModule": {
+      "meshes": [
+        {
+          "term": "Carcinoma, Non-Small-Cell Lung"
+        },
+        {
+          "term": "Influenza, Human"
+        }
+      ]
+    },
+    "interventionBrowseModule": {
+      "meshes": [
+        {
+          "term": "Immune Checkpoint Inhibitors"
+        },
+        {
+          "term": "Influenza Vaccines"
+        }
+      ]
+    }
+  },
+  "hasResults": false
+}

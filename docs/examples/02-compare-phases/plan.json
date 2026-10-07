@@ -1,0 +1,34 @@
+{
+  "interpretation": "Count trials by phase for pembrolizumab and for nivolumab side by side.",
+  "entities": [
+    {
+      "kind": "drug",
+      "value": "pembrolizumab",
+      "role": "compare"
+    },
+    {
+      "kind": "drug",
+      "value": "nivolumab",
+      "role": "compare"
+    }
+  ],
+  "filters": {
+    "phases": [],
+    "statuses": [],
+    "study_types": [],
+    "sponsor_classes": [],
+    "intervention_types": [],
+    "evidence": [],
+    "date_field": "start_date",
+    "year_from": null,
+    "year_to": null
+  },
+  "analysis": {
+    "kind": "aggregate",
+    "dimension": "phase",
+    "series": null,
+    "time_unit": null,
+    "top_n": 15
+  },
+  "chart_preference": null
+}
