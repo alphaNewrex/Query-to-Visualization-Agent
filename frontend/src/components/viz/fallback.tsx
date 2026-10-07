@@ -31,7 +31,8 @@ export function FallbackView({ response, reason }: { response: QueryResponse; re
     format: null,
     href_field: null,
   }));
-  const rows = records.map((record) => ({ ...record, citations: [], citation_count: 0, source_url: null }) as Datum);
+  // The defaults come first, so that a row's own citation count and source URL are shown as they are.
+  const rows = records.map((record) => ({ citations: [], citation_count: 0, source_url: null, ...record }) as Datum);
 
   return (
     <div className="flex flex-col gap-4">

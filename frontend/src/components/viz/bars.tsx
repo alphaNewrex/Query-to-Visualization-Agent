@@ -8,7 +8,7 @@ import { formatNumber } from "@/lib/format";
 import type { Pivoted } from "@/lib/pivot";
 import type { FieldDef, QuantitativeChannel } from "@/lib/types";
 
-import { seriesConfig, seriesFill, tooltipRowsAt, TooltipPanel, truncate } from "./chart-kit";
+import { seriesConfig, seriesFill, tooltipRowsAt, TooltipPanel, truncate, WrappedTick } from "./chart-kit";
 
 /** Bars never fill their slot: the data is the only thing allowed to be loud (dataviz mark spec). */
 const MAX_BAR_SIZE = 24;
@@ -28,6 +28,8 @@ export interface BarsChartProps {
   contiguous?: boolean;
   /** Write each bar's value at its tip. */
   tipLabels?: boolean;
+  /** Vertical bars only: wrap the category labels to this many characters and lines, as the width allows. */
+  categoryLabels?: { maxChars: number; maxLines: number };
   height: number;
   /** A bar was clicked: its x label and its positional series key. */
   onPick: (xLabel: string, seriesKey: string) => void;
@@ -47,6 +49,7 @@ export function BarsChart({
   horizontal,
   contiguous = false,
   tipLabels = false,
+  categoryLabels,
   height,
   onPick,
 }: BarsChartProps) {
@@ -55,8 +58,6 @@ export function BarsChart({
   const valueDomain: [number | "auto", number | "auto"] = isLog ? ["auto", "auto"] : [0, "auto"];
   const formatTick = (value: number) => formatNumber(value, y.format);
   const labelCount = pivoted.rows.length;
-  // Long labels on many bars are tilted so that neighbours never overprint each other.
-  const tilt = labelCount * Math.max(...pivoted.rows.map((row) => row.x.length), 0) > 70;
   const lastKey = pivoted.series[pivoted.series.length - 1]?.key;
 
   return (
@@ -101,9 +102,14 @@ export function BarsChart({
               interval={labelCount > 14 ? "preserveStartEnd" : 0}
               minTickGap={12}
               tickMargin={8}
-              angle={tilt ? -35 : 0}
-              textAnchor={tilt ? "end" : "middle"}
-              height={tilt ? 64 : undefined}
+              tick={
+                categoryLabels
+                  ? (props: { x?: number | string; y?: number | string; payload?: { value?: unknown } }) => (
+                      <WrappedTick {...props} maxChars={categoryLabels.maxChars} maxLines={categoryLabels.maxLines} />
+                    )
+                  : undefined
+              }
+              height={categoryLabels ? 20 + categoryLabels.maxLines * 14 : undefined}
               tickLine={false}
               axisLine={{ stroke: "var(--border)" }}
             />

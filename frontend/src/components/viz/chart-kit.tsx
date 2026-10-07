@@ -176,6 +176,67 @@ export function markLabel(xLabel: string, seriesLabel: string | null): string {
   return seriesLabel === null ? xLabel : `${xLabel} · ${seriesLabel}`;
 }
 
+/** Greedy word wrap: a word longer than `maxChars` stands alone on its line. */
+function wrapWords(text: string, maxChars: number): string[] {
+  const lines: string[] = [];
+  let line = "";
+  for (const word of text.split(" ")) {
+    if (line === "") {
+      line = word;
+    } else if (line.length + 1 + word.length <= maxChars) {
+      line = `${line} ${word}`;
+    } else {
+      lines.push(line);
+      line = word;
+    }
+  }
+  return line === "" ? lines : [...lines, line];
+}
+
+/**
+ * Splits an axis label into lines of at most `maxChars` characters. It breaks after a slash first,
+ * so "Phase 1/Phase 2" becomes "Phase 1/" and "Phase 2", then at spaces.
+ */
+export function wrapLabel(label: string, maxChars: number): string[] {
+  if (label.length <= maxChars) {
+    return [label];
+  }
+  const groups = label.split("/");
+  return groups.flatMap((group, index) => wrapWords(index < groups.length - 1 ? `${group}/` : group, maxChars));
+}
+
+/** A category axis tick that wraps onto up to `maxLines` lines instead of overprinting its neighbour. */
+export function WrappedTick({
+  x,
+  y,
+  payload,
+  maxChars,
+  maxLines,
+}: {
+  x?: number | string;
+  y?: number | string;
+  payload?: { value?: unknown };
+  maxChars: number;
+  maxLines: number;
+}) {
+  const lines = wrapLabel(String(payload?.value ?? ""), maxChars);
+  const shown = lines.slice(0, maxLines);
+  if (lines.length > maxLines) {
+    shown[maxLines - 1] = truncate(`${shown[maxLines - 1]} ${lines.slice(maxLines).join(" ")}`, maxChars);
+  }
+  return (
+    <g transform={`translate(${Number(x ?? 0)},${Number(y ?? 0)})`}>
+      <text textAnchor="middle" fontSize={12} fill="var(--muted-foreground)">
+        {shown.map((line, index) => (
+          <tspan key={index} x={0} dy={index === 0 ? 12 : 14}>
+            {line}
+          </tspan>
+        ))}
+      </text>
+    </g>
+  );
+}
+
 export function truncate(text: string, max: number): string {
   return text.length > max ? `${text.slice(0, Math.max(1, max - 1))}…` : text;
 }

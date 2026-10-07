@@ -87,7 +87,7 @@ export function ScatterPlotView({ spec, onSelect }: RendererProps<"scatter_plot"
   return (
     <ChartFrame yTitle={y.title} xTitle={x.title} series={hasSeries ? groups : []} legendLabel={series?.title ?? "Series"}>
       <ChartContainer config={config} className="aspect-auto w-full" style={{ height: HEIGHT }}>
-        <ScatterChart margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
+        <ScatterChart margin={{ top: 12, right: 20, bottom: 0, left: 0 }}>
           <CartesianGrid />
           <XAxis
             type="number"
@@ -96,7 +96,6 @@ export function ScatterPlotView({ spec, onSelect }: RendererProps<"scatter_plot"
             scale={xAxis.scale}
             domain={xAxis.domain}
             ticks={xAxis.ticks}
-            allowDataOverflow
             tickFormatter={(value: number) => formatNumber(value, x.format)}
             tickLine={false}
             axisLine={{ stroke: "var(--border)" }}
@@ -109,7 +108,6 @@ export function ScatterPlotView({ spec, onSelect }: RendererProps<"scatter_plot"
             scale={yAxis.scale}
             domain={yAxis.domain}
             ticks={yAxis.ticks}
-            allowDataOverflow
             tickFormatter={(value: number) => formatNumber(value, y.format)}
             tickLine={false}
             axisLine={false}

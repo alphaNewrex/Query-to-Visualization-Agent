@@ -101,7 +101,7 @@ export function NetworkGraphView({ spec, onSelect }: RendererProps<"network_grap
         aria-label={spec.title}
         viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
         className="mx-auto block h-auto w-full"
-        style={{ maxWidth: viewBox.width * 1.5, maxHeight: "72vh" }}
+        style={{ maxWidth: viewBox.width * 1.2, maxHeight: "72vh" }}
         onMouseLeave={() => setHover(null)}
       >
         <g>

@@ -132,13 +132,14 @@ export function layoutGraph(spec: Spec, size: { width: number; height: number })
       .force("collide", forceCollide<SimNode>((node) => node.r + 3))
       .force("link", forceLink<SimNode, SimulationLinkDatum<SimNode>>(simLinks).id((node) => node.id).strength(0.03));
   } else {
+    // The pull towards the centre is weaker along x than along y, so that the graph spreads across the width it is shown at.
     simulation
-      .force("charge", forceManyBody<SimNode>().strength(-90))
-      .force("link", forceLink<SimNode, SimulationLinkDatum<SimNode>>(simLinks).id((node) => node.id).distance(70).strength(0.35))
+      .force("charge", forceManyBody<SimNode>().strength(-170).distanceMax(500))
+      .force("link", forceLink<SimNode, SimulationLinkDatum<SimNode>>(simLinks).id((node) => node.id).distance(80).strength(0.25))
       .force("center", forceCenter(0, 0))
-      .force("collide", forceCollide<SimNode>((node) => node.r + 3))
-      .force("x", forceX<SimNode>(0).strength(0.05))
-      .force("y", forceY<SimNode>(0).strength(0.05));
+      .force("collide", forceCollide<SimNode>((node) => node.r + 6))
+      .force("x", forceX<SimNode>(0).strength(0.03))
+      .force("y", forceY<SimNode>(0).strength(0.07));
   }
   for (let tick = 0; tick < TICKS; tick += 1) {
     simulation.tick();
