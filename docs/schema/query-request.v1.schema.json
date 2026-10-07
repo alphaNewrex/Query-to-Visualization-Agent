@@ -1,0 +1,469 @@
+{
+  "$defs": {
+    "CompareSpec": {
+      "additionalProperties": false,
+      "description": "Values of one entity kind to compare side by side, one series each.",
+      "properties": {
+        "field": {
+          "enum": [
+            "drug_name",
+            "condition",
+            "sponsor",
+            "country"
+          ],
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 2,
+          "type": "array"
+        }
+      },
+      "required": [
+        "field",
+        "values"
+      ],
+      "title": "CompareSpec",
+      "type": "object"
+    },
+    "RequestOptions": {
+      "additionalProperties": false,
+      "description": "Behaviour switches of one request; `meta.options` echoes the effective values.",
+      "properties": {
+        "planner": {
+          "default": "llm",
+          "description": "'llm': the model writes the plan (503 `planner_unavailable` when no model is configured). 'structured': never call a model; the plan is built from the request fields and `group_by` is required. The question text is then not interpreted, and the response says so. Ignored by `POST /v1/analyses`.",
+          "enum": [
+            "llm",
+            "structured"
+          ],
+          "type": "string"
+        },
+        "citations_per_datum": {
+          "default": 5,
+          "description": "Trials cited for each datum; 0 disables citations.",
+          "maximum": 20,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "drug_match": {
+          "default": "broad",
+          "description": "'broad': the registry's intervention search (names, other names, titles, descriptions, synonyms). 'name_only': intervention names and their synonyms only. The two give different counts, so the definition used is always stated in the response.",
+          "enum": [
+            "broad",
+            "name_only"
+          ],
+          "type": "string"
+        },
+        "include_trace": {
+          "default": true,
+          "description": "Include the step list in `meta.debug.trace`.",
+          "type": "boolean"
+        },
+        "use_cache": {
+          "default": true,
+          "description": "false bypasses the plan cache and the response cache for this request; the registry-call cache stays.",
+          "type": "boolean"
+        }
+      },
+      "title": "RequestOptions",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A question about clinical trials, with optional structured fields.\n\nStrings are trimmed and unknown keys are rejected. Rules across fields:\n\n1. Structured filter fields are ANDed with what the question says. Where they conflict, the field\n   wins: it replaces the planner's value for the same entity kind or filter family, and the\n   override is recorded in `meta.interpretation.adjustments`.\n2. A structured entity field whose value is one of the compared values does not become an extra\n   filter; the comparison is kept.\n3. Entity arrays mean \"all of\"; enum arrays mean \"any of\". A comparison is always explicit:\n   `compare` in the request or an \"A vs B\" in the question.\n4. `group_by`, `time_unit`, `top_n` and `chart_type` replace the planner's choices.\n5. Every structured field is shown to the model, so \"this drug\" in the question resolves to\n   `drug_name`.\n6. `meta.filters` in every response repeats the filter fields in canonical form (arrays for list\n   fields, every key present), so it can be sent back as request fields. For that reason every list\n   field accepts an empty array as \"no filter\", the same as null.",
+  "examples": [
+    {
+      "drug_name": "Pembrolizumab",
+      "query": "How has the number of trials for this drug changed over time?"
+    }
+  ],
+  "properties": {
+    "query": {
+      "description": "The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 3 to 1,000 characters, at least one letter and no other control characters.",
+      "maxLength": 1000,
+      "minLength": 3,
+      "type": "string"
+    },
+    "drug_name": {
+      "anyOf": [
+        {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 5,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Drugs the trials must test, up to 5, each 1 to 200 characters; a single string is accepted. A trial must match all of them. Searched with the registry's intervention search, so brand and code names resolve (Keytruda and MK-3475 return the same trials as pembrolizumab)."
+    },
+    "condition": {
+      "anyOf": [
+        {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 5,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Conditions the trials must study; same rules as `drug_name`, searched with the registry's condition search."
+    },
+    "sponsor": {
+      "anyOf": [
+        {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 5,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Lead-sponsor names; same rules as `drug_name`, searched in the lead sponsor name."
+    },
+    "country": {
+      "anyOf": [
+        {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 5,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Countries; same rules as `drug_name`. Each must resolve to one of the registry's country names (common aliases and ISO alpha-2 or alpha-3 codes are accepted), otherwise the request is refused with close matches. A trial must list a site in every named country."
+    },
+    "term": {
+      "anyOf": [
+        {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 5,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Other search words, matched anywhere in the record; same rules as `drug_name`."
+    },
+    "trial_phase": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "EARLY_PHASE1",
+              "PHASE1",
+              "PHASE2",
+              "PHASE3",
+              "PHASE4",
+              "NA"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Phases, any of. Lenient spellings are normalised before validation: 'Phase 2', 'phase2', '2' and 'II' become PHASE2, and 'Phase 2/3' becomes both PHASE2 and PHASE3; a single value is accepted. 'Lists this phase' semantics, as on the registry's website: PHASE2 also matches Phase 1/Phase 2 and Phase 2/Phase 3 trials."
+    },
+    "status": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "NOT_YET_RECRUITING",
+              "RECRUITING",
+              "ENROLLING_BY_INVITATION",
+              "ACTIVE_NOT_RECRUITING",
+              "COMPLETED",
+              "SUSPENDED",
+              "TERMINATED",
+              "WITHDRAWN",
+              "AVAILABLE",
+              "NO_LONGER_AVAILABLE",
+              "TEMPORARILY_NOT_AVAILABLE",
+              "APPROVED_FOR_MARKETING",
+              "WITHHELD",
+              "UNKNOWN"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Study-level overall statuses, any of."
+    },
+    "study_type": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "INTERVENTIONAL",
+              "OBSERVATIONAL",
+              "EXPANDED_ACCESS"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Study types, any of."
+    },
+    "sponsor_class": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "NIH",
+              "FED",
+              "OTHER_GOV",
+              "INDIV",
+              "INDUSTRY",
+              "NETWORK",
+              "AMBIG",
+              "OTHER",
+              "UNKNOWN"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Classes of the lead sponsor, any of."
+    },
+    "intervention_type": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "BEHAVIORAL",
+              "BIOLOGICAL",
+              "COMBINATION_PRODUCT",
+              "DEVICE",
+              "DIAGNOSTIC_TEST",
+              "DIETARY_SUPPLEMENT",
+              "DRUG",
+              "GENETIC",
+              "PROCEDURE",
+              "RADIATION",
+              "OTHER"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Trials with at least one intervention of these types, any of."
+    },
+    "start_year": {
+      "anyOf": [
+        {
+          "maximum": 2100,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "First year, inclusive, of the date named by `date_field`. Not after `end_year`."
+    },
+    "end_year": {
+      "anyOf": [
+        {
+          "maximum": 2100,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Last year, inclusive, of the date named by `date_field`. Not before `start_year`."
+    },
+    "date_field": {
+      "anyOf": [
+        {
+          "enum": [
+            "start_date",
+            "primary_completion_date",
+            "completion_date",
+            "first_posted_date"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Which date the year bounds apply to. Null means the date on the time axis when the chart has one, otherwise the study start date."
+    },
+    "compare": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CompareSpec"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Compare these as series. Replaces any comparison found in the question."
+    },
+    "group_by": {
+      "anyOf": [
+        {
+          "items": {
+            "enum": [
+              "phase",
+              "overall_status",
+              "study_type",
+              "sponsor_class",
+              "intervention_type",
+              "sex",
+              "age_group",
+              "allocation",
+              "masking",
+              "primary_purpose",
+              "has_results",
+              "country",
+              "sponsor",
+              "drug",
+              "condition",
+              "start_date",
+              "primary_completion_date",
+              "completion_date",
+              "first_posted_date",
+              "enrollment"
+            ],
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Analysis hint: the first key is the axis, the second the series. The second key must be one of the closed dimensions (phase, overall_status, study_type, sponsor_class, intervention_type, sex, age_group, allocation, masking, primary_purpose, has_results). Overrides what the planner chose. Required when `options.planner` is 'structured'."
+    },
+    "time_unit": {
+      "anyOf": [
+        {
+          "enum": [
+            "year",
+            "quarter",
+            "month"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Analysis hint: bucket width for a date dimension."
+    },
+    "top_n": {
+      "anyOf": [
+        {
+          "maximum": 50,
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "How many categories or rows to keep. Default 15, or 10 for the rows of a trial list. Network sizes are fixed in v1."
+    },
+    "chart_type": {
+      "anyOf": [
+        {
+          "enum": [
+            "bar_chart",
+            "time_series",
+            "histogram",
+            "scatter_plot",
+            "network_graph",
+            "table",
+            "metric"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "A preference. Honoured when valid for the data shape, otherwise ignored with a warning."
+    },
+    "options": {
+      "$ref": "#/$defs/RequestOptions"
+    }
+  },
+  "required": [
+    "query"
+  ],
+  "title": "QueryRequest",
+  "type": "object"
+}

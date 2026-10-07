@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/gen-types.mjs --fixtures && next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run"
+    "typecheck": "node scripts/gen-types.mjs --fixtures && next typegen && tsc --noEmit",
+    "test": "node scripts/gen-types.mjs --check && node scripts/gen-types.mjs --fixtures && vitest run",
+    "gen:types": "node scripts/gen-types.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

@@ -1,0 +1,59 @@
+{
+  "$defs": {
+    "ErrorBody": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "invalid_request",
+            "not_found",
+            "method_not_allowed",
+            "planner_unavailable",
+            "upstream_unavailable",
+            "upstream_rate_limited",
+            "upstream_timeout",
+            "deadline_exceeded",
+            "internal_error",
+            "backend_unreachable"
+          ],
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "additionalProperties": true,
+          "description": "`errors[]` of {path, code, message} for invalid_request; `reason` for planner_unavailable; otherwise empty.",
+          "type": "object"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "is_retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "details",
+        "request_id",
+        "is_retryable"
+      ],
+      "title": "ErrorBody",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The body of every non-2xx response, from the backend and from the frontend's proxy.",
+  "properties": {
+    "error": {
+      "$ref": "#/$defs/ErrorBody"
+    }
+  },
+  "required": [
+    "error"
+  ],
+  "title": "ErrorResponse",
+  "type": "object"
+}

@@ -1,0 +1,3831 @@
+{
+  "$defs": {
+    "Adjustment": {
+      "additionalProperties": false,
+      "description": "A change the service made to the plan, and what it did.",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "action": {
+          "enum": [
+            "dropped",
+            "replaced",
+            "clamped",
+            "defaulted",
+            "repaired",
+            "kept"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "path",
+        "message",
+        "action"
+      ],
+      "title": "Adjustment",
+      "type": "object"
+    },
+    "Aggregate": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "aggregate",
+          "type": "string"
+        },
+        "dimension": {
+          "description": "What trials are counted by: a category, a date or enrollment size.",
+          "enum": [
+            "phase",
+            "overall_status",
+            "study_type",
+            "sponsor_class",
+            "intervention_type",
+            "sex",
+            "age_group",
+            "allocation",
+            "masking",
+            "primary_purpose",
+            "has_results",
+            "country",
+            "sponsor",
+            "drug",
+            "condition",
+            "start_date",
+            "primary_completion_date",
+            "completion_date",
+            "first_posted_date",
+            "enrollment"
+          ],
+          "type": "string"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "enum": [
+                "phase",
+                "overall_status",
+                "study_type",
+                "sponsor_class",
+                "intervention_type",
+                "sex",
+                "age_group",
+                "allocation",
+                "masking",
+                "primary_purpose",
+                "has_results"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "A second, closed dimension that splits the first; null otherwise."
+        },
+        "time_unit": {
+          "anyOf": [
+            {
+              "enum": [
+                "year",
+                "quarter",
+                "month"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Only for date dimensions; null lets the service use year."
+        },
+        "top_n": {
+          "anyOf": [
+            {
+              "maximum": 500,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Only when the user asks for a number of items; otherwise null."
+        }
+      },
+      "required": [
+        "kind",
+        "dimension",
+        "series",
+        "time_unit",
+        "top_n"
+      ],
+      "title": "Aggregate",
+      "type": "object"
+    },
+    "AnalysisRequest": {
+      "additionalProperties": false,
+      "description": "A typed plan to answer without a model: the body of `POST /v1/analyses`.\n\nNothing is checked against a question; the plan is validated for shape and limits only. Posting\n`{\"plan\": meta.plan, \"options\": meta.options}` from an earlier response reproduces its visualization\nfor the same data timestamp.",
+      "properties": {
+        "plan": {
+          "$ref": "#/$defs/QueryPlan"
+        },
+        "options": {
+          "$ref": "#/$defs/RequestOptions"
+        }
+      },
+      "required": [
+        "plan"
+      ],
+      "title": "AnalysisRequest",
+      "type": "object"
+    },
+    "AppliedFilters": {
+      "additionalProperties": false,
+      "description": "The effective scope in request field names: it can be sent back as request fields.",
+      "properties": {
+        "drug_name": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "condition": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "sponsor": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "country": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "term": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "trial_phase": {
+          "items": {
+            "enum": [
+              "EARLY_PHASE1",
+              "PHASE1",
+              "PHASE2",
+              "PHASE3",
+              "PHASE4",
+              "NA"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "status": {
+          "items": {
+            "enum": [
+              "NOT_YET_RECRUITING",
+              "RECRUITING",
+              "ENROLLING_BY_INVITATION",
+              "ACTIVE_NOT_RECRUITING",
+              "COMPLETED",
+              "SUSPENDED",
+              "TERMINATED",
+              "WITHDRAWN",
+              "AVAILABLE",
+              "NO_LONGER_AVAILABLE",
+              "TEMPORARILY_NOT_AVAILABLE",
+              "APPROVED_FOR_MARKETING",
+              "WITHHELD",
+              "UNKNOWN"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "study_type": {
+          "items": {
+            "enum": [
+              "INTERVENTIONAL",
+              "OBSERVATIONAL",
+              "EXPANDED_ACCESS"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "sponsor_class": {
+          "items": {
+            "enum": [
+              "NIH",
+              "FED",
+              "OTHER_GOV",
+              "INDIV",
+              "INDUSTRY",
+              "NETWORK",
+              "AMBIG",
+              "OTHER",
+              "UNKNOWN"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "intervention_type": {
+          "items": {
+            "enum": [
+              "BEHAVIORAL",
+              "BIOLOGICAL",
+              "COMBINATION_PRODUCT",
+              "DEVICE",
+              "DIAGNOSTIC_TEST",
+              "DIETARY_SUPPLEMENT",
+              "DRUG",
+              "GENETIC",
+              "PROCEDURE",
+              "RADIATION",
+              "OTHER"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "start_year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "end_year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "date_field": {
+          "anyOf": [
+            {
+              "enum": [
+                "start_date",
+                "primary_completion_date",
+                "completion_date",
+                "first_posted_date"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "compare": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CompareSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "drug_name",
+        "condition",
+        "sponsor",
+        "country",
+        "term",
+        "trial_phase",
+        "status",
+        "study_type",
+        "sponsor_class",
+        "intervention_type",
+        "start_year",
+        "end_year",
+        "date_field",
+        "compare"
+      ],
+      "title": "AppliedFilters",
+      "type": "object"
+    },
+    "BarChart": {
+      "additionalProperties": false,
+      "description": "One row per (x, series), following `x.domain`; with a series every combination is present.",
+      "properties": {
+        "type": {
+          "const": "bar_chart",
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Scope, number of trials, data date and any subset the chart is limited to."
+        },
+        "orientation": {
+          "description": "A drawing hint; x is the category axis either way.",
+          "enum": [
+            "vertical",
+            "horizontal"
+          ],
+          "type": "string"
+        },
+        "stack": {
+          "description": "A grouped bar chart is `series` set with `none`; `stacked` only for an exclusive series.",
+          "enum": [
+            "none",
+            "stacked"
+          ],
+          "type": "string"
+        },
+        "encoding": {
+          "$ref": "#/$defs/BarChartEncoding"
+        },
+        "data": {
+          "items": {
+            "$ref": "#/$defs/Datum"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "subtitle",
+        "orientation",
+        "stack",
+        "encoding",
+        "data"
+      ],
+      "title": "BarChart",
+      "type": "object"
+    },
+    "BarChartEncoding": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "$ref": "#/$defs/CategoryChannel"
+        },
+        "y": {
+          "$ref": "#/$defs/QuantitativeChannel"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CategoryChannel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tooltip": {
+          "items": {
+            "$ref": "#/$defs/FieldDef"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "series",
+        "tooltip"
+      ],
+      "title": "BarChartEncoding",
+      "type": "object"
+    },
+    "CacheInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "is_plan_cached": {
+          "type": "boolean"
+        },
+        "is_response_cached": {
+          "type": "boolean"
+        },
+        "cached_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When a cached response was first built; null on a fresh one."
+        }
+      },
+      "required": [
+        "is_plan_cached",
+        "is_response_cached",
+        "cached_at"
+      ],
+      "title": "CacheInfo",
+      "type": "object"
+    },
+    "CategoryChannel": {
+      "additionalProperties": false,
+      "description": "A channel of labelled values; colour index i belongs to `domain[i]`.",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "nominal",
+            "ordinal"
+          ],
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "domain": {
+          "description": "Every value in display order: axis, legend and colour index.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "sort": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChannelSort"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "is_exclusive": {
+          "description": "false: a trial can fall under several values, so values add up to more than the trials; never draw such a channel as parts of a whole.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "field",
+        "type",
+        "title",
+        "domain",
+        "sort",
+        "is_exclusive"
+      ],
+      "title": "CategoryChannel",
+      "type": "object"
+    },
+    "ChannelSort": {
+      "additionalProperties": false,
+      "description": "How a category axis was ordered. Informational: `domain` and row order are authoritative.",
+      "properties": {
+        "by": {
+          "enum": [
+            "value",
+            "label",
+            "natural"
+          ],
+          "type": "string"
+        },
+        "order": {
+          "enum": [
+            "ascending",
+            "descending"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "by",
+        "order"
+      ],
+      "title": "ChannelSort",
+      "type": "object"
+    },
+    "Citation": {
+      "additionalProperties": false,
+      "description": "A pointer into the trial record that a value was computed from.",
+      "properties": {
+        "nct_id": {
+          "description": "Key into the top-level `references` map.",
+          "pattern": "^NCT\\d{8}$",
+          "type": "string"
+        },
+        "field": {
+          "description": "Path in `GET /api/v2/studies/{nct_id}` with [i] for list items, addressing one value.",
+          "type": "string"
+        },
+        "excerpt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The value at that path, verbatim; numbers and booleans in JSON notation. Null means the field is absent and the absence is the evidence."
+        }
+      },
+      "required": [
+        "nct_id",
+        "field",
+        "excerpt"
+      ],
+      "title": "Citation",
+      "type": "object"
+    },
+    "CitationsInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "is_enabled": {
+          "type": "boolean"
+        },
+        "max_per_datum": {
+          "type": "integer"
+        },
+        "selection": {
+          "description": "Which trials are cited, as the strategy chose them.",
+          "type": "string"
+        },
+        "trials_cited": {
+          "description": "The size of `references`.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "is_enabled",
+        "max_per_datum",
+        "selection",
+        "trials_cited"
+      ],
+      "title": "CitationsInfo",
+      "type": "object"
+    },
+    "Clarification": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "enum": [
+            "missing_entity",
+            "unknown_value",
+            "ambiguous_request",
+            "could_not_interpret",
+            "too_broad"
+          ],
+          "type": "string"
+        },
+        "missing_fields": {
+          "description": "Names of request fields that would settle it; may be empty.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "options": {
+          "description": "Complete request bodies a button can post; may be empty.",
+          "items": {
+            "$ref": "#/$defs/LabeledRequest"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "reason",
+        "missing_fields",
+        "options"
+      ],
+      "title": "Clarification",
+      "type": "object"
+    },
+    "ClarificationResponse": {
+      "additionalProperties": false,
+      "description": "The service needs a name or a choice before it can answer.",
+      "properties": {
+        "spec_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "type": "string"
+        },
+        "kind": {
+          "const": "clarification",
+          "default": "clarification",
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "visualization": {
+          "default": null,
+          "type": "null"
+        },
+        "clarification": {
+          "$ref": "#/$defs/Clarification"
+        },
+        "references": {
+          "additionalProperties": {
+            "$ref": "#/$defs/TrialReference"
+          },
+          "type": "object"
+        },
+        "meta": {
+          "$ref": "#/$defs/Meta"
+        }
+      },
+      "required": [
+        "spec_version",
+        "kind",
+        "message",
+        "visualization",
+        "clarification",
+        "references",
+        "meta"
+      ],
+      "title": "ClarificationResponse",
+      "type": "object"
+    },
+    "Clarify": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "clarify",
+          "type": "string"
+        },
+        "reason": {
+          "enum": [
+            "missing_entity",
+            "ambiguous_request"
+          ],
+          "type": "string"
+        },
+        "missing": {
+          "items": {
+            "enum": [
+              "drug_name",
+              "condition",
+              "sponsor",
+              "country",
+              "compare",
+              "group_by"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "reason",
+        "missing"
+      ],
+      "title": "Clarify",
+      "type": "object"
+    },
+    "CompareSpec": {
+      "additionalProperties": false,
+      "description": "Values of one entity kind to compare side by side, one series each.",
+      "properties": {
+        "field": {
+          "enum": [
+            "drug_name",
+            "condition",
+            "sponsor",
+            "country"
+          ],
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 2,
+          "type": "array"
+        }
+      },
+      "required": [
+        "field",
+        "values"
+      ],
+      "title": "CompareSpec",
+      "type": "object"
+    },
+    "Counts": {
+      "additionalProperties": false,
+      "properties": {
+        "data_points": {
+          "description": "Rows, or nodes plus links.",
+          "type": "integer"
+        },
+        "series": {
+          "items": {
+            "$ref": "#/$defs/SeriesCounts"
+          },
+          "type": "array"
+        },
+        "trials_in_several_series": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Filled for a two-group comparison."
+        }
+      },
+      "required": [
+        "data_points",
+        "series",
+        "trials_in_several_series"
+      ],
+      "title": "Counts",
+      "type": "object"
+    },
+    "Datum": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "description": "A data row: the fields named by the encoding, plus the three reserved keys below.\n\nThe one contract model that allows extra keys, restricted to scalars. A renderer reads a field\nthrough its encoding, and never sorts, filters or computes.",
+      "properties": {
+        "citations": {
+          "description": "Evidence for at most `max_per_datum` trials; [] when disabled.",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "type": "array"
+        },
+        "citation_count": {
+          "description": "Distinct trials behind this datum; never null.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "An API URL that returns exactly those trials, or null when none can."
+        }
+      },
+      "required": [
+        "citations",
+        "citation_count",
+        "source_url"
+      ],
+      "title": "Datum",
+      "type": "object"
+    },
+    "Debug": {
+      "additionalProperties": false,
+      "properties": {
+        "trace": {
+          "items": {
+            "$ref": "#/$defs/TraceStep"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "trace"
+      ],
+      "title": "Debug",
+      "type": "object"
+    },
+    "Edge": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "description": "A network link: `trial_count` is its other key.",
+      "properties": {
+        "citations": {
+          "description": "Evidence for at most `max_per_datum` trials; [] when disabled.",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "type": "array"
+        },
+        "citation_count": {
+          "description": "Distinct trials behind this datum; never null.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "An API URL that returns exactly those trials, or null when none can."
+        },
+        "id": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "citations",
+        "citation_count",
+        "source_url",
+        "id",
+        "source",
+        "target"
+      ],
+      "title": "Edge",
+      "type": "object"
+    },
+    "Entity": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "drug",
+            "condition",
+            "sponsor",
+            "country",
+            "term"
+          ],
+          "type": "string"
+        },
+        "value": {
+          "description": "The words exactly as they appear in the question or in a structured field. Never translate, expand, correct or add a name.",
+          "type": "string"
+        },
+        "role": {
+          "description": "'filter': every counted trial must match. 'compare': one side of an 'A vs B' comparison.",
+          "enum": [
+            "filter",
+            "compare"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value",
+        "role"
+      ],
+      "title": "Entity",
+      "type": "object"
+    },
+    "EntityResolution": {
+      "additionalProperties": false,
+      "description": "What the registry made of one entity of the plan.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "drug",
+            "condition",
+            "sponsor",
+            "country",
+            "term"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "question",
+            "request_field",
+            "plan"
+          ],
+          "type": "string"
+        },
+        "text": {
+          "description": "The words used.",
+          "type": "string"
+        },
+        "term_searched": {
+          "description": "After `essie.literal()`, or the registry's country name.",
+          "type": "string"
+        },
+        "definition": {
+          "enum": [
+            "intervention_search",
+            "intervention_name",
+            "condition_search",
+            "lead_sponsor_search",
+            "country_exact",
+            "term_search"
+          ],
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "low_match",
+            "ambiguous",
+            "no_match",
+            "matches_everything"
+          ],
+          "type": "string"
+        },
+        "trials_matched": {
+          "type": "integer"
+        },
+        "strict_name_matches": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Drugs only: the count of `AREA[InterventionName]`."
+        },
+        "other_readings": {
+          "items": {
+            "$ref": "#/$defs/OtherReading"
+          },
+          "type": "array"
+        },
+        "candidates": {
+          "description": "Sponsors only.",
+          "items": {
+            "$ref": "#/$defs/SponsorCandidate"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "source",
+        "text",
+        "term_searched",
+        "definition",
+        "status",
+        "trials_matched",
+        "strict_name_matches",
+        "other_readings",
+        "candidates"
+      ],
+      "title": "EntityResolution",
+      "type": "object"
+    },
+    "ErrorBody": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "invalid_request",
+            "not_found",
+            "method_not_allowed",
+            "planner_unavailable",
+            "upstream_unavailable",
+            "upstream_rate_limited",
+            "upstream_timeout",
+            "deadline_exceeded",
+            "internal_error",
+            "backend_unreachable"
+          ],
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "additionalProperties": true,
+          "description": "`errors[]` of {path, code, message} for invalid_request; `reason` for planner_unavailable; otherwise empty.",
+          "type": "object"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "is_retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "details",
+        "request_id",
+        "is_retryable"
+      ],
+      "title": "ErrorBody",
+      "type": "object"
+    },
+    "ErrorResponse": {
+      "additionalProperties": false,
+      "description": "The body of every non-2xx response, from the backend and from the frontend's proxy.",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ErrorBody"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "ErrorResponse",
+      "type": "object"
+    },
+    "ExclusionCount": {
+      "additionalProperties": false,
+      "description": "Trials of a series that were not drawn, and why.",
+      "properties": {
+        "reason": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason",
+        "count",
+        "message"
+      ],
+      "title": "ExclusionCount",
+      "type": "object"
+    },
+    "FieldDef": {
+      "additionalProperties": false,
+      "description": "A displayed field: a tooltip entry or a table column.",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "nominal",
+            "ordinal",
+            "quantitative",
+            "temporal"
+          ],
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "format": {
+          "anyOf": [
+            {
+              "enum": [
+                ",d",
+                ".1f",
+                ".1%"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "href_field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "A row key holding a URL to link this value to."
+        }
+      },
+      "required": [
+        "field",
+        "title",
+        "type",
+        "unit",
+        "format",
+        "href_field"
+      ],
+      "title": "FieldDef",
+      "type": "object"
+    },
+    "FieldRef": {
+      "additionalProperties": false,
+      "description": "A reference to a row key.",
+      "properties": {
+        "field": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "field"
+      ],
+      "title": "FieldRef",
+      "type": "object"
+    },
+    "FilterEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "family": {
+          "enum": [
+            "phases",
+            "statuses",
+            "study_types",
+            "sponsor_classes",
+            "intervention_types"
+          ],
+          "type": "string"
+        },
+        "phrase": {
+          "description": "The words of the question that state this filter, copied verbatim.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "family",
+        "phrase"
+      ],
+      "title": "FilterEvidence",
+      "type": "object"
+    },
+    "Histogram": {
+      "additionalProperties": false,
+      "description": "One row per bin, contiguous and ascending. Bins may be uneven: draw one bar per row using the label.",
+      "properties": {
+        "type": {
+          "const": "histogram",
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "encoding": {
+          "$ref": "#/$defs/HistogramEncoding"
+        },
+        "data": {
+          "items": {
+            "$ref": "#/$defs/Datum"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "subtitle",
+        "encoding",
+        "data"
+      ],
+      "title": "Histogram",
+      "type": "object"
+    },
+    "HistogramEncoding": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "$ref": "#/$defs/QuantitativeChannel",
+          "description": "Bin start, inclusive."
+        },
+        "x2": {
+          "$ref": "#/$defs/FieldRef",
+          "description": "Bin end, exclusive; null in the last row means open-ended."
+        },
+        "y": {
+          "$ref": "#/$defs/QuantitativeChannel"
+        },
+        "label": {
+          "$ref": "#/$defs/FieldRef"
+        },
+        "tooltip": {
+          "items": {
+            "$ref": "#/$defs/FieldDef"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "x",
+        "x2",
+        "y",
+        "label",
+        "tooltip"
+      ],
+      "title": "HistogramEncoding",
+      "type": "object"
+    },
+    "Interpretation": {
+      "additionalProperties": false,
+      "description": "How the question was read, resolved and executed.",
+      "properties": {
+        "summary": {
+          "description": "Written by code from the plan, so it describes what was run.",
+          "type": "string"
+        },
+        "analysis": {
+          "enum": [
+            "aggregate",
+            "total",
+            "relate",
+            "network",
+            "trial_list"
+          ],
+          "type": "string"
+        },
+        "measure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Measure"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null for relate and trial_list."
+        },
+        "group_by": {
+          "description": "The first is the axis, the second the series; node kinds for a network.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "compare": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CompareSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "time_granularity": {
+          "anyOf": [
+            {
+              "enum": [
+                "year",
+                "quarter",
+                "month"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "counting_unit": {
+          "const": "trial",
+          "type": "string"
+        },
+        "entities": {
+          "items": {
+            "$ref": "#/$defs/EntityResolution"
+          },
+          "type": "array"
+        },
+        "adjustments": {
+          "items": {
+            "$ref": "#/$defs/Adjustment"
+          },
+          "type": "array"
+        },
+        "strategy": {
+          "items": {
+            "$ref": "#/$defs/StrategyStep"
+          },
+          "type": "array"
+        },
+        "chart_rationale": {
+          "description": "The rule of the visualization-type table that fired.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "summary",
+        "analysis",
+        "measure",
+        "group_by",
+        "compare",
+        "time_granularity",
+        "counting_unit",
+        "entities",
+        "adjustments",
+        "strategy",
+        "chart_rationale"
+      ],
+      "title": "Interpretation",
+      "type": "object"
+    },
+    "LabeledRequest": {
+      "additionalProperties": false,
+      "description": "A complete request body a button can post; built by rules, never by the model.",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/$defs/QueryRequest"
+        }
+      },
+      "required": [
+        "label",
+        "request"
+      ],
+      "title": "LabeledRequest",
+      "type": "object"
+    },
+    "Measure": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregate": {
+          "const": "count",
+          "type": "string"
+        },
+        "of": {
+          "const": "trials",
+          "type": "string"
+        }
+      },
+      "required": [
+        "aggregate",
+        "of"
+      ],
+      "title": "Measure",
+      "type": "object"
+    },
+    "MessageResponse": {
+      "additionalProperties": false,
+      "description": "Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run.",
+      "properties": {
+        "spec_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "no_data",
+            "unsupported"
+          ],
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "visualization": {
+          "default": null,
+          "type": "null"
+        },
+        "clarification": {
+          "default": null,
+          "type": "null"
+        },
+        "references": {
+          "additionalProperties": {
+            "$ref": "#/$defs/TrialReference"
+          },
+          "type": "object"
+        },
+        "meta": {
+          "$ref": "#/$defs/Meta"
+        }
+      },
+      "required": [
+        "spec_version",
+        "kind",
+        "message",
+        "visualization",
+        "clarification",
+        "references",
+        "meta"
+      ],
+      "title": "MessageResponse",
+      "type": "object"
+    },
+    "Meta": {
+      "additionalProperties": false,
+      "description": "Everything about the answer other than what is drawn. A renderer needs nothing from it.",
+      "properties": {
+        "request_id": {
+          "type": "string"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "As sent, after whitespace normalisation; null for `POST /v1/analyses`."
+        },
+        "filters": {
+          "$ref": "#/$defs/AppliedFilters"
+        },
+        "interpretation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Interpretation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null when no plan could be produced."
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QueryPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The canonical plan, defaults explicit."
+        },
+        "options": {
+          "$ref": "#/$defs/RequestOptions",
+          "description": "The effective options; `{plan, options}` posted to `/v1/analyses` replays the answer."
+        },
+        "planner": {
+          "$ref": "#/$defs/PlannerInfo"
+        },
+        "assumptions": {
+          "description": "Plain-language choices made where the question was open.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/$defs/Note"
+          },
+          "type": "array"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Source"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null when no upstream request was made."
+        },
+        "counts": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Counts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "truncation": {
+          "$ref": "#/$defs/Truncation"
+        },
+        "citations": {
+          "$ref": "#/$defs/CitationsInfo"
+        },
+        "suggested_followups": {
+          "items": {
+            "$ref": "#/$defs/LabeledRequest"
+          },
+          "type": "array"
+        },
+        "cache": {
+          "$ref": "#/$defs/CacheInfo"
+        },
+        "timing": {
+          "$ref": "#/$defs/Timing"
+        },
+        "debug": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Debug"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null when `options.include_trace` is false."
+        }
+      },
+      "required": [
+        "request_id",
+        "generated_at",
+        "query",
+        "filters",
+        "interpretation",
+        "plan",
+        "options",
+        "planner",
+        "assumptions",
+        "warnings",
+        "source",
+        "counts",
+        "truncation",
+        "citations",
+        "suggested_followups",
+        "cache",
+        "timing",
+        "debug"
+      ],
+      "title": "Meta",
+      "type": "object"
+    },
+    "Metric": {
+      "additionalProperties": false,
+      "description": "A single number, with citations and `source_url` like any datum.",
+      "properties": {
+        "type": {
+          "const": "metric",
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "encoding": {
+          "$ref": "#/$defs/MetricEncoding"
+        },
+        "data": {
+          "description": "Exactly one row.",
+          "items": {
+            "$ref": "#/$defs/Datum"
+          },
+          "maxItems": 1,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "subtitle",
+        "encoding",
+        "data"
+      ],
+      "title": "Metric",
+      "type": "object"
+    },
+    "MetricEncoding": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/QuantitativeChannel"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "MetricEncoding",
+      "type": "object"
+    },
+    "Network": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "network",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "sponsor",
+            "drug",
+            "condition",
+            "country"
+          ],
+          "type": "string"
+        },
+        "target": {
+          "description": "The same kind as source for co-occurrence, e.g. drug and drug.",
+          "enum": [
+            "sponsor",
+            "drug",
+            "condition",
+            "country"
+          ],
+          "type": "string"
+        },
+        "link": {
+          "anyOf": [
+            {
+              "enum": [
+                "same_trial",
+                "same_arm"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "'same_arm' when the question is about combinations; null lets the service decide."
+        }
+      },
+      "required": [
+        "kind",
+        "source",
+        "target",
+        "link"
+      ],
+      "title": "Network",
+      "type": "object"
+    },
+    "NetworkData": {
+      "additionalProperties": false,
+      "properties": {
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/Node"
+          },
+          "type": "array"
+        },
+        "edges": {
+          "items": {
+            "$ref": "#/$defs/Edge"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "nodes",
+        "edges"
+      ],
+      "title": "NetworkData",
+      "type": "object"
+    },
+    "NetworkEdgeEncoding": {
+      "additionalProperties": false,
+      "properties": {
+        "weight": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuantitativeChannel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Map to stroke width."
+        },
+        "tooltip": {
+          "items": {
+            "$ref": "#/$defs/FieldDef"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "weight",
+        "tooltip"
+      ],
+      "title": "NetworkEdgeEncoding",
+      "type": "object"
+    },
+    "NetworkEncoding": {
+      "additionalProperties": false,
+      "properties": {
+        "nodes": {
+          "$ref": "#/$defs/NetworkNodeEncoding"
+        },
+        "edges": {
+          "$ref": "#/$defs/NetworkEdgeEncoding"
+        }
+      },
+      "required": [
+        "nodes",
+        "edges"
+      ],
+      "title": "NetworkEncoding",
+      "type": "object"
+    },
+    "NetworkGraph": {
+      "additionalProperties": false,
+      "description": "Nodes and links; `source` and `target` of a link are node ids.",
+      "properties": {
+        "type": {
+          "const": "network_graph",
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "is_directed": {
+          "const": false,
+          "type": "boolean"
+        },
+        "layout": {
+          "enum": [
+            "force",
+            "bipartite"
+          ],
+          "type": "string"
+        },
+        "encoding": {
+          "$ref": "#/$defs/NetworkEncoding"
+        },
+        "data": {
+          "$ref": "#/$defs/NetworkData"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "subtitle",
+        "is_directed",
+        "layout",
+        "encoding",
+        "data"
+      ],
+      "title": "NetworkGraph",
+      "type": "object"
+    },
+    "NetworkNodeEncoding": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "$ref": "#/$defs/FieldRef"
+        },
+        "color": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CategoryChannel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "With the `bipartite` layout its domain has exactly two values, the two sides."
+        },
+        "size": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuantitativeChannel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Map to node area."
+        },
+        "tooltip": {
+          "items": {
+            "$ref": "#/$defs/FieldDef"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "label",
+        "color",
+        "size",
+        "tooltip"
+      ],
+      "title": "NetworkNodeEncoding",
+      "type": "object"
+    },
+    "Node": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "description": "A network node: `label`, `entity_type` and `trial_count` are its other keys.",
+      "properties": {
+        "citations": {
+          "description": "Evidence for at most `max_per_datum` trials; [] when disabled.",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "type": "array"
+        },
+        "citation_count": {
+          "description": "Distinct trials behind this datum; never null.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "An API URL that returns exactly those trials, or null when none can."
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "citations",
+        "citation_count",
+        "source_url",
+        "id"
+      ],
+      "title": "Node",
+      "type": "object"
+    },
+    "Note": {
+      "additionalProperties": false,
+      "description": "A data-quality or completeness caveat; `code` is one of the stable warning codes.",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "Note",
+      "type": "object"
+    },
+    "OtherReading": {
+      "additionalProperties": false,
+      "description": "The count if the words were read as another kind of entity.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "drug",
+            "condition",
+            "sponsor",
+            "country",
+            "term"
+          ],
+          "type": "string"
+        },
+        "trials_matched": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "trials_matched"
+      ],
+      "title": "OtherReading",
+      "type": "object"
+    },
+    "PlanFilters": {
+      "additionalProperties": false,
+      "properties": {
+        "phases": {
+          "description": "Empty unless the question restricts phase.",
+          "items": {
+            "enum": [
+              "EARLY_PHASE1",
+              "PHASE1",
+              "PHASE2",
+              "PHASE3",
+              "PHASE4",
+              "NA"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "statuses": {
+          "description": "Empty unless the question restricts status. 'recruiting' means RECRUITING only.",
+          "items": {
+            "enum": [
+              "NOT_YET_RECRUITING",
+              "RECRUITING",
+              "ENROLLING_BY_INVITATION",
+              "ACTIVE_NOT_RECRUITING",
+              "COMPLETED",
+              "SUSPENDED",
+              "TERMINATED",
+              "WITHDRAWN",
+              "AVAILABLE",
+              "NO_LONGER_AVAILABLE",
+              "TEMPORARILY_NOT_AVAILABLE",
+              "APPROVED_FOR_MARKETING",
+              "WITHHELD",
+              "UNKNOWN"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "study_types": {
+          "description": "Empty unless the question restricts study type.",
+          "items": {
+            "enum": [
+              "INTERVENTIONAL",
+              "OBSERVATIONAL",
+              "EXPANDED_ACCESS"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "sponsor_classes": {
+          "description": "Empty unless the question restricts the kind of sponsor, e.g. industry.",
+          "items": {
+            "enum": [
+              "NIH",
+              "FED",
+              "OTHER_GOV",
+              "INDIV",
+              "INDUSTRY",
+              "NETWORK",
+              "AMBIG",
+              "OTHER",
+              "UNKNOWN"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "intervention_types": {
+          "description": "Empty unless the question restricts the kind of intervention.",
+          "items": {
+            "enum": [
+              "BEHAVIORAL",
+              "BIOLOGICAL",
+              "COMBINATION_PRODUCT",
+              "DEVICE",
+              "DIAGNOSTIC_TEST",
+              "DIETARY_SUPPLEMENT",
+              "DRUG",
+              "GENETIC",
+              "PROCEDURE",
+              "RADIATION",
+              "OTHER"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "evidence": {
+          "description": "One item for every non-empty list above.",
+          "items": {
+            "$ref": "#/$defs/FilterEvidence"
+          },
+          "type": "array"
+        },
+        "date_field": {
+          "anyOf": [
+            {
+              "enum": [
+                "start_date",
+                "primary_completion_date",
+                "completion_date",
+                "first_posted_date"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Which date year_from and year_to apply to; null lets the service decide."
+        },
+        "year_from": {
+          "anyOf": [
+            {
+              "maximum": 2100,
+              "minimum": 1900,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "First year, inclusive; null if the question gives none."
+        },
+        "year_to": {
+          "anyOf": [
+            {
+              "maximum": 2100,
+              "minimum": 1900,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Last year, inclusive; null if the question gives none."
+        }
+      },
+      "required": [
+        "phases",
+        "statuses",
+        "study_types",
+        "sponsor_classes",
+        "intervention_types",
+        "evidence",
+        "date_field",
+        "year_from",
+        "year_to"
+      ],
+      "title": "PlanFilters",
+      "type": "object"
+    },
+    "PlannerInfo": {
+      "additionalProperties": false,
+      "description": "How the plan was produced.",
+      "properties": {
+        "mode": {
+          "enum": [
+            "llm",
+            "structured",
+            "supplied_plan"
+          ],
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The snapshot the model alias resolved to."
+        },
+        "reasoning_effort": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "prompt_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attempts": {
+          "type": "integer"
+        },
+        "is_repaired": {
+          "type": "boolean"
+        },
+        "is_fallback": {
+          "type": "boolean"
+        },
+        "usage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Usage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "mode",
+        "model",
+        "reasoning_effort",
+        "prompt_version",
+        "attempts",
+        "is_repaired",
+        "is_fallback",
+        "usage"
+      ],
+      "title": "PlannerInfo",
+      "type": "object"
+    },
+    "QuantitativeChannel": {
+      "additionalProperties": false,
+      "description": "A numeric channel.",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "type": {
+          "const": "quantitative",
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "A plural noun: trials, participants, months, sites."
+        },
+        "format": {
+          "anyOf": [
+            {
+              "enum": [
+                ",d",
+                ".1f",
+                ".1%"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The closed set of number formats of v1."
+        },
+        "scale": {
+          "description": "log only when every value is above zero.",
+          "enum": [
+            "linear",
+            "log"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "type",
+        "title",
+        "unit",
+        "format",
+        "scale"
+      ],
+      "title": "QuantitativeChannel",
+      "type": "object"
+    },
+    "QueryPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "interpretation": {
+          "description": "One sentence restating what will be counted and how it is grouped. No figures other than those in the question.",
+          "type": "string"
+        },
+        "entities": {
+          "description": "Named drugs, conditions, sponsors, countries or other terms.",
+          "items": {
+            "$ref": "#/$defs/Entity"
+          },
+          "maxItems": 12,
+          "type": "array"
+        },
+        "filters": {
+          "$ref": "#/$defs/PlanFilters"
+        },
+        "analysis": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Aggregate"
+            },
+            {
+              "$ref": "#/$defs/Total"
+            },
+            {
+              "$ref": "#/$defs/Relate"
+            },
+            {
+              "$ref": "#/$defs/Network"
+            },
+            {
+              "$ref": "#/$defs/TrialList"
+            },
+            {
+              "$ref": "#/$defs/Clarify"
+            },
+            {
+              "$ref": "#/$defs/Unsupported"
+            }
+          ]
+        },
+        "chart_preference": {
+          "anyOf": [
+            {
+              "enum": [
+                "bar_chart",
+                "time_series",
+                "histogram",
+                "scatter_plot",
+                "network_graph",
+                "table",
+                "metric"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Only when the user names a chart form; otherwise null."
+        }
+      },
+      "required": [
+        "interpretation",
+        "entities",
+        "filters",
+        "analysis",
+        "chart_preference"
+      ],
+      "title": "QueryPlan",
+      "type": "object"
+    },
+    "QueryRequest": {
+      "additionalProperties": false,
+      "description": "A question about clinical trials, with optional structured fields.\n\nStrings are trimmed and unknown keys are rejected. Rules across fields:\n\n1. Structured filter fields are ANDed with what the question says. Where they conflict, the field\n   wins: it replaces the planner's value for the same entity kind or filter family, and the\n   override is recorded in `meta.interpretation.adjustments`.\n2. A structured entity field whose value is one of the compared values does not become an extra\n   filter; the comparison is kept.\n3. Entity arrays mean \"all of\"; enum arrays mean \"any of\". A comparison is always explicit:\n   `compare` in the request or an \"A vs B\" in the question.\n4. `group_by`, `time_unit`, `top_n` and `chart_type` replace the planner's choices.\n5. Every structured field is shown to the model, so \"this drug\" in the question resolves to\n   `drug_name`.\n6. `meta.filters` in every response repeats the filter fields in canonical form (arrays for list\n   fields, every key present), so it can be sent back as request fields. For that reason every list\n   field accepts an empty array as \"no filter\", the same as null.",
+      "examples": [
+        {
+          "drug_name": "Pembrolizumab",
+          "query": "How has the number of trials for this drug changed over time?"
+        }
+      ],
+      "properties": {
+        "query": {
+          "description": "The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 3 to 1,000 characters, at least one letter and no other control characters.",
+          "maxLength": 1000,
+          "minLength": 3,
+          "type": "string"
+        },
+        "drug_name": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Drugs the trials must test, up to 5, each 1 to 200 characters; a single string is accepted. A trial must match all of them. Searched with the registry's intervention search, so brand and code names resolve (Keytruda and MK-3475 return the same trials as pembrolizumab)."
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Conditions the trials must study; same rules as `drug_name`, searched with the registry's condition search."
+        },
+        "sponsor": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Lead-sponsor names; same rules as `drug_name`, searched in the lead sponsor name."
+        },
+        "country": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Countries; same rules as `drug_name`. Each must resolve to one of the registry's country names (common aliases and ISO alpha-2 or alpha-3 codes are accepted), otherwise the request is refused with close matches. A trial must list a site in every named country."
+        },
+        "term": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 5,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Other search words, matched anywhere in the record; same rules as `drug_name`."
+        },
+        "trial_phase": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "EARLY_PHASE1",
+                  "PHASE1",
+                  "PHASE2",
+                  "PHASE3",
+                  "PHASE4",
+                  "NA"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Phases, any of. Lenient spellings are normalised before validation: 'Phase 2', 'phase2', '2' and 'II' become PHASE2, and 'Phase 2/3' becomes both PHASE2 and PHASE3; a single value is accepted. 'Lists this phase' semantics, as on the registry's website: PHASE2 also matches Phase 1/Phase 2 and Phase 2/Phase 3 trials."
+        },
+        "status": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "NOT_YET_RECRUITING",
+                  "RECRUITING",
+                  "ENROLLING_BY_INVITATION",
+                  "ACTIVE_NOT_RECRUITING",
+                  "COMPLETED",
+                  "SUSPENDED",
+                  "TERMINATED",
+                  "WITHDRAWN",
+                  "AVAILABLE",
+                  "NO_LONGER_AVAILABLE",
+                  "TEMPORARILY_NOT_AVAILABLE",
+                  "APPROVED_FOR_MARKETING",
+                  "WITHHELD",
+                  "UNKNOWN"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Study-level overall statuses, any of."
+        },
+        "study_type": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "INTERVENTIONAL",
+                  "OBSERVATIONAL",
+                  "EXPANDED_ACCESS"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Study types, any of."
+        },
+        "sponsor_class": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "NIH",
+                  "FED",
+                  "OTHER_GOV",
+                  "INDIV",
+                  "INDUSTRY",
+                  "NETWORK",
+                  "AMBIG",
+                  "OTHER",
+                  "UNKNOWN"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Classes of the lead sponsor, any of."
+        },
+        "intervention_type": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "BEHAVIORAL",
+                  "BIOLOGICAL",
+                  "COMBINATION_PRODUCT",
+                  "DEVICE",
+                  "DIAGNOSTIC_TEST",
+                  "DIETARY_SUPPLEMENT",
+                  "DRUG",
+                  "GENETIC",
+                  "PROCEDURE",
+                  "RADIATION",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Trials with at least one intervention of these types, any of."
+        },
+        "start_year": {
+          "anyOf": [
+            {
+              "maximum": 2100,
+              "minimum": 1900,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "First year, inclusive, of the date named by `date_field`. Not after `end_year`."
+        },
+        "end_year": {
+          "anyOf": [
+            {
+              "maximum": 2100,
+              "minimum": 1900,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Last year, inclusive, of the date named by `date_field`. Not before `start_year`."
+        },
+        "date_field": {
+          "anyOf": [
+            {
+              "enum": [
+                "start_date",
+                "primary_completion_date",
+                "completion_date",
+                "first_posted_date"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Which date the year bounds apply to. Null means the date on the time axis when the chart has one, otherwise the study start date."
+        },
+        "compare": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CompareSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Compare these as series. Replaces any comparison found in the question."
+        },
+        "group_by": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "phase",
+                  "overall_status",
+                  "study_type",
+                  "sponsor_class",
+                  "intervention_type",
+                  "sex",
+                  "age_group",
+                  "allocation",
+                  "masking",
+                  "primary_purpose",
+                  "has_results",
+                  "country",
+                  "sponsor",
+                  "drug",
+                  "condition",
+                  "start_date",
+                  "primary_completion_date",
+                  "completion_date",
+                  "first_posted_date",
+                  "enrollment"
+                ],
+                "type": "string"
+              },
+              "maxItems": 2,
+              "minItems": 1,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Analysis hint: the first key is the axis, the second the series. The second key must be one of the closed dimensions (phase, overall_status, study_type, sponsor_class, intervention_type, sex, age_group, allocation, masking, primary_purpose, has_results). Overrides what the planner chose. Required when `options.planner` is 'structured'."
+        },
+        "time_unit": {
+          "anyOf": [
+            {
+              "enum": [
+                "year",
+                "quarter",
+                "month"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Analysis hint: bucket width for a date dimension."
+        },
+        "top_n": {
+          "anyOf": [
+            {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "How many categories or rows to keep. Default 15, or 10 for the rows of a trial list. Network sizes are fixed in v1."
+        },
+        "chart_type": {
+          "anyOf": [
+            {
+              "enum": [
+                "bar_chart",
+                "time_series",
+                "histogram",
+                "scatter_plot",
+                "network_graph",
+                "table",
+                "metric"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "A preference. Honoured when valid for the data shape, otherwise ignored with a warning."
+        },
+        "options": {
+          "$ref": "#/$defs/RequestOptions"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "QueryRequest",
+      "type": "object"
+    },
+    "QueryResponse": {
+      "discriminator": {
+        "mapping": {
+          "clarification": "#/$defs/ClarificationResponse",
+          "no_data": "#/$defs/MessageResponse",
+          "unsupported": "#/$defs/MessageResponse",
+          "visualization": "#/$defs/VisualizationResponse"
+        },
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/VisualizationResponse"
+        },
+        {
+          "$ref": "#/$defs/ClarificationResponse"
+        },
+        {
+          "$ref": "#/$defs/MessageResponse"
+        }
+      ]
+    },
+    "Relate": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "relate",
+          "type": "string"
+        },
+        "x": {
+          "enum": [
+            "enrollment",
+            "duration_months",
+            "site_count"
+          ],
+          "type": "string"
+        },
+        "y": {
+          "enum": [
+            "enrollment",
+            "duration_months",
+            "site_count"
+          ],
+          "type": "string"
+        },
+        "color_by": {
+          "anyOf": [
+            {
+              "enum": [
+                "phase",
+                "overall_status",
+                "study_type",
+                "sponsor_class",
+                "intervention_type",
+                "sex",
+                "age_group",
+                "allocation",
+                "masking",
+                "primary_purpose",
+                "has_results"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "x",
+        "y",
+        "color_by"
+      ],
+      "title": "Relate",
+      "type": "object"
+    },
+    "RequestOptions": {
+      "additionalProperties": false,
+      "description": "Behaviour switches of one request; `meta.options` echoes the effective values.",
+      "properties": {
+        "planner": {
+          "default": "llm",
+          "description": "'llm': the model writes the plan (503 `planner_unavailable` when no model is configured). 'structured': never call a model; the plan is built from the request fields and `group_by` is required. The question text is then not interpreted, and the response says so. Ignored by `POST /v1/analyses`.",
+          "enum": [
+            "llm",
+            "structured"
+          ],
+          "type": "string"
+        },
+        "citations_per_datum": {
+          "default": 5,
+          "description": "Trials cited for each datum; 0 disables citations.",
+          "maximum": 20,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "drug_match": {
+          "default": "broad",
+          "description": "'broad': the registry's intervention search (names, other names, titles, descriptions, synonyms). 'name_only': intervention names and their synonyms only. The two give different counts, so the definition used is always stated in the response.",
+          "enum": [
+            "broad",
+            "name_only"
+          ],
+          "type": "string"
+        },
+        "include_trace": {
+          "default": true,
+          "description": "Include the step list in `meta.debug.trace`.",
+          "type": "boolean"
+        },
+        "use_cache": {
+          "default": true,
+          "description": "false bypasses the plan cache and the response cache for this request; the registry-call cache stays.",
+          "type": "boolean"
+        }
+      },
+      "title": "RequestOptions",
+      "type": "object"
+    },
+    "ScatterPlot": {
+      "additionalProperties": false,
+      "description": "One row per trial; each row cites itself with the fields its coordinates came from.",
+      "properties": {
+        "type": {
+          "const": "scatter_plot",
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "encoding": {
+          "$ref": "#/$defs/ScatterPlotEncoding"
+        },
+        "data": {
+          "items": {
+            "$ref": "#/$defs/Datum"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "subtitle",
+        "encoding",
+        "data"
+      ],
+      "title": "ScatterPlot",
+      "type": "object"
+    },
+    "ScatterPlotEncoding": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "$ref": "#/$defs/QuantitativeChannel"
+        },
+        "y": {
+          "$ref": "#/$defs/QuantitativeChannel"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CategoryChannel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "size": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuantitativeChannel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "label": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FieldDef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tooltip": {
+          "items": {
+            "$ref": "#/$defs/FieldDef"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "series",
+        "size",
+        "label",
+        "tooltip"
+      ],
+      "title": "ScatterPlotEncoding",
+      "type": "object"
+    },
+    "ScopeEvidence": {
+      "additionalProperties": false,
+      "description": "Why a trial is in scope: the first fetched field that contains an entity's words.",
+      "properties": {
+        "entity_kind": {
+          "enum": [
+            "drug",
+            "condition",
+            "sponsor",
+            "country",
+            "term"
+          ],
+          "type": "string"
+        },
+        "entity_text": {
+          "description": "The user's words.",
+          "type": "string"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Path of the first fetched field that contains them."
+        },
+        "excerpt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The value at that path; both null means matched by the registry's own search."
+        }
+      },
+      "required": [
+        "entity_kind",
+        "entity_text",
+        "field",
+        "excerpt"
+      ],
+      "title": "ScopeEvidence",
+      "type": "object"
+    },
+    "SeriesCounts": {
+      "additionalProperties": false,
+      "description": "`trials_matched = trials_analyzed + the sum of trials_excluded counts` always holds.",
+      "properties": {
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null for a single scope."
+        },
+        "trials_matched": {
+          "type": "integer"
+        },
+        "trials_analyzed": {
+          "type": "integer"
+        },
+        "trials_excluded": {
+          "items": {
+            "$ref": "#/$defs/ExclusionCount"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "label",
+        "trials_matched",
+        "trials_analyzed",
+        "trials_excluded"
+      ],
+      "title": "SeriesCounts",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "description": "The registry the data came from, and every request made to it.",
+      "properties": {
+        "name": {
+          "const": "ClinicalTrials.gov",
+          "default": "ClinicalTrials.gov",
+          "type": "string"
+        },
+        "url": {
+          "const": "https://clinicaltrials.gov",
+          "default": "https://clinicaltrials.gov",
+          "type": "string"
+        },
+        "api_version": {
+          "description": "From `GET /version`, verbatim.",
+          "type": "string"
+        },
+        "data_timestamp": {
+          "description": "From `GET /version`, verbatim; it has no offset.",
+          "type": "string"
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "study_url_template": {
+          "const": "https://clinicaltrials.gov/study/{nct_id}",
+          "default": "https://clinicaltrials.gov/study/{nct_id}",
+          "type": "string"
+        },
+        "record_url_template": {
+          "const": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
+          "default": "https://clinicaltrials.gov/api/v2/studies/{nct_id}",
+          "type": "string"
+        },
+        "fhir_url_template": {
+          "const": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
+          "default": "https://clinicaltrials.gov/api/v2/studies/{nct_id}?format=fhir.json",
+          "type": "string"
+        },
+        "requests": {
+          "items": {
+            "$ref": "#/$defs/UpstreamRequest"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "url",
+        "api_version",
+        "data_timestamp",
+        "retrieved_at",
+        "study_url_template",
+        "record_url_template",
+        "fhir_url_template",
+        "requests"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "SponsorCandidate": {
+      "additionalProperties": false,
+      "description": "A distinct lead-sponsor name in a 200-row sample, with its share of the sample.",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "sample_share": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "sample_share"
+      ],
+      "title": "SponsorCandidate",
+      "type": "object"
+    },
+    "StrategyStep": {
+      "additionalProperties": false,
+      "description": "How the trials of one series were fetched.",
+      "properties": {
+        "series": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "enum": [
+            "sorted_page",
+            "walk",
+            "count_fan_out",
+            "sample_then_recount",
+            "capped_walk",
+            "none"
+          ],
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "upstream_requests": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "series",
+        "name",
+        "reason",
+        "upstream_requests"
+      ],
+      "title": "StrategyStep",
+      "type": "object"
+    },
+    "Table": {
+      "additionalProperties": false,
+      "description": "One row per record; `href_field` names a row key holding a URL.",
+      "properties": {
+        "type": {
+          "const": "table",
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "encoding": {
+          "$ref": "#/$defs/TableEncoding"
+        },
+        "data": {
+          "items": {
+            "$ref": "#/$defs/Datum"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "subtitle",
+        "encoding",
+        "data"
+      ],
+      "title": "Table",
+      "type": "object"
+    },
+    "TableEncoding": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "description": "In display order.",
+          "items": {
+            "$ref": "#/$defs/FieldDef"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "columns"
+      ],
+      "title": "TableEncoding",
+      "type": "object"
+    },
+    "TemporalChannel": {
+      "additionalProperties": false,
+      "description": "A time axis. Labels are YYYY, YYYY-Qn or YYYY-MM, ascending with no gaps; never parse them as dates.",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "type": {
+          "const": "temporal",
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "time_unit": {
+          "enum": [
+            "year",
+            "quarter",
+            "month"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "type",
+        "title",
+        "time_unit"
+      ],
+      "title": "TemporalChannel",
+      "type": "object"
+    },
+    "TimeSeries": {
+      "additionalProperties": false,
+      "description": "One row per (period, series), ascending and zero-filled.",
+      "properties": {
+        "type": {
+          "const": "time_series",
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mark": {
+          "enum": [
+            "line",
+            "bar",
+            "area"
+          ],
+          "type": "string"
+        },
+        "stack": {
+          "description": "Always `none` for lines.",
+          "enum": [
+            "none",
+            "stacked"
+          ],
+          "type": "string"
+        },
+        "encoding": {
+          "$ref": "#/$defs/TimeSeriesEncoding"
+        },
+        "data": {
+          "items": {
+            "$ref": "#/$defs/Datum"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "subtitle",
+        "mark",
+        "stack",
+        "encoding",
+        "data"
+      ],
+      "title": "TimeSeries",
+      "type": "object"
+    },
+    "TimeSeriesEncoding": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "$ref": "#/$defs/TemporalChannel"
+        },
+        "y": {
+          "$ref": "#/$defs/QuantitativeChannel"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CategoryChannel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tooltip": {
+          "items": {
+            "$ref": "#/$defs/FieldDef"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "series",
+        "tooltip"
+      ],
+      "title": "TimeSeriesEncoding",
+      "type": "object"
+    },
+    "Timing": {
+      "additionalProperties": false,
+      "properties": {
+        "total_ms": {
+          "type": "integer"
+        },
+        "plan_ms": {
+          "type": "integer"
+        },
+        "resolve_ms": {
+          "type": "integer"
+        },
+        "fetch_ms": {
+          "type": "integer"
+        },
+        "build_ms": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "total_ms",
+        "plan_ms",
+        "resolve_ms",
+        "fetch_ms",
+        "build_ms"
+      ],
+      "title": "Timing",
+      "type": "object"
+    },
+    "Total": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "total",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "Total",
+      "type": "object"
+    },
+    "TraceStep": {
+      "additionalProperties": false,
+      "description": "One step of the run. `detail` is outside the stability promise.",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "type": {
+          "enum": [
+            "plan",
+            "validate",
+            "repair",
+            "resolve_entity",
+            "probe",
+            "strategy",
+            "execute",
+            "build"
+          ],
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "duration_ms": {
+          "type": "integer"
+        },
+        "request_indexes": {
+          "description": "Indexes into `meta.source.requests`.",
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "detail": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "required": [
+        "index",
+        "type",
+        "summary",
+        "duration_ms",
+        "request_indexes",
+        "detail"
+      ],
+      "title": "TraceStep",
+      "type": "object"
+    },
+    "TrialList": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "trial_list",
+          "type": "string"
+        },
+        "sort_by": {
+          "enum": [
+            "enrollment",
+            "start_date",
+            "completion_date",
+            "first_posted_date"
+          ],
+          "type": "string"
+        },
+        "order": {
+          "enum": [
+            "desc",
+            "asc"
+          ],
+          "type": "string"
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "maximum": 500,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Only when the user gives a number; otherwise null."
+        }
+      },
+      "required": [
+        "kind",
+        "sort_by",
+        "order",
+        "limit"
+      ],
+      "title": "TrialList",
+      "type": "object"
+    },
+    "TrialReference": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "description": "The brief title, verbatim.",
+          "type": "string"
+        },
+        "url": {
+          "description": "https://clinicaltrials.gov/study/{nct_id}",
+          "type": "string"
+        },
+        "scope_evidence": {
+          "items": {
+            "$ref": "#/$defs/ScopeEvidence"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "url",
+        "scope_evidence"
+      ],
+      "title": "TrialReference",
+      "type": "object"
+    },
+    "Truncation": {
+      "additionalProperties": false,
+      "properties": {
+        "is_truncated": {
+          "type": "boolean"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/TruncationItem"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "is_truncated",
+        "items"
+      ],
+      "title": "Truncation",
+      "type": "object"
+    },
+    "TruncationItem": {
+      "additionalProperties": false,
+      "properties": {
+        "scope": {
+          "enum": [
+            "trials",
+            "categories",
+            "series",
+            "periods",
+            "nodes",
+            "edges",
+            "points",
+            "rows"
+          ],
+          "type": "string"
+        },
+        "shown": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        },
+        "rule": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "scope",
+        "shown",
+        "total",
+        "rule"
+      ],
+      "title": "TruncationItem",
+      "type": "object"
+    },
+    "Unsupported": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "unsupported",
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "not_about_clinical_trials",
+            "needs_data_not_in_registry",
+            "single_trial_lookup",
+            "analysis_not_supported",
+            "other"
+          ],
+          "type": "string"
+        },
+        "reason": {
+          "description": "One sentence. No figures other than those in the question.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "category",
+        "reason"
+      ],
+      "title": "Unsupported",
+      "type": "object"
+    },
+    "UpstreamRequest": {
+      "additionalProperties": false,
+      "description": "One request to ClinicalTrials.gov, in the order issued.",
+      "properties": {
+        "method": {
+          "const": "GET",
+          "default": "GET",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "status": {
+          "type": "integer"
+        },
+        "duration_ms": {
+          "type": "integer"
+        },
+        "total_count": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "records_returned": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "is_cached": {
+          "type": "boolean"
+        },
+        "origin": {
+          "enum": [
+            "resolution",
+            "probe",
+            "execution"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "url",
+        "status",
+        "duration_ms",
+        "total_count",
+        "records_returned",
+        "is_cached",
+        "origin"
+      ],
+      "title": "UpstreamRequest",
+      "type": "object"
+    },
+    "Usage": {
+      "additionalProperties": false,
+      "description": "Token counts of one model call.",
+      "properties": {
+        "input_tokens": {
+          "type": "integer"
+        },
+        "output_tokens": {
+          "type": "integer"
+        },
+        "reasoning_tokens": {
+          "type": "integer"
+        },
+        "cached_tokens": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input_tokens",
+        "output_tokens",
+        "reasoning_tokens",
+        "cached_tokens"
+      ],
+      "title": "Usage",
+      "type": "object"
+    },
+    "Visualization": {
+      "discriminator": {
+        "mapping": {
+          "bar_chart": "#/$defs/BarChart",
+          "histogram": "#/$defs/Histogram",
+          "metric": "#/$defs/Metric",
+          "network_graph": "#/$defs/NetworkGraph",
+          "scatter_plot": "#/$defs/ScatterPlot",
+          "table": "#/$defs/Table",
+          "time_series": "#/$defs/TimeSeries"
+        },
+        "propertyName": "type"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/BarChart"
+        },
+        {
+          "$ref": "#/$defs/TimeSeries"
+        },
+        {
+          "$ref": "#/$defs/Histogram"
+        },
+        {
+          "$ref": "#/$defs/ScatterPlot"
+        },
+        {
+          "$ref": "#/$defs/NetworkGraph"
+        },
+        {
+          "$ref": "#/$defs/Table"
+        },
+        {
+          "$ref": "#/$defs/Metric"
+        }
+      ]
+    },
+    "VisualizationResponse": {
+      "additionalProperties": false,
+      "description": "An answer drawn as a chart, a number or a table.",
+      "properties": {
+        "spec_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "type": "string"
+        },
+        "kind": {
+          "const": "visualization",
+          "default": "visualization",
+          "type": "string"
+        },
+        "message": {
+          "description": "A one-sentence headline computed from the data.",
+          "type": "string"
+        },
+        "visualization": {
+          "$ref": "#/$defs/Visualization"
+        },
+        "clarification": {
+          "default": null,
+          "type": "null"
+        },
+        "references": {
+          "additionalProperties": {
+            "$ref": "#/$defs/TrialReference"
+          },
+          "description": "Exactly the trials cited in the data, keyed by NCT ID.",
+          "type": "object"
+        },
+        "meta": {
+          "$ref": "#/$defs/Meta"
+        }
+      },
+      "required": [
+        "spec_version",
+        "kind",
+        "message",
+        "visualization",
+        "clarification",
+        "references",
+        "meta"
+      ],
+      "title": "VisualizationResponse",
+      "type": "object"
+    }
+  },
+  "description": "Every top-level type of the contract, one field each.",
+  "properties": {
+    "query_request": {
+      "$ref": "#/$defs/QueryRequest"
+    },
+    "analysis_request": {
+      "$ref": "#/$defs/AnalysisRequest"
+    },
+    "query_plan": {
+      "$ref": "#/$defs/QueryPlan"
+    },
+    "query_response": {
+      "$ref": "#/$defs/QueryResponse"
+    },
+    "error_response": {
+      "$ref": "#/$defs/ErrorResponse"
+    }
+  },
+  "required": [
+    "query_request",
+    "analysis_request",
+    "query_plan",
+    "query_response",
+    "error_response"
+  ],
+  "title": "Contract",
+  "type": "object"
+}
