@@ -201,11 +201,11 @@ class QueryRequest(BaseModel):
     )
 
     query: str = Field(
-        min_length=3,
+        min_length=1,
         max_length=1000,
         description="The natural-language question. Tabs and line breaks become spaces and runs of "
         "whitespace collapse before validation, because a pasted question can carry line breaks. "
-        "Then 3 to 1,000 characters, at least one letter and no other control characters.",
+        "Then 1 to 1,000 characters, at least one letter and no other control characters.",
     )
     drug_name: _Words | None = Field(
         None,

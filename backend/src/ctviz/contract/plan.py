@@ -307,7 +307,13 @@ class Unsupported(PlanModel):
     reason: str = Field(description="One sentence. No figures other than those in the question.")
 
 
-Analysis = Aggregate | Total | Relate | Network | TrialList | Clarify | Unsupported
+# The message is conversation, not a question about trials; code writes every word of the reply.
+class Converse(PlanModel):
+    kind: Literal["converse"]
+    topic: Literal["greeting", "thanks", "capabilities", "small_talk"]
+
+
+Analysis = Aggregate | Total | Relate | Network | TrialList | Clarify | Unsupported | Converse
 
 
 class QueryPlan(PlanModel):

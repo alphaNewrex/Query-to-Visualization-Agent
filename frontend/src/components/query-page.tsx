@@ -203,7 +203,7 @@ export function QueryPage() {
       <header className="sticky top-0 z-20 border-b bg-background">
         <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
           <div className="min-w-0">
-            <h1 className="truncate text-base font-semibold tracking-tight sm:text-lg">ClinicalTrials.gov Query-to-Visualization Agent</h1>
+            <h1 className="truncate text-base font-semibold tracking-tight sm:text-lg">CTViz Agent</h1>
             <p className="hidden text-xs text-muted-foreground sm:block">Ask a question about clinical trials and get a chart with its sources.</p>
           </div>
           <Button variant="outline" size="sm" onClick={newConversation} disabled={turns.length === 0 && values.query === ""} className="shrink-0">

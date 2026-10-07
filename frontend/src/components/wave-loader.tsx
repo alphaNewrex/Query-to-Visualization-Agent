@@ -23,7 +23,7 @@ const WAVES_MAX = 10;
  * of the Durves dot patterns (matrix, dot radius, amplitude, waves). The wave count rolls from -10 to 10
  * and back, which makes the pattern shimmer. It takes the current text colour.
  */
-export function WaveLoader({ size = 16, matrix, period = 2.4, className, label = "Working", decorative = false }: WaveLoaderProps) {
+export function WaveLoader({ size = 16, matrix, period = 6, className, label = "Working", decorative = false }: WaveLoaderProps) {
   const dots = matrix ?? (size >= 16 ? 4 : 3);
   const cell = size / dots;
   const maxRadius = cell * 0.46;

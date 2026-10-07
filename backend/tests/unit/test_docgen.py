@@ -83,7 +83,7 @@ def test_properties_carry_no_title_of_their_own(combined: dict[str, Any]) -> Non
 def test_the_request_documents_its_bounds(combined: dict[str, Any]) -> None:
     properties = combined["$defs"]["QueryRequest"]["properties"]
 
-    assert (properties["query"]["minLength"], properties["query"]["maxLength"]) == (3, 1000)
+    assert (properties["query"]["minLength"], properties["query"]["maxLength"]) == (1, 1000)
     assert properties["top_n"]["anyOf"][0]["maximum"] == 50
 
 

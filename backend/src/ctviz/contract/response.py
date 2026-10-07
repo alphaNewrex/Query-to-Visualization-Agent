@@ -698,11 +698,12 @@ class Outcome:
     `reason` is the clarification reason, the unsupported category or the no-data reason, by `kind`.
     """
 
-    kind: Literal["clarification", "unsupported", "no_data"]
+    kind: Literal["clarification", "unsupported", "no_data", "conversation"]
     reason: str
     message: str
     clarification: Clarification | None = None
     warnings: tuple[Note, ...] = ()
+    followups: tuple[LabeledRequest, ...] = ()  # ready-made questions a conversational reply offers
 
 
 class VisualizationResponse(Model):
@@ -732,10 +733,11 @@ class ClarificationResponse(Model):
 
 
 class MessageResponse(Model):
-    """Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run."""
+    """Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run,
+    `conversation` for a greeting, thanks or a question about the service itself (no registry call)."""
 
     spec_version: Literal["1.0"] = "1.0"
-    kind: Literal["no_data", "unsupported"]
+    kind: Literal["no_data", "unsupported", "conversation"]
     message: str
     visualization: None = None
     clarification: None = None

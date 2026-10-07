@@ -1360,6 +1360,32 @@
         "title": "Conversation",
         "description": "How the answer relates to the previous turn, written by code from the two plans."
       },
+      "Converse": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "converse",
+            "title": "Kind"
+          },
+          "topic": {
+            "type": "string",
+            "enum": [
+              "greeting",
+              "thanks",
+              "capabilities",
+              "small_talk"
+            ],
+            "title": "Topic"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "topic"
+        ],
+        "title": "Converse"
+      },
       "Counts": {
         "properties": {
           "data_points": {
@@ -2277,7 +2303,8 @@
             "type": "string",
             "enum": [
               "no_data",
-              "unsupported"
+              "unsupported",
+              "conversation"
             ],
             "title": "Kind"
           },
@@ -2316,7 +2343,7 @@
           "meta"
         ],
         "title": "MessageResponse",
-        "description": "Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run."
+        "description": "Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run,\n`conversation` for a greeting, thanks or a question about the service itself (no registry call)."
       },
       "Meta": {
         "properties": {
@@ -3429,6 +3456,9 @@
               },
               {
                 "$ref": "#/components/schemas/Unsupported"
+              },
+              {
+                "$ref": "#/components/schemas/Converse"
               }
             ],
             "title": "Analysis"
@@ -3481,9 +3511,9 @@
           "query": {
             "type": "string",
             "maxLength": 1000,
-            "minLength": 3,
+            "minLength": 1,
             "title": "Query",
-            "description": "The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 3 to 1,000 characters, at least one letter and no other control characters."
+            "description": "The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 1 to 1,000 characters, at least one letter and no other control characters."
           },
           "drug_name": {
             "anyOf": [
@@ -4059,6 +4089,7 @@
           "propertyName": "kind",
           "mapping": {
             "clarification": "#/components/schemas/ClarificationResponse",
+            "conversation": "#/components/schemas/MessageResponse",
             "no_data": "#/components/schemas/MessageResponse",
             "unsupported": "#/components/schemas/MessageResponse",
             "visualization": "#/components/schemas/VisualizationResponse"

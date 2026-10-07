@@ -171,6 +171,30 @@
       "title": "Clarify",
       "type": "object"
     },
+    "Converse": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "converse",
+          "type": "string"
+        },
+        "topic": {
+          "enum": [
+            "greeting",
+            "thanks",
+            "capabilities",
+            "small_talk"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "topic"
+      ],
+      "title": "Converse",
+      "type": "object"
+    },
     "Entity": {
       "additionalProperties": false,
       "properties": {
@@ -792,6 +816,9 @@
         },
         {
           "$ref": "#/$defs/Unsupported"
+        },
+        {
+          "$ref": "#/$defs/Converse"
         }
       ]
     },

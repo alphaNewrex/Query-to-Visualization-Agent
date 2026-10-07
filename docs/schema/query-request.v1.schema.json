@@ -202,6 +202,30 @@
       "title": "CompareSpec",
       "type": "object"
     },
+    "Converse": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "converse",
+          "type": "string"
+        },
+        "topic": {
+          "enum": [
+            "greeting",
+            "thanks",
+            "capabilities",
+            "small_talk"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "topic"
+      ],
+      "title": "Converse",
+      "type": "object"
+    },
     "Entity": {
       "additionalProperties": false,
       "properties": {
@@ -799,6 +823,9 @@
             },
             {
               "$ref": "#/$defs/Unsupported"
+            },
+            {
+              "$ref": "#/$defs/Converse"
             }
           ]
         },
@@ -1077,9 +1104,9 @@
   ],
   "properties": {
     "query": {
-      "description": "The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 3 to 1,000 characters, at least one letter and no other control characters.",
+      "description": "The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 1 to 1,000 characters, at least one letter and no other control characters.",
       "maxLength": 1000,
-      "minLength": 3,
+      "minLength": 1,
       "type": "string"
     },
     "drug_name": {

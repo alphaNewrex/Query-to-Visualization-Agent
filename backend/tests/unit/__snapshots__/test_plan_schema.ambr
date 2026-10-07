@@ -183,6 +183,32 @@
         'title': 'Clarify',
         'type': 'object',
       }),
+      'Converse': dict({
+        'additionalProperties': False,
+        'properties': dict({
+          'kind': dict({
+            'const': 'converse',
+            'title': 'Kind',
+            'type': 'string',
+          }),
+          'topic': dict({
+            'enum': list([
+              'greeting',
+              'thanks',
+              'capabilities',
+              'small_talk',
+            ]),
+            'title': 'Topic',
+            'type': 'string',
+          }),
+        }),
+        'required': list([
+          'kind',
+          'topic',
+        ]),
+        'title': 'Converse',
+        'type': 'object',
+      }),
       'Entity': dict({
         'additionalProperties': False,
         'properties': dict({
@@ -829,6 +855,9 @@
           }),
           dict({
             '$ref': '#/$defs/Unsupported',
+          }),
+          dict({
+            '$ref': '#/$defs/Converse',
           }),
         ]),
         'title': 'Analysis',

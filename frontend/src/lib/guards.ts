@@ -1,4 +1,4 @@
-import type { ErrorResponse, QueryResponse, Viz, VizType } from "./types";
+import type { ErrorResponse, MessageResponse, QueryResponse, Viz, VizType } from "./types";
 
 /** The contract's major version this client renders (PLAN 5.9). Minor versions only add keys. */
 export const SUPPORTED_SPEC_MAJOR = 1;
@@ -64,7 +64,8 @@ export function isKnownVisualization(value: unknown): value is Viz {
 export type Outcome =
   | { tag: "chart"; response: Extract<QueryResponse, { kind: "visualization" }>; visualization: Viz }
   | { tag: "clarification"; response: Extract<QueryResponse, { kind: "clarification" }> }
-  | { tag: "message"; response: Extract<QueryResponse, { kind: "no_data" | "unsupported" }> }
+  | { tag: "message"; response: MessageResponse }
+  | { tag: "conversation"; response: MessageResponse }
   | { tag: "fallback"; response: QueryResponse };
 
 export function classify(response: QueryResponse): Outcome {
@@ -81,6 +82,8 @@ export function classify(response: QueryResponse): Outcome {
     case "no_data":
     case "unsupported":
       return { tag: "message", response };
+    case "conversation":
+      return { tag: "conversation", response };
     default:
       return { tag: "fallback", response };
   }

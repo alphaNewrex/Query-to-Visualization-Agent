@@ -310,7 +310,7 @@ Strings are trimmed and unknown keys are rejected. Rules across fields:
 
 | Field | Type | Required | Default | Constraints | Description |
 | --- | --- | --- | --- | --- | --- |
-| `query` | string | yes |  | 3 to 1,000 characters | The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 3 to 1,000 characters, at least one letter and no other control characters. |
+| `query` | string | yes |  | 1 to 1,000 characters | The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 1 to 1,000 characters, at least one letter and no other control characters. |
 | `drug_name` | string[] \| null | no | `null` | at most 5 items; each 1 to 200 characters | Drugs the trials must test, up to 5, each 1 to 200 characters; a single string is accepted. A trial must match all of them. Searched with the registry's intervention search, so brand and code names resolve (Keytruda and MK-3475 return the same trials as pembrolizumab). |
 | `condition` | string[] \| null | no | `null` | at most 5 items; each 1 to 200 characters | Conditions the trials must study; same rules as `drug_name`, searched with the registry's condition search. |
 | `sponsor` | string[] \| null | no | `null` | at most 5 items; each 1 to 200 characters | Lead-sponsor names; same rules as `drug_name`, searched in the lead sponsor name. |

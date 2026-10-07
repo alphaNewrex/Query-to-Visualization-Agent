@@ -321,6 +321,19 @@ export const unsupported: QueryResponse = {
   meta: makeMeta("Which pembrolizumab trial is most likely to succeed?", { source: null }),
 };
 
+export const conversation: QueryResponse = {
+  spec_version: "1.0",
+  kind: "conversation",
+  message: "Hello! This service answers questions about clinical trials registered on ClinicalTrials.gov with a chart, a number or a table.",
+  visualization: null,
+  clarification: null,
+  references: {},
+  meta: makeMeta("Hi", {
+    source: null,
+    suggested_followups: [{ label: "How many recruiting trials are there for lung cancer?", request: asRequest("How many recruiting trials are there for lung cancer?") }],
+  }),
+};
+
 /** Every chart fixture by name, in the order the registry lists the types. */
 export const chartFixtures: Record<string, QueryResponse> = {
   time_series: timeSeries,
@@ -334,4 +347,4 @@ export const chartFixtures: Record<string, QueryResponse> = {
   scatter_plot: scatter,
 };
 
-export const allFixtures: Record<string, QueryResponse> = { ...chartFixtures, clarification, no_data: noData, unsupported };
+export const allFixtures: Record<string, QueryResponse> = { ...chartFixtures, clarification, no_data: noData, unsupported, conversation };

@@ -960,6 +960,30 @@
       "title": "Conversation",
       "type": "object"
     },
+    "Converse": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "converse",
+          "type": "string"
+        },
+        "topic": {
+          "enum": [
+            "greeting",
+            "thanks",
+            "capabilities",
+            "small_talk"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "topic"
+      ],
+      "title": "Converse",
+      "type": "object"
+    },
     "Counts": {
       "additionalProperties": false,
       "properties": {
@@ -1794,7 +1818,7 @@
     },
     "MessageResponse": {
       "additionalProperties": false,
-      "description": "Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run.",
+      "description": "Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run,\n`conversation` for a greeting, thanks or a question about the service itself (no registry call).",
       "properties": {
         "spec_version": {
           "const": "1.0",
@@ -1804,7 +1828,8 @@
         "kind": {
           "enum": [
             "no_data",
-            "unsupported"
+            "unsupported",
+            "conversation"
           ],
           "type": "string"
         },
@@ -2845,6 +2870,9 @@
             },
             {
               "$ref": "#/$defs/Unsupported"
+            },
+            {
+              "$ref": "#/$defs/Converse"
             }
           ]
         },
@@ -2899,9 +2927,9 @@
       ],
       "properties": {
         "query": {
-          "description": "The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 3 to 1,000 characters, at least one letter and no other control characters.",
+          "description": "The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 1 to 1,000 characters, at least one letter and no other control characters.",
           "maxLength": 1000,
-          "minLength": 3,
+          "minLength": 1,
           "type": "string"
         },
         "drug_name": {
@@ -4531,6 +4559,7 @@
   "discriminator": {
     "mapping": {
       "clarification": "#/$defs/ClarificationResponse",
+      "conversation": "#/$defs/MessageResponse",
       "no_data": "#/$defs/MessageResponse",
       "unsupported": "#/$defs/MessageResponse",
       "visualization": "#/$defs/VisualizationResponse"

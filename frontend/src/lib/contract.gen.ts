@@ -40,7 +40,7 @@ export interface Contract {
  */
 export interface QueryRequest {
   /**
-   * The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 3 to 1,000 characters, at least one letter and no other control characters.
+   * The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 1 to 1,000 characters, at least one letter and no other control characters.
    */
   query: string;
   /**
@@ -443,7 +443,7 @@ export interface QueryPlan {
     | [Entity, Entity, Entity, Entity, Entity, Entity, Entity, Entity, Entity, Entity, Entity]
     | [Entity, Entity, Entity, Entity, Entity, Entity, Entity, Entity, Entity, Entity, Entity, Entity];
   filters: PlanFilters;
-  analysis: Aggregate | Total | Relate | Network | TrialList | Clarify | Unsupported;
+  analysis: Aggregate | Total | Relate | Network | TrialList | Clarify | Unsupported | Converse;
   /**
    * Only when the user names a chart form; otherwise null.
    */
@@ -750,6 +750,10 @@ export interface Unsupported {
    * One sentence. No figures other than those in the question.
    */
   reason: string;
+}
+export interface Converse {
+  kind: "converse";
+  topic: "greeting" | "thanks" | "capabilities" | "small_talk";
 }
 /**
  * Behaviour switches of one request; `meta.options` echoes the effective values.
@@ -1609,11 +1613,12 @@ export interface Clarification {
   options: LabeledRequest[];
 }
 /**
- * Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run.
+ * Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run,
+ * `conversation` for a greeting, thanks or a question about the service itself (no registry call).
  */
 export interface MessageResponse {
   spec_version: "1.0";
-  kind: "no_data" | "unsupported";
+  kind: "no_data" | "unsupported" | "conversation";
   message: string;
   visualization: null;
   clarification: null;

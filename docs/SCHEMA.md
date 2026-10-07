@@ -11,7 +11,7 @@ lists every key, so it has no Required column.
 ## Contents
 
 - [Requests](#requests): [`QueryRequest`](#queryrequest), [`RequestOptions`](#requestoptions), [`CompareSpec`](#comparespec), [`ExcludeSpec`](#excludespec), [`AnalysisRequest`](#analysisrequest)
-- [Query plan](#query-plan): [`QueryPlan`](#queryplan), [`Entity`](#entity), [`PlanFilters`](#planfilters), [`FilterEvidence`](#filterevidence), [`Aggregate`](#aggregate), [`Total`](#total), [`Relate`](#relate), [`Network`](#network), [`TrialList`](#triallist), [`Clarify`](#clarify), [`Unsupported`](#unsupported)
+- [Query plan](#query-plan): [`QueryPlan`](#queryplan), [`Entity`](#entity), [`PlanFilters`](#planfilters), [`FilterEvidence`](#filterevidence), [`Aggregate`](#aggregate), [`Total`](#total), [`Relate`](#relate), [`Network`](#network), [`TrialList`](#triallist), [`Clarify`](#clarify), [`Unsupported`](#unsupported), [`Converse`](#converse)
 - [Response envelope and non-chart outcomes](#response-envelope-and-non-chart-outcomes): [`QueryResponse`](#queryresponse), [`VisualizationResponse`](#visualizationresponse), [`ClarificationResponse`](#clarificationresponse), [`MessageResponse`](#messageresponse), [`Clarification`](#clarification), [`LabeledRequest`](#labeledrequest)
 - [Visualization types](#visualization-types): [`Visualization`](#visualization), [`BarChart`](#barchart), [`BarChartEncoding`](#barchartencoding), [`TimeSeries`](#timeseries), [`TimeSeriesEncoding`](#timeseriesencoding), [`Histogram`](#histogram), [`HistogramEncoding`](#histogramencoding), [`ScatterPlot`](#scatterplot), [`ScatterPlotEncoding`](#scatterplotencoding), [`NetworkGraph`](#networkgraph), [`NetworkEncoding`](#networkencoding), [`NetworkNodeEncoding`](#networknodeencoding), [`NetworkEdgeEncoding`](#networkedgeencoding), [`NetworkData`](#networkdata), [`Table`](#table), [`TableEncoding`](#tableencoding), [`Metric`](#metric), [`MetricEncoding`](#metricencoding)
 - [Channels](#channels): [`CategoryChannel`](#categorychannel), [`ChannelSort`](#channelsort), [`TemporalChannel`](#temporalchannel), [`QuantitativeChannel`](#quantitativechannel), [`FieldDef`](#fielddef), [`FieldRef`](#fieldref)
@@ -50,7 +50,7 @@ Strings are trimmed and unknown keys are rejected. Rules across fields:
 
 | Field | Type | Required | Default | Constraints | Description |
 | --- | --- | --- | --- | --- | --- |
-| `query` | string | yes |  | 3 to 1,000 characters | The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 3 to 1,000 characters, at least one letter and no other control characters. |
+| `query` | string | yes |  | 1 to 1,000 characters | The natural-language question. Tabs and line breaks become spaces and runs of whitespace collapse before validation, because a pasted question can carry line breaks. Then 1 to 1,000 characters, at least one letter and no other control characters. |
 | `drug_name` | string[] \| null | no | `null` | at most 5 items; each 1 to 200 characters | Drugs the trials must test, up to 5, each 1 to 200 characters; a single string is accepted. A trial must match all of them. Searched with the registry's intervention search, so brand and code names resolve (Keytruda and MK-3475 return the same trials as pembrolizumab). |
 | `condition` | string[] \| null | no | `null` | at most 5 items; each 1 to 200 characters | Conditions the trials must study; same rules as `drug_name`, searched with the registry's condition search. |
 | `sponsor` | string[] \| null | no | `null` | at most 5 items; each 1 to 200 characters | Lead-sponsor names; same rules as `drug_name`, searched in the lead sponsor name. |
@@ -138,7 +138,7 @@ for the same data timestamp.
 
 ## Query plan
 
-The plan is what the planner model writes, what `POST /v1/analyses` accepts and what every response echoes in `meta.plan`. It is a closed vocabulary: no field can hold a data value, a row or an NCT ID. Every field is required, because the schema is written for strict structured outputs. `analysis` is one of seven shapes, told apart by `kind`; rows without a default below must be sent.
+The plan is what the planner model writes, what `POST /v1/analyses` accepts and what every response echoes in `meta.plan`. It is a closed vocabulary: no field can hold a data value, a row or an NCT ID. Every field is required, because the schema is written for strict structured outputs. `analysis` is one of eight shapes, told apart by `kind`; rows without a default below must be sent.
 
 ### QueryPlan
 
@@ -147,7 +147,7 @@ The plan is what the planner model writes, what `POST /v1/analyses` accepts and 
 | `interpretation` | string | yes |  |  | One sentence restating what will be counted and how it is grouped. No figures other than those in the question. |
 | `entities` | [`Entity`](#entity)[] | yes |  | at most 12 items | Named drugs, conditions, sponsors, countries or other terms. |
 | `filters` | [`PlanFilters`](#planfilters) | yes |  |  |  |
-| `analysis` | [`Aggregate`](#aggregate) \| [`Total`](#total) \| [`Relate`](#relate) \| [`Network`](#network) \| [`TrialList`](#triallist) \| [`Clarify`](#clarify) \| [`Unsupported`](#unsupported) | yes |  |  |  |
+| `analysis` | [`Aggregate`](#aggregate) \| [`Total`](#total) \| [`Relate`](#relate) \| [`Network`](#network) \| [`TrialList`](#triallist) \| [`Clarify`](#clarify) \| [`Unsupported`](#unsupported) \| [`Converse`](#converse) | yes |  |  |  |
 | `chart_preference` | `bar_chart` \| `time_series` \| `histogram` \| `scatter_plot` \| `network_graph` \| `table` \| `metric` \| null | yes |  |  | Only when the user names a chart form; otherwise null. |
 | `unapplied` | string[] | yes |  | at most 5 items | Words copied from the question that ask to make part of the chart look different (highlight, mark, annotate, colour); empty otherwise, and empty for most questions. Never a counting rule or a wish for a clear chart, and never a reason for 'unsupported'. |
 
@@ -251,9 +251,16 @@ The plan is what the planner model writes, what `POST /v1/analyses` accepts and 
 | `category` | `not_about_clinical_trials` \| `needs_data_not_in_registry` \| `single_trial_lookup` \| `analysis_not_supported` \| `other` | yes |  |  |  |
 | `reason` | string | yes |  |  | One sentence. No figures other than those in the question. |
 
+### Converse
+
+| Field | Type | Required | Default | Constraints | Description |
+| --- | --- | --- | --- | --- | --- |
+| `kind` | `converse` | yes |  |  |  |
+| `topic` | `greeting` \| `thanks` \| `capabilities` \| `small_talk` | yes |  |  |  |
+
 ## Response envelope and non-chart outcomes
 
-Every HTTP 200 body has the same seven keys: `spec_version`, `kind`, `message`, `visualization`, `clarification`, `references` and `meta`. `kind` says which of three shapes it is. A finished interpretation is always HTTP 200, also when there is nothing to draw: `clarification` (the service needs a name or a choice), `unsupported` (outside what the service answers) and `no_data` (the plan ran and nothing matched) all carry `visualization: null` and `references: {}`. HTTP errors are for failures of the service or of its dependencies.
+Every HTTP 200 body has the same seven keys: `spec_version`, `kind`, `message`, `visualization`, `clarification`, `references` and `meta`. `kind` says which of three shapes it is. A finished interpretation is always HTTP 200, also when there is nothing to draw: `clarification` (the service needs a name or a choice), `unsupported` (outside what the service answers), `conversation` (a greeting, thanks or a question about the service; no registry call) and `no_data` (the plan ran and nothing matched) all carry `visualization: null` and `references: {}`. HTTP errors are for failures of the service or of its dependencies.
 
 Conventions that hold everywhere in a response:
 
@@ -280,7 +287,7 @@ One of these shapes, chosen by `kind`:
 | --- | --- | --- |
 | `visualization` | [`VisualizationResponse`](#visualizationresponse) | An answer drawn as a chart, a number or a table. |
 | `clarification` | [`ClarificationResponse`](#clarificationresponse) | The service needs a name or a choice before it can answer. |
-| `no_data`, `unsupported` | [`MessageResponse`](#messageresponse) | Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run. |
+| `conversation`, `no_data`, `unsupported` | [`MessageResponse`](#messageresponse) | Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run, `conversation` for a greeting, thanks or a question about the service itself (no registry call). |
 
 ### VisualizationResponse
 
@@ -312,12 +319,13 @@ The service needs a name or a choice before it can answer.
 
 ### MessageResponse
 
-Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run.
+Nothing to draw: `no_data` when the plan ran and matched nothing, `unsupported` when it cannot run,
+`conversation` for a greeting, thanks or a question about the service itself (no registry call).
 
 | Field | Type | Description |
 | --- | --- | --- |
 | `spec_version` | `1.0` |  |
-| `kind` | `no_data` \| `unsupported` |  |
+| `kind` | `no_data` \| `unsupported` \| `conversation` |  |
 | `message` | string |  |
 | `visualization` | null |  |
 | `clarification` | null |  |

@@ -21,6 +21,7 @@ import structlog
 from pydantic_core import to_jsonable_python
 from structlog.typing import FilteringBoundLogger
 
+from ctviz import examples
 from ctviz.applied import applied_filters
 from ctviz.catalog.countries import CountryTable
 from ctviz.catalog.fields import FieldSpec
@@ -197,7 +198,11 @@ async def execute(
     """
     watch = _Stopwatch(plan_ms)
     if planned.outcome is not None:
-        return outcome_response(_MetaBuilder(planned, ctx, deps, watch).build(), planned.outcome)
+        outcome = planned.outcome
+        if outcome.kind == "conversation":
+            directory = examples.examples_directory(deps.settings)
+            outcome = replace(outcome, followups=tuple(examples.suggestions(directory)))
+        return outcome_response(_MetaBuilder(planned, ctx, deps, watch).build(), outcome)
     version = await deps.ctgov.version()
     if not planned.options.use_cache:
         return await _run(planned, deps, ctx, watch, version, progress)

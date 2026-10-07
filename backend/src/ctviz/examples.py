@@ -5,6 +5,8 @@ import re
 from pathlib import Path
 from typing import Final
 
+from ctviz.contract.request import QueryRequest
+from ctviz.contract.response import LabeledRequest
 from ctviz.settings import REPOSITORY_ROOT, Settings
 
 _SLUG: Final = re.compile(r"^\d{2}-[a-z0-9-]+$")
@@ -51,6 +53,25 @@ def summaries(directory: Path) -> list[Document]:
             }
         )
     return listing
+
+
+def suggestions(directory: Path, limit: int = 3) -> list[LabeledRequest]:
+    """Ready-made questions for a conversational reply: recorded charts asked in the question alone, each of
+    a different chart type, in the order of the recordings."""
+    chosen: list[LabeledRequest] = []
+    seen: set[object] = set()
+    for item in summaries(directory):
+        query, kind = item["query"], item["kind"]
+        if kind != "visualization" or item["visualization_type"] in seen or not isinstance(query, str):
+            continue
+        request = _read(directory / str(item["slug"]) / "request.json")
+        if set(request) != {"query"}:
+            continue  # a recording that needs a structured field is no stand-alone question
+        seen.add(item["visualization_type"])
+        chosen.append(LabeledRequest(label=query, request=QueryRequest(query=query)))
+        if len(chosen) == limit:
+            break
+    return chosen
 
 
 def _read(path: Path) -> Document:

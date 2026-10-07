@@ -153,7 +153,9 @@ def _message_response(
 ) -> MessageResponse:
     if outcome.kind == "clarification":
         raise ValueError("A clarification is not a message response.")
-    meta = build_meta(context, plan=plan, shaped=shaped, extra_warnings=outcome.warnings)
+    meta = build_meta(
+        context, plan=plan, shaped=shaped, extra_warnings=outcome.warnings, extra_followups=outcome.followups
+    )
     return MessageResponse(kind=outcome.kind, message=outcome.message, meta=meta)
 
 
@@ -199,6 +201,7 @@ def build_meta(
     built: Built | None = None,
     book: CitationBook | None = None,
     extra_warnings: Sequence[Note] = (),
+    extra_followups: Sequence[LabeledRequest] = (),
 ) -> Meta:
     """Everything about the answer other than what is drawn; the parts that need data are null without it."""
     counts, counts_warnings = _counts(shaped, built) if shaped is not None else (None, [])
@@ -241,7 +244,7 @@ def build_meta(
             selection=text.citation_selection([step.name for step in context.strategy]),
             trials_cited=len(book.references()) if book is not None else 0,
         ),
-        suggested_followups=_followups(context, plan, shaped),
+        suggested_followups=[*_followups(context, plan, shaped), *extra_followups],
         cache=context.cache,
         timing=context.timing,
         debug=Debug(trace=list(context.trace)) if context.trace is not None else None,

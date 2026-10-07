@@ -9,7 +9,7 @@ import type { ClarificationResponse, MessageResponse, QueryRequest } from "@/lib
 
 import { Followups } from "./notes";
 
-/** Clarification, no data and unsupported: all HTTP 200 answers that carry no chart. */
+/** Clarification, no data and unsupported (a conversation reply has its own, plain, component): all HTTP 200 answers that carry no chart. */
 export function OutcomeCard({
   response,
   onRun,
@@ -39,6 +39,22 @@ export function OutcomeCard({
         {response.meta.suggested_followups.length > 0 ? <Followups items={response.meta.suggested_followups} onRun={onRun} /> : null}
       </AlertDescription>
     </Alert>
+  );
+}
+
+/** A greeting, thanks or a question about the service: the reply is a plain message, with questions to click. */
+export function ConversationReply({
+  response,
+  onRun,
+}: {
+  response: MessageResponse;
+  onRun: (request: QueryRequest, label?: string) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-3" data-outcome="conversation">
+      <p className="max-w-[88%] rounded-2xl rounded-bl-md bg-muted px-3.5 py-2 text-sm break-words sm:max-w-[75%]">{response.message}</p>
+      <Followups items={response.meta.suggested_followups} onRun={onRun} />
+    </div>
   );
 }
 

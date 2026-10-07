@@ -28,7 +28,7 @@ EVALUATION_ENTITIES = {
 
 
 def test_the_version_names_the_current_prompt() -> None:
-    assert PROMPT_VERSION == "plan-v6"
+    assert PROMPT_VERSION == "plan-v7"
 
 
 def test_the_rules_are_printed_in_the_instructions() -> None:

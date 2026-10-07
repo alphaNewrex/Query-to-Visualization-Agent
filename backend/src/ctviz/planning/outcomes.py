@@ -8,7 +8,7 @@ from collections.abc import Sequence
 from typing import Final
 
 from ctviz.catalog.fields import CATALOG
-from ctviz.contract.plan import Clarify, PlanIssue, QueryPlan, Unsupported
+from ctviz.contract.plan import Clarify, Converse, PlanIssue, QueryPlan, Unsupported
 from ctviz.contract.response import Clarification, ClarificationReason, LabeledRequest, Outcome
 from ctviz.planning.findings import Findings
 from ctviz.planning.grounding import (
@@ -46,6 +46,10 @@ _UNSUPPORTED_MESSAGES: Final = {
     "offer. {offered}",
     "other": "This question cannot be answered by this service.",
 }
+_SERVICE: Final = (
+    "This service answers questions about clinical trials registered on ClinicalTrials.gov "
+    "with a chart, a number or a table."
+)
 DECLINED_MESSAGE: Final = "The planning model declined this question, so nothing was drawn."
 COULD_NOT_INTERPRET_MESSAGE: Final = (
     "The question could not be turned into a checked plan, so nothing was drawn. "
@@ -78,6 +82,22 @@ def unsupported(category: str) -> Outcome:
     return Outcome(kind="unsupported", reason=category, message=message.format(offered=_offered()).strip())
 
 
+def conversation(topic: str) -> Outcome:
+    """A reply to a greeting, thanks or a question about the service: a template per topic, no data fetched.
+
+    Suggested follow-ups are attached by the pipeline, which knows where the examples live.
+    """
+    if topic == "thanks":
+        message = "You are welcome. Ask another question about clinical trials whenever you like."
+    elif topic == "capabilities":
+        message = f"{_SERVICE} {_offered()}"
+    elif topic == "small_talk":
+        message = f"{_SERVICE} Ask a question about trials to get started."
+    else:
+        message = f"Hello! {_SERVICE}"
+    return Outcome(kind="conversation", reason=topic, message=message)
+
+
 def could_not_interpret(issues: Sequence[PlanIssue] = ()) -> Outcome:
     """A plan that stayed blocked: the sentences code wrote for each problem say what was wrong."""
     reasons = " ".join(dict.fromkeys(issue.message for issue in issues))
@@ -92,6 +112,8 @@ def outcome_of_analysis(plan: QueryPlan) -> Outcome | None:
     analysis = plan.analysis
     if isinstance(analysis, Unsupported):
         return unsupported(analysis.category)
+    if isinstance(analysis, Converse):
+        return conversation(analysis.topic)
     if isinstance(analysis, Clarify):
         return clarification(analysis.reason, _clarify_message(analysis), analysis.missing)
     return None
@@ -116,6 +138,8 @@ def direct_outcome(plan: QueryPlan, facts: Facts, found: Findings) -> tuple[Quer
     if isinstance(plan.analysis, Unsupported):
         # A plan marked unsupported is answered before any entity check can ask a question.
         return plan, unsupported(plan.analysis.category)
+    if isinstance(plan.analysis, Converse):
+        return plan, conversation(plan.analysis.topic)
     if facts.mode == "model":
         plan, outcome = _placeholders(plan, facts, found)
         if outcome is not None:

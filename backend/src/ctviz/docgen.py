@@ -414,11 +414,11 @@ _SECTIONS: Final = (
         "The plan is what the planner model writes, what `POST /v1/analyses` accepts and what every "
         "response echoes in `meta.plan`. It is a closed vocabulary: no field can hold a data value, a row "
         "or an NCT ID. Every field is required, because the schema is written for strict structured "
-        "outputs. `analysis` is one of seven shapes, told apart by `kind`; rows without a default below "
+        "outputs. `analysis` is one of eight shapes, told apart by `kind`; rows without a default below "
         "must be sent.",
         _names(
             "QueryPlan Entity PlanFilters FilterEvidence Aggregate Total Relate Network TrialList "
-            "Clarify Unsupported"
+            "Clarify Unsupported Converse"
         ),
     ),
     Section(
@@ -427,7 +427,8 @@ _SECTIONS: Final = (
         "`visualization`, `clarification`, `references` and `meta`. `kind` says which of three shapes it "
         "is. A finished interpretation is always HTTP 200, also when there is nothing to draw: "
         "`clarification` (the service needs a name or a choice), `unsupported` (outside what the service "
-        "answers) and `no_data` (the plan ran and nothing matched) all carry `visualization: null` and "
+        "answers), `conversation` (a greeting, thanks or a question about the service; no registry call) and "
+        "`no_data` (the plan ran and nothing matched) all carry `visualization: null` and "
         "`references: {}`. HTTP errors are for failures of the service or of its dependencies.\n\n"
         "Conventions that hold everywhere in a response:\n\n" + _CONVENTIONS,
         _names(

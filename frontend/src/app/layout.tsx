@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ClinicalTrials.gov Query-to-Visualization Agent",
+  title: "CTViz Agent",
   description: "Turns questions about clinical trials into charts backed by ClinicalTrials.gov data.",
 };
 

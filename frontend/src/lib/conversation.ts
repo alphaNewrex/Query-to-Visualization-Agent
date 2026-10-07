@@ -173,7 +173,8 @@ export function threadReducer(thread: Thread, action: ThreadAction): Thread {
 export function contextOf(thread: Thread): Previous | null {
   for (let i = thread.turns.length - 1; i >= 0; i--) {
     const { state, request } = thread.turns[i];
-    if (state.tag === "done" && state.response.meta.plan) {
+    // A greeting or thanks has no scope to carry: skipping it keeps the last real answer open to follow-ups.
+    if (state.tag === "done" && state.response.kind !== "conversation" && state.response.meta.plan) {
       return { query: request.query ?? null, plan: state.response.meta.plan };
     }
   }

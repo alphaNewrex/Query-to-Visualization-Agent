@@ -57,7 +57,7 @@ def test_the_query_request_table_marks_query_required_and_prints_its_bounds(refe
     assert rows[0] == ["Field", "Type", "Required", "Default", "Constraints", "Description"]
     query = by_field(rows)["query"]
     assert query[2] == "yes"
-    assert query[4] == "3 to 1,000 characters"
+    assert query[4] == "1 to 1,000 characters"
 
 
 def test_defaults_and_limits_are_read_inside_unions_and_arrays(reference: str) -> None:
@@ -130,7 +130,7 @@ def test_a_union_lists_its_shapes_by_their_tag(reference: str) -> None:
     shapes = {row[0]: row[1] for row in table_under(reference, "### QueryResponse")[2:]}
 
     assert shapes["`visualization`"] == "[`VisualizationResponse`](#visualizationresponse)"
-    assert shapes["`no_data`, `unsupported`"] == "[`MessageResponse`](#messageresponse)"
+    assert shapes["`conversation`, `no_data`, `unsupported`"] == "[`MessageResponse`](#messageresponse)"
     assert len(table_under(reference, "### Visualization")[2:]) == 7
 
 

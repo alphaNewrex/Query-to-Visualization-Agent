@@ -96,8 +96,8 @@ function parseYear(text: string): number | null {
 export function validate(values: FormValues): FormErrors {
   const errors: FormErrors = {};
   const query = values.query.trim();
-  if (query.length < 3) {
-    errors.query = "Write at least three characters.";
+  if (query.length === 0) {
+    errors.query = "Write a question or a message.";
   } else if (query.length > 1000) {
     errors.query = "Keep the question under 1,000 characters.";
   } else if (!/\p{L}/u.test(query)) {

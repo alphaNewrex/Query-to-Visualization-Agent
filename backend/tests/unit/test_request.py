@@ -16,7 +16,7 @@ def test_whitespace_in_the_query_is_collapsed() -> None:
     assert make(query="  trials\n\tper   year ").query == "trials per year"
 
 
-@pytest.mark.parametrize("query", ["ab", "123 456", "x" * 1001, "bad\x00query"])
+@pytest.mark.parametrize("query", ["12", "123 456", "x" * 1001, "bad\x00query"])
 def test_an_unusable_query_is_rejected(query: str) -> None:
     with pytest.raises(ValidationError):
         make(query=query)

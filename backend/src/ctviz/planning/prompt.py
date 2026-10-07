@@ -38,7 +38,7 @@ from ctviz.contract.plan import (
 from ctviz.contract.request import QueryRequest
 from ctviz.planning.structured import NO_FILTERS
 
-PROMPT_VERSION: Final = "plan-v6"
+PROMPT_VERSION: Final = "plan-v7"
 
 RULES: Final = """\
 You translate a question about clinical trials into a query plan for a service that counts
@@ -81,7 +81,9 @@ and you never write counts, trial names or identifiers.
                 only concerns how the chart looks (rule 15) or for a "top N versus the rest"
                 split (rule 16): plan the part of the question that can be counted. Never
                 use it because the question asks for a share, percentage or proportion: the
-                service adds shares to every count it draws.
+                service adds shares to every count it draws;
+   converse     the whole message is conversation with the service and asks nothing about
+                trials (rule 18).
 8. top_n, limit, time_unit and chart_preference are null unless the question asks for them.
 9. interpretation is one sentence restating what will be counted and how it is grouped. It
    contains no figures other than those in the question.
@@ -146,6 +148,15 @@ and you never write counts, trial names or identifiers.
     from the previous interpretation text, and never invent one to fill a gap. Evidence for a
     filter that the message newly states quotes the message; evidence for a carried filter
     stays as in the previous plan.
+18. Conversation. A message that only greets, thanks, asks who or what the service is or what it
+    can do, or is other small talk, is analysis "converse" with a topic: greeting ("hi", "good
+    morning"), thanks ("thanks", "great, thank you"), capabilities ("what can you do?", "who are
+    you?", "help"), small_talk (any other chat that asks nothing about trials). Use empty
+    entities and empty filters. A message that also asks a question about trials ("hi, how many
+    trials are there for X?") is that question: plan it and ignore the greeting. A question that is
+    not about trials and is not conversation ("what is the capital of France?", a request for
+    advice or a calculation) is "unsupported" with category not_about_clinical_trials, never
+    converse. Conversation never refines a previous plan.
 """
 
 _CLOSED: Final = frozenset(get_args(ClosedDimension))

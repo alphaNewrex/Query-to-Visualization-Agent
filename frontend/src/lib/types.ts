@@ -18,7 +18,7 @@ export type { AnalysisRequest, Citation, Datum, ErrorResponse, QueryPlan, QueryR
 
 export type VisualizationResponse = Extract<QueryResponse, { kind: "visualization" }>;
 export type ClarificationResponse = Extract<QueryResponse, { kind: "clarification" }>;
-export type MessageResponse = Extract<QueryResponse, { kind: "no_data" | "unsupported" }>;
+export type MessageResponse = Extract<QueryResponse, { kind: "no_data" | "unsupported" | "conversation" }>;
 
 export type Viz = NonNullable<QueryResponse["visualization"]>;
 export type VizType = Viz["type"];

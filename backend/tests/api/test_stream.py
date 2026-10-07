@@ -120,7 +120,7 @@ async def test_a_failure_after_the_stream_began_is_one_error_event() -> None:
 
 
 async def test_a_bad_body_is_still_an_ordinary_422(structured: httpx2.AsyncClient) -> None:
-    reply = await structured.post("/v1/query/stream", json={"query": "x"})
+    reply = await structured.post("/v1/query/stream", json={"query": "12"})
     assert reply.status_code == 422 and reply.json()["error"]["code"] == "invalid_request"
 
 

@@ -4,7 +4,7 @@ import { type Answered, contextOf, conversationOf, EMPTY_THREAD, stepLabel, type
 import type { QueryPlan, QueryResponse } from "@/lib/types";
 
 import { makeMeta } from "./fixtures/build";
-import { noData, timeSeries } from "./fixtures/responses";
+import { conversation, noData, timeSeries } from "./fixtures/responses";
 
 const plan = (name: string) => ({ marker: name }) as unknown as QueryPlan;
 
@@ -49,6 +49,13 @@ describe("contextOf", () => {
     const answered: Answered = { response: { ...noData, meta: { ...noData.meta, plan: plan("none") } }, sent: { query: "q" }, source: "live", example: null };
     const thread = run([ask(1, "q"), { type: "done", id: 1, answered }]);
     expect(contextOf(thread)).toEqual({ query: "q", plan: plan("none") });
+  });
+
+  it("skips a conversational reply, so a greeting does not end the follow-ups to the last answer", () => {
+    const hello: Answered = { response: { ...conversation, meta: { ...conversation.meta, plan: plan("hello") } }, sent: { query: "Hi" }, source: "live", example: null };
+    const thread = run([ask(1, "first"), { type: "done", id: 1, answered: answer("first") }, ask(2, "Hi"), { type: "done", id: 2, answered: hello }]);
+    expect(contextOf(thread)).toEqual({ query: "first", plan: plan("first") });
+    expect(contextOf(run([ask(1, "Hi"), { type: "done", id: 1, answered: hello }]))).toBeNull();
   });
 
   it("is null again after a new conversation", () => {

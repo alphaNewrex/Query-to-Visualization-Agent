@@ -15,7 +15,7 @@ import type { AnalysisRequest, DatumSelection, QueryRequest, QueryResponse, Viz 
 
 import { ErrorBoundary } from "./error-boundary";
 import { Notes } from "./notes";
-import { OutcomeCard } from "./outcome-card";
+import { ConversationReply, OutcomeCard } from "./outcome-card";
 import { TraceTab } from "./trace-tab";
 
 function CopyButton({ text }: { text: string }) {
@@ -80,6 +80,9 @@ export function ResultView({
 }) {
   const outcome = classify(response);
 
+  if (outcome.tag === "conversation") {
+    return <ConversationReply response={outcome.response} onRun={onRun} />;
+  }
   if (outcome.tag === "clarification" || outcome.tag === "message") {
     return <OutcomeCard response={outcome.response} onRun={onRun} />;
   }

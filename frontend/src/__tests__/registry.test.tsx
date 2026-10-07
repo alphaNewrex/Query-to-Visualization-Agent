@@ -7,7 +7,7 @@ import { ResultView } from "@/components/result-view";
 import { RENDERERS } from "@/components/viz/registry";
 import type { DatumSelection, QueryResponse } from "@/lib/types";
 
-import { allFixtures, barChart, chartFixtures, metric, network, table, timeSeries } from "./fixtures/responses";
+import { allFixtures, barChart, chartFixtures, conversation, metric, network, table, timeSeries } from "./fixtures/responses";
 
 afterEach(cleanup);
 
@@ -32,6 +32,13 @@ describe("registry", () => {
     } else {
       expect(container.querySelector(`[data-outcome="${response.kind}"]`)).not.toBeNull();
     }
+  });
+
+  it("shows a conversational reply as a plain message with a button for each suggested question", () => {
+    const { container } = show(conversation);
+    expect(container.querySelector('[role="alert"]')).toBeNull();
+    expect(container.textContent).not.toMatch(/not supported/i);
+    expect(screen.getByRole("button", { name: "How many recruiting trials are there for lung cancer?" })).toBeTruthy();
   });
 
   it("draws every table row and network node as its own mark", () => {

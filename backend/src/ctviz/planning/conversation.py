@@ -43,7 +43,7 @@ NEW_QUESTION = Conversation(is_follow_up=False, carried_over=[], changed=[])
 
 def describe(previous: QueryPlan | None, plan: QueryPlan) -> Described:
     """Diff two plans; with no previous plan, or when nothing of it was kept, the lists are empty."""
-    if previous is None:
+    if previous is None or plan.analysis.kind == "converse":
         return Described(NEW_QUESTION, ())
     carried: list[str] = []
     changed: list[str] = []
@@ -131,7 +131,7 @@ def _years(previous: QueryPlan, plan: QueryPlan, carried: list[str], changed: li
 
 def _analysis(previous: QueryPlan, plan: QueryPlan, carried: list[str], changed: list[str]) -> None:
     old, new = previous.analysis, plan.analysis
-    if old.kind in ("clarify", "unsupported") or new.kind in ("clarify", "unsupported"):
+    if {old.kind, new.kind} & {"clarify", "unsupported", "converse"}:
         return
     if not (isinstance(old, Aggregate) and isinstance(new, Aggregate)):
         if old.kind == new.kind:
